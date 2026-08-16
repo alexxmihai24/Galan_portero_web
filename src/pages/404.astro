@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base titulo="Página no encontrada" descripcion="Esta página no existe en bodegasgalanportero.com.">
+  <section class="perdido">
+    <div class="contenedor perdido__interior">
+      <p class="sello">Error 404</p>
+      <h1 class="perdido__titulo display">Aquí no<br />hay nada</h1>
+      <p class="perdido__texto lectura">
+        La página que buscas no existe o ha cambiado de sitio. Vuelve a la bodega y sigue por donde quieras.
+      </p>
+      <div class="perdido__acciones">
+        <a class="boton boton--solido" href="/">
+          Volver al inicio
+          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="boton" href="/vinos">Ver los vinos</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .perdido {
+    min-height: 78svh;
+    display: grid;
+    align-items: center;
+    padding-block: var(--e-6);
+  }
+
+  .perdido__titulo {
+    font-size: var(--t-5);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .perdido__texto {
+    color: var(--texto-tenue);
+  }
+
+  .perdido__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+    margin-top: var(--e-3);
+  }
+</style>

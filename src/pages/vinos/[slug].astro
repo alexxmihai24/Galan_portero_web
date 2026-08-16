@@ -1,0 +1,463 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import SelectorCantidad from '../../components/SelectorCantidad';
+import { vinos, enlaceCompra, euros, ENVIO_GRATIS_DESDE, TIENDA } from '../../data/vinos';
+
+import solera from '../../assets/fotos/solera-2.jpg';
+
+export function getStaticPaths() {
+  return vinos.map((vino) => ({ params: { slug: vino.slug }, props: { vino } }));
+}
+
+const { vino } = Astro.props;
+
+// El enlace se arma en el servidor para no repetir la forma de la URL en el cliente.
+const opciones = vino.variaciones.map((v) => ({ ...v, enlace: enlaceCompra(vino, v) }));
+const minimo = Math.min(...vino.variaciones.map((v) => v.precio));
+const maximo = Math.max(...vino.variaciones.map((v) => v.precio));
+
+const otros = vinos.filter((v) => v.slug !== vino.slug).slice(0, 4);
+---
+
+<Base titulo={vino.corto} descripcion={vino.resumen.slice(0, 180)}>
+  <article class="producto">
+    <nav class="miga contenedor" aria-label="Migas de pan">
+      <a class="enlace" href="/vinos">Vinos</a>
+      <span aria-hidden="true">/</span>
+      <span>{vino.gama}</span>
+      <span aria-hidden="true">/</span>
+      <span class="miga__actual">{vino.corto}</span>
+    </nav>
+
+    <div class="contenedor producto__interior">
+      <figure class="producto__foto">
+        <Image
+          src={vino.imagen}
+          alt={vino.nombre}
+          widths={[420, 720, 1080]}
+          sizes="(max-width: 62rem) 88vw, 32rem"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+
+      <div class="producto__ficha">
+        <p class="sello">{vino.gama} &middot; {vino.estilo}</p>
+        <h1 class="producto__nombre display">{vino.nombre}</h1>
+        <p class="producto__gancho italica">{vino.gancho}</p>
+
+        <p class="producto__rango">
+          {minimo === maximo ? euros(minimo) : `${euros(minimo)} – ${euros(maximo)}`}
+        </p>
+
+        <p class="producto__resumen">{vino.resumen}</p>
+
+        <SelectorCantidad client:visible opciones={opciones} nombre={vino.corto} />
+
+        <ul class="garantias">
+          <li>Envío gratis a península desde {ENVIO_GRATIS_DESDE} &euro;</li>
+          <li>Pago seguro en bodegasgalanportero.com</li>
+          <li>Denominación de Origen Protegida Montilla-Moriles</li>
+        </ul>
+      </div>
+    </div>
+  </article>
+
+  <!-- --------------------------------------------------------- la cata -->
+  <section class="cata-larga papel seccion">
+    <div class="contenedor cata-larga__interior">
+      <header class="revelar">
+        <p class="sello">Nota de cata</p>
+        <h2 class="cata-larga__titulo display">Cómo se bebe</h2>
+      </header>
+
+      <dl class="cata-larga__lista">
+        <div class="revelar" data-retardo="1">
+          <dt class="sello">Color</dt>
+          <dd>{vino.cata.color}</dd>
+        </div>
+        <div class="revelar" data-retardo="2">
+          <dt class="sello">Nariz</dt>
+          <dd>{vino.cata.aroma}</dd>
+        </div>
+        <div class="revelar" data-retardo="3">
+          <dt class="sello">Boca</dt>
+          <dd>{vino.cata.boca}</dd>
+        </div>
+        <div class="revelar" data-retardo="4">
+          <dt class="sello">Crianza</dt>
+          <dd>{vino.crianza}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------- criaderas -->
+  <section class="banda">
+    <div class="banda__foto">
+      <Image
+        src={solera}
+        alt="Botas del sistema de criaderas y soleras"
+        widths={[720, 1200, 1800]}
+        sizes="100vw"
+        loading="lazy"
+      />
+    </div>
+    <div class="banda__panel grano">
+      <div class="banda__texto">
+        <p class="sello">Criaderas y soleras</p>
+        <h2 class="banda__titulo display">El vino baja de escala en escala</h2>
+        <p class="lectura">
+          Se saca de la solera, la fila que toca el suelo, y esa se rellena con la criadera de encima. Así
+          hasta arriba. Ningún año se embotella solo: cada botella lleva un poco de todos los anteriores.
+        </p>
+        <a class="boton" href="/produccion">
+          Ver el proceso
+          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ otros -->
+  <section class="seccion">
+    <div class="contenedor">
+      <h2 class="otros__titulo display revelar">También de la casa</h2>
+      <ul class="otros">
+        {
+          otros.map((v, i) => (
+            <li class="revelar" data-retardo={(i % 4) + 1}>
+              <a class="mini" href={`/vinos/${v.slug}`}>
+                <figure class="mini__foto">
+                  <Image
+                    src={v.imagen}
+                    alt={v.nombre}
+                    widths={[220, 400]}
+                    sizes="(max-width: 48rem) 42vw, 14rem"
+                    loading="lazy"
+                  />
+                </figure>
+                <p class="mini__nombre">{v.corto}</p>
+                <p class="mini__precio">Desde {euros(Math.min(...v.variaciones.map((x) => x.precio)))}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: vino.nombre,
+      description: vino.resumen,
+      brand: { '@type': 'Brand', name: 'Bodegas Galán Portero' },
+      category: vino.estilo,
+      offers: vino.variaciones.map((v) => ({
+        '@type': 'Offer',
+        name: v.formato,
+        price: v.precio,
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/InStock',
+        url: `${TIENDA}/producto/`,
+      })),
+    })}
+  />
+</Base>
+
+<style>
+  .producto {
+    padding-top: calc(var(--e-6) + 1rem);
+  }
+
+  .miga {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    font-family: var(--sello);
+    font-size: var(--t--2);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--texto-tenue);
+    margin-bottom: var(--e-3);
+    align-items: center;
+  }
+
+  .miga a {
+    display: inline-block;
+    padding-block: 0.32rem;
+  }
+
+  .miga__actual {
+    color: var(--oro);
+  }
+
+  .producto__interior {
+    display: grid;
+    gap: var(--e-4);
+    align-items: start;
+    padding-bottom: var(--e-5);
+  }
+
+  @media (width >= 62rem) {
+    .producto__interior {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--e-5);
+    }
+  }
+
+  .producto__foto {
+    margin: 0;
+    background: linear-gradient(180deg, var(--azabache-80), color-mix(in srgb, var(--azabache) 90%, var(--caoba)));
+    border: 1px solid var(--filete);
+    padding: var(--e-4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Halo dorado detrás de la botella, el mismo lenguaje que la vitrina */
+  .producto__foto::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 62% 55% at 50% 42%,
+      color-mix(in srgb, var(--oro) 26%, transparent) 0%,
+      transparent 70%
+    );
+  }
+
+  .producto__foto :global(img) {
+    position: relative;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .producto__ficha {
+    display: grid;
+    gap: var(--e-2);
+    align-content: start;
+  }
+
+  .producto__nombre {
+    font-size: var(--t-3);
+  }
+
+  .producto__gancho {
+    font-size: var(--t-1);
+    color: color-mix(in srgb, var(--albariza) 85%, transparent);
+  }
+
+  .producto__rango {
+    font-family: var(--display);
+    font-size: var(--t-2);
+    color: var(--oro-claro);
+  }
+
+  .producto__resumen {
+    color: var(--texto-tenue);
+    padding-bottom: var(--e-1);
+    border-bottom: 1px solid var(--filete);
+  }
+
+  .garantias {
+    list-style: none;
+    margin: var(--e-1) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+    font-size: var(--t--2);
+    font-family: var(--sello);
+    letter-spacing: 0.06em;
+    color: var(--texto-tenue);
+  }
+
+  .garantias li {
+    padding-left: 1.4em;
+    position: relative;
+  }
+
+  .garantias li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.7em;
+    height: 1px;
+    background: var(--oro);
+  }
+
+  /* ---------------------------------------------------------- la cata */
+
+  .cata-larga__interior {
+    display: grid;
+    gap: var(--e-4);
+  }
+
+  @media (width >= 56rem) {
+    .cata-larga__interior {
+      grid-template-columns: 18rem 1fr;
+      gap: var(--e-5);
+    }
+  }
+
+  .cata-larga__titulo {
+    font-size: var(--t-3);
+    margin-top: 0.3em;
+  }
+
+  .cata-larga__lista {
+    margin: 0;
+    display: grid;
+    gap: 0;
+  }
+
+  .cata-larga__lista > div {
+    display: grid;
+    gap: 0.6rem;
+    padding-block: var(--e-3);
+    border-top: 1px solid var(--filete);
+  }
+
+  @media (width >= 40rem) {
+    .cata-larga__lista > div {
+      grid-template-columns: 8rem 1fr;
+      gap: var(--e-2);
+    }
+  }
+
+  .cata-larga__lista dt {
+    color: var(--caoba);
+  }
+
+  .cata-larga__lista dd {
+    margin: 0;
+    font-size: var(--t-1);
+    line-height: 1.6;
+  }
+
+  /* ----------------------------------------------------------- banda */
+
+  .banda {
+    position: relative;
+    display: grid;
+  }
+
+  .banda__foto,
+  .banda__panel {
+    grid-area: 1 / 1;
+  }
+
+  .banda__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    min-height: 24rem;
+    object-fit: cover;
+  }
+
+  .banda__panel {
+    position: relative;
+    display: grid;
+    align-items: center;
+    background: linear-gradient(
+      90deg,
+      var(--azabache) 0%,
+      color-mix(in srgb, var(--azabache) 86%, transparent) 48%,
+      transparent 100%
+    );
+  }
+
+  @media (width < 48rem) {
+    .banda__panel {
+      background: color-mix(in srgb, var(--azabache) 84%, transparent);
+    }
+  }
+
+  .banda__texto {
+    width: min(100% - 2.5rem, var(--ancho));
+    margin-inline: auto;
+    padding-block: var(--e-5);
+  }
+
+  @media (width >= 48rem) {
+    .banda__texto {
+      width: min(100% - 5rem, var(--ancho));
+      padding-inline-end: 48%;
+    }
+  }
+
+  .banda__titulo {
+    font-size: var(--t-3);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .banda__texto .boton {
+    margin-top: var(--e-3);
+  }
+
+  /* ------------------------------------------------------------ otros */
+
+  .otros__titulo {
+    font-size: var(--t-2);
+    margin-bottom: var(--e-3);
+  }
+
+  .otros {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--e-2);
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  }
+
+  .mini {
+    text-decoration: none;
+    display: grid;
+    gap: 0.4rem;
+    padding-bottom: var(--e-1);
+  }
+
+  .mini__foto {
+    margin: 0 0 0.6rem;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--azabache) 88%, var(--caoba));
+    border: 1px solid var(--filete);
+    transition: border-color 0.4s var(--salida);
+  }
+
+  .mini:hover .mini__foto {
+    border-color: color-mix(in srgb, var(--oro) 60%, transparent);
+  }
+
+  .mini__foto :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    padding: var(--e-2);
+    transition: scale 0.6s var(--salida);
+  }
+
+  .mini:hover .mini__foto :global(img) {
+    scale: 1.07;
+  }
+
+  .mini__nombre {
+    font-family: var(--display);
+    font-size: var(--t-1);
+  }
+
+  .mini__precio {
+    font-size: var(--t--2);
+    font-family: var(--sello);
+    letter-spacing: 0.1em;
+    color: var(--texto-tenue);
+  }
+</style>

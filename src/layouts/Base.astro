@@ -1,0 +1,107 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Encabezado from '../components/Encabezado.astro';
+import PieDePagina from '../components/PieDePagina.astro';
+
+import '@fontsource-variable/bodoni-moda';
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/archivo';
+import '../styles/global.css';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** Ruta de imagen social; por defecto la foto de la pasera */
+  imagen?: string;
+}
+
+const { titulo, descripcion, imagen = '/og-default.jpg' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const tituloCompleto = titulo === 'inicio' ? 'Bodegas Galán Portero' : `${titulo} · Bodegas Galán Portero`;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#17110e" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bodegas Galán Portero" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(imagen, Astro.site).href} />
+    <meta property="og:locale" content="es_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@galanportero" />
+
+    <ClientRouter />
+
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Winery',
+        name: 'Bodegas Galán Portero',
+        url: 'https://bodegasgalanportero.com',
+        telephone: '+34957664237',
+        email: 'info@bodegasgalanportero.com',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Av. del Marqués de la Vega de Armijo, 76',
+          postalCode: '14550',
+          addressLocality: 'Montilla',
+          addressRegion: 'Córdoba',
+          addressCountry: 'ES',
+        },
+        sameAs: [
+          'https://www.facebook.com/bodegasgalanportero/',
+          'https://www.instagram.com/bodegasgalanportero/',
+          'https://twitter.com/galanportero',
+        ],
+      })}
+    />
+  </head>
+
+  <body>
+    <a class="saltar" href="#principal">Saltar al contenido</a>
+    <Encabezado />
+    <main id="principal">
+      <slot />
+    </main>
+    <PieDePagina />
+
+    <script>
+      // Reserva para navegadores sin `animation-timeline: view()` (Safari, Firefox).
+      // Donde el timeline nativo existe, el CSS ya gana y esto no toca nada.
+      const soportaTimeline = CSS.supports('animation-timeline', 'view()');
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function activarRevelados() {
+        if (soportaTimeline || reduce) return;
+        const objetivos = document.querySelectorAll<HTMLElement>('.revelar:not(.visible)');
+        const io = new IntersectionObserver(
+          (entradas) => {
+            for (const e of entradas) {
+              if (!e.isIntersecting) continue;
+              e.target.classList.add('visible');
+              io.unobserve(e.target);
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0.05 },
+        );
+        objetivos.forEach((el) => io.observe(el));
+      }
+
+      activarRevelados();
+      document.addEventListener('astro:page-load', activarRevelados);
+    </script>
+  </body>
+</html>

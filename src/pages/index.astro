@@ -1,0 +1,722 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Vitrina from '../components/Vitrina.astro';
+import { marquesDeLaVega, pack, euros, enlaceCompraPack, ENVIO_GRATIS_DESDE } from '../data/vinos';
+
+import lagarPuntal from '../assets/fotos/lagar.jpg';
+import barrica from '../assets/fotos/barrica.jpg';
+import solera from '../assets/fotos/solera.jpg';
+import patio from '../assets/fotos/patio.jpg';
+import copas from '../assets/fotos/copas.jpg';
+
+const rasgos = [
+  { cifra: '1950', pie: 'Desde mediados del siglo XX' },
+  { cifra: '+30', pie: 'Años la solera fundadora' },
+  { cifra: '100%', pie: 'Uva Pedro Ximénez' },
+  { cifra: '415', pie: 'g/L de azúcar en su esplendor' },
+];
+---
+
+<Base
+  titulo="inicio"
+  descripcion="Bodega familiar en Montilla desde mediados del siglo XX. Pedro Ximénez de pasas y vinos generosos con Denominación de Origen Protegida Montilla-Moriles."
+>
+  <!-- ------------------------------------------------------------- hero -->
+  <section class="hero grano">
+    <div class="hero__foto">
+      <Image
+        src={lagarPuntal}
+        alt="El Lagar El Puntal, cortijo blanco sobre el viñedo de Pedro Ximénez en la campiña de Montilla"
+        widths={[720, 1200, 1800, 2400]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+
+    <div class="hero__texto contenedor">
+      <p class="sello hero__sello">Montilla &middot; Córdoba &middot; D.O.P. Montilla-Moriles</p>
+      <h1 class="hero__titulo display">
+        Se hace<br />
+        <span class="hero__enfasis italica">al sol</span>
+      </h1>
+      <p class="hero__entrada">
+        Vinos puros de pasas, naturales, dulces, de color rubí oscuro, obtenidos a partir del soleado previo
+        de la uva, casi hasta la pasificación.
+      </p>
+      <div class="hero__acciones">
+        <a class="boton boton--solido" href="/vinos">
+          Ver los vinos
+          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="boton" href="/bodega">Nuestra historia</a>
+      </div>
+    </div>
+
+    <p class="hero__desliza sello sello--tenue" aria-hidden="true">Desliza</p>
+  </section>
+
+  <!-- ------------------------------------------------------------ cifras -->
+  <section class="cifras">
+    <div class="contenedor cifras__rejilla">
+      {
+        rasgos.map((r, i) => (
+          <div class="cifra revelar" data-retardo={i + 1}>
+            <p class="cifra__valor display">{r.cifra}</p>
+            <p class="cifra__pie sello sello--tenue">{r.pie}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------- el vino -->
+  <section class="papel seccion" id="pedro-ximenez">
+    <div class="contenedor px">
+      <div class="px__texto revelar">
+        <p class="sello">Vino dulce Pedro Ximénez 100% de pasas</p>
+        <h2 class="px__titulo display">Auténtica<br />miel de uva</h2>
+        <div class="lectura">
+          <p>
+            Fruto de una historia marcada por la constancia en el trabajo, de una variedad de uva y un terreno
+            hechos el uno para el otro, y gracias a la pasión por un trabajo artesanal transmitida de padres a
+            hijos, elaboramos unos vinos dulces de una calidad excelsa.
+          </p>
+          <p>
+            Sometidos a crianza para aumentar lentamente su color en las botas. Color que pasa de ambarino a
+            tonalidades casi azabache, con contenidos mínimos en azúcares superiores a los 272 gramos por
+            litro, llegando a alcanzar los 415 gramos por litro una vez envejecido, en su estado de mayor
+            esplendor.
+          </p>
+          <p>
+            Se trata de vinos densos, cargados de agradables aromas varietales, con matices que recuerdan al
+            higo pasificado, el chocolate, el cacao, el café, el dátil y por supuesto el olor característico
+            de la uva pasificada que le da nombre.
+          </p>
+          <p class="italica px__remate">
+            Una verdadera delicia para los sentidos, fragante y frutoso, suave en la boca y en absoluto
+            empalagoso.
+          </p>
+        </div>
+        <a class="boton px__boton" href="/produccion">
+          Cómo se hace
+          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+
+      <div class="px__fotos">
+        <figure class="px__foto px__foto--alta revelar" data-retardo="1">
+          <Image
+            src={barrica}
+            alt="Barricas de roble americano en la bodega"
+            widths={[420, 720, 1000]}
+            sizes="(max-width: 62rem) 45vw, 22rem"
+            loading="lazy"
+          />
+        </figure>
+        <figure class="px__foto revelar" data-retardo="2">
+          <Image
+            src={copas}
+            alt="Copas de vino generoso servidas"
+            widths={[420, 720, 1000]}
+            sizes="(max-width: 62rem) 45vw, 20rem"
+            loading="lazy"
+          />
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------- vitrina -->
+  <Vitrina />
+
+  <!-- ------------------------------------------------------------- pack -->
+  <section class="pack papel seccion">
+    <div class="contenedor pack__interior">
+      <figure class="pack__foto revelar">
+        <Image
+          src={pack.imagen}
+          alt="Caja horizontal del Pack 5 Essences con las cinco botellas a la vista"
+          widths={[520, 860, 1200]}
+          sizes="(max-width: 56rem) 90vw, 34rem"
+          loading="lazy"
+        />
+      </figure>
+      <div class="pack__texto revelar" data-retardo="1">
+        <p class="sello">Las cinco, juntas</p>
+        <h2 class="pack__titulo display">{pack.nombre}</h2>
+        <p class="lectura">{pack.resumen}</p>
+        <ul class="pack__lista">
+          {pack.incluye.map((n) => <li>{n}</li>)}
+        </ul>
+        <p class="pack__precio">
+          <span class="sello sello--tenue">Precio</span>
+          <strong>{euros(pack.precio)}</strong>
+        </p>
+        <a class="boton boton--solido" href={enlaceCompraPack()} rel="noopener">
+          Comprar el pack
+          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------- marqués de la vega -->
+  <section class="mv seccion">
+    <div class="contenedor">
+      <header class="mv__cabecera revelar">
+        <p class="sello">Nuestra enseña</p>
+        <h2 class="mv__titulo display">Marqués de la Vega</h2>
+        <p class="mv__entrada lectura">
+          El Pedro Ximénez es un vino único en el mundo elaborado en las paseras de nuestra Denominación de
+          Origen. Estos dos son los nuestros.
+        </p>
+      </header>
+
+      <div class="mv__rejilla">
+        {
+          marquesDeLaVega.map((v, i) => (
+            <a class="ficha revelar" href={`/vinos/${v.slug}`} data-retardo={i + 1}>
+              <figure class="ficha__foto">
+                <Image
+                  src={v.imagen}
+                  alt={v.nombre}
+                  widths={[360, 620, 900]}
+                  sizes="(max-width: 48rem) 80vw, 26rem"
+                  loading="lazy"
+                />
+              </figure>
+              <div class="ficha__cuerpo">
+                <p class="sello sello--tenue">{v.estilo}</p>
+                <h3 class="ficha__nombre display">{v.corto}</h3>
+                <p class="ficha__gancho italica">{v.gancho}</p>
+                <p class="ficha__precio">
+                  Desde <strong>{euros(Math.min(...v.variaciones.map((x) => x.precio)))}</strong>
+                </p>
+                <span class="ficha__mas sello">
+                  Ver ficha <span aria-hidden="true">&rarr;</span>
+                </span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------- historia -->
+  <section class="historia">
+    <div class="historia__foto">
+      <Image
+        src={solera}
+        alt="Botas apiladas en el sistema de criaderas y soleras"
+        widths={[720, 1200, 1800]}
+        sizes="100vw"
+        loading="lazy"
+      />
+    </div>
+    <div class="historia__panel grano">
+      <div class="historia__texto">
+        <p class="sello">Desde mediados del siglo XX</p>
+        <h2 class="historia__titulo display">Pasión por lo nuestro</h2>
+        <p class="lectura">
+          Los fundadores, Don Antonio Galán López y Doña Soledad Portero Urbano, eran un matrimonio montillano
+          dedicado a la labor en el campo. Con unos hijos ya dispuestos para ayudar, decidieron fundar una
+          pequeña bodega familiar a raíz de los estupendos viñedos de la comarca.
+        </p>
+        <a class="boton" href="/bodega">
+          Conócenos
+          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- eventos -->
+  <section class="eventos papel seccion">
+    <div class="contenedor eventos__interior">
+      <div class="revelar">
+        <p class="sello">Para tu evento especial</p>
+        <h2 class="eventos__titulo display">Productos personalizados</h2>
+        <p class="lectura">
+          Botellas con etiqueta propia para bodas, comuniones, empresas y celebraciones. Nos dices qué
+          necesitas y lo preparamos.
+        </p>
+        <a class="boton" href="/personalizados">
+          Pedir presupuesto
+          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+      <figure class="eventos__foto revelar" data-retardo="1">
+        <Image
+          src={patio}
+          alt="Patio de la bodega en Montilla"
+          widths={[480, 800, 1200]}
+          sizes="(max-width: 56rem) 90vw, 28rem"
+          loading="lazy"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <p class="envio sello">
+    Envíos gratis a península desde sólo {ENVIO_GRATIS_DESDE} &euro;
+  </p>
+</Base>
+
+<style>
+  /* ------------------------------------------------------------- hero */
+
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-items: end;
+    padding-block: var(--e-6) var(--e-5);
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .hero__foto {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .hero__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* El cortijo del Puntal está sobre el 52%/32% de la foto: se ancla ahí para
+       que no se pierda al recortar en vertical, y el zoom va hacia él. */
+    object-position: 52% 34%;
+    transform-origin: 52% 34%;
+    animation: ken-burns 26s ease-in-out infinite alternate;
+  }
+
+  @keyframes ken-burns {
+    from {
+      scale: 1;
+    }
+    to {
+      scale: 1.11;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__foto :global(img) {
+      animation: none;
+    }
+  }
+
+  /* Velo para que el texto se lea sin apagar la foto */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--azabache) 72%, transparent) 0%, transparent 32%),
+      linear-gradient(
+        0deg,
+        var(--azabache) 4%,
+        color-mix(in srgb, var(--azabache) 78%, transparent) 34%,
+        color-mix(in srgb, var(--azabache) 45%, transparent) 58%,
+        transparent 88%
+      );
+  }
+
+  .hero__sello {
+    margin-bottom: var(--e-3);
+  }
+
+  .hero__titulo {
+    font-size: var(--t-6);
+    margin-bottom: var(--e-3);
+  }
+
+  .hero__enfasis {
+    color: var(--oro-claro);
+    display: inline-block;
+    padding-left: 0.14em;
+  }
+
+  .hero__entrada {
+    max-width: 34rem;
+    font-size: var(--t-1);
+    color: color-mix(in srgb, var(--albariza) 86%, transparent);
+    margin-bottom: var(--e-3);
+  }
+
+  .hero__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+  }
+
+  .hero__desliza {
+    position: absolute;
+    right: 2.5rem;
+    bottom: var(--e-3);
+    writing-mode: vertical-rl;
+    letter-spacing: 0.3em;
+  }
+
+  @media (width < 48rem) {
+    .hero__desliza {
+      display: none;
+    }
+  }
+
+  /* ----------------------------------------------------------- cifras */
+
+  .cifras {
+    background: var(--azabache-90);
+    border-block: 1px solid color-mix(in srgb, var(--oro) 20%, transparent);
+    padding-block: var(--e-3);
+  }
+
+  .cifras__rejilla {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--e-3) var(--e-2);
+  }
+
+  @media (width >= 56rem) {
+    .cifras__rejilla {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .cifra {
+    text-align: center;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .cifra__valor {
+    font-size: var(--t-3);
+    color: var(--oro-claro);
+  }
+
+  /* --------------------------------------------------------------- px */
+
+  .px {
+    display: grid;
+    gap: var(--e-4);
+    align-items: center;
+  }
+
+  @media (width >= 62rem) {
+    .px {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--e-5);
+    }
+  }
+
+  .px__titulo {
+    font-size: var(--t-4);
+    margin-block: 0.3em 0.55em;
+  }
+
+  .px__remate {
+    font-size: var(--t-1);
+    color: var(--caoba);
+  }
+
+  .px__boton {
+    margin-top: var(--e-3);
+  }
+
+  .px__fotos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e-2);
+    align-items: start;
+  }
+
+  .px__foto {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .px__foto :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    transition: scale 0.9s var(--salida);
+  }
+
+  .px__foto:hover :global(img) {
+    scale: 1.05;
+  }
+
+  .px__foto--alta {
+    margin-top: var(--e-4);
+  }
+
+  /* ------------------------------------------------------------- pack */
+
+  .pack {
+    --fondo: var(--albariza-hueso);
+    background: var(--fondo);
+  }
+
+  .pack__interior {
+    display: grid;
+    gap: var(--e-4);
+    align-items: center;
+  }
+
+  @media (width >= 56rem) {
+    .pack__interior {
+      grid-template-columns: 1.05fr 1fr;
+      gap: var(--e-5);
+    }
+  }
+
+  .pack__foto {
+    margin: 0;
+  }
+
+  .pack__titulo {
+    font-size: var(--t-3);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .pack__lista {
+    list-style: none;
+    padding: 0;
+    margin: var(--e-3) 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .pack__lista li {
+    font-family: var(--sello);
+    font-size: var(--t--2);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    border: 1px solid color-mix(in srgb, var(--azabache) 22%, transparent);
+    padding: 0.5em 0.85em;
+  }
+
+  .pack__precio {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    margin-bottom: var(--e-2);
+  }
+
+  .pack__precio strong {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: var(--t-2);
+  }
+
+  /* --------------------------------------------------------------- mv */
+
+  .mv__cabecera {
+    max-width: 42rem;
+    margin-bottom: var(--e-4);
+  }
+
+  .mv__titulo {
+    font-size: var(--t-4);
+    margin-block: 0.3em 0.45em;
+  }
+
+  .mv__entrada {
+    color: var(--texto-tenue);
+  }
+
+  .mv__rejilla {
+    display: grid;
+    gap: var(--e-3);
+  }
+
+  @media (width >= 48rem) {
+    .mv__rejilla {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .ficha {
+    text-decoration: none;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    background: var(--azabache-90);
+    border: 1px solid var(--filete);
+    transition:
+      border-color 0.5s var(--salida),
+      transform 0.5s var(--salida);
+  }
+
+  .ficha:hover,
+  .ficha:focus-visible {
+    border-color: color-mix(in srgb, var(--oro) 65%, transparent);
+    transform: translateY(-4px);
+  }
+
+  .ficha__foto {
+    margin: 0;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--azabache) 88%, var(--caoba));
+  }
+
+  .ficha__foto :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+    padding: var(--e-3);
+    transition: scale 0.7s var(--salida);
+  }
+
+  .ficha:hover .ficha__foto :global(img) {
+    scale: 1.06;
+  }
+
+  .ficha__cuerpo {
+    padding: var(--e-3);
+    display: grid;
+    gap: 0.55rem;
+    align-content: start;
+  }
+
+  .ficha__nombre {
+    font-size: var(--t-2);
+  }
+
+  .ficha__gancho {
+    color: var(--texto-tenue);
+  }
+
+  .ficha__precio {
+    font-size: var(--t--1);
+    color: var(--texto-tenue);
+  }
+
+  .ficha__precio strong {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: var(--t-1);
+    color: var(--albariza);
+  }
+
+  .ficha__mas {
+    margin-top: 0.4rem;
+  }
+
+  /* ---------------------------------------------------------- historia */
+
+  .historia {
+    position: relative;
+    display: grid;
+  }
+
+  .historia__foto {
+    grid-area: 1 / 1;
+  }
+
+  .historia__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    min-height: 26rem;
+    object-fit: cover;
+  }
+
+  .historia__panel {
+    grid-area: 1 / 1;
+    position: relative;
+    display: grid;
+    align-items: center;
+    background: linear-gradient(
+      90deg,
+      var(--azabache) 0%,
+      color-mix(in srgb, var(--azabache) 88%, transparent) 45%,
+      transparent 100%
+    );
+  }
+
+  @media (width < 48rem) {
+    .historia__panel {
+      background: color-mix(in srgb, var(--azabache) 84%, transparent);
+    }
+  }
+
+  .historia__texto {
+    width: min(100% - 2.5rem, var(--ancho));
+    margin-inline: auto;
+    max-width: 34rem;
+    padding-block: var(--e-5);
+  }
+
+  @media (width >= 48rem) {
+    .historia__texto {
+      width: min(100% - 5rem, var(--ancho));
+      padding-inline-end: 50%;
+      max-width: none;
+    }
+    .historia__texto .lectura {
+      max-width: 30rem;
+    }
+  }
+
+  .historia__titulo {
+    font-size: var(--t-4);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .historia__texto .boton {
+    margin-top: var(--e-3);
+  }
+
+  /* ---------------------------------------------------------- eventos */
+
+  .eventos__interior {
+    display: grid;
+    gap: var(--e-4);
+    align-items: center;
+  }
+
+  @media (width >= 56rem) {
+    .eventos__interior {
+      grid-template-columns: 1fr 0.85fr;
+      gap: var(--e-5);
+    }
+  }
+
+  .eventos__titulo {
+    font-size: var(--t-3);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .eventos__interior .boton {
+    margin-top: var(--e-3);
+  }
+
+  .eventos__foto {
+    margin: 0;
+  }
+
+  .eventos__foto :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  /* ------------------------------------------------------------ envío */
+
+  .envio {
+    text-align: center;
+    padding-block: var(--e-3);
+    background: var(--caoba);
+    color: var(--albariza);
+    margin: 0;
+  }
+</style>

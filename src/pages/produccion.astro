@@ -1,0 +1,673 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+
+import pasera from '../assets/fotos/pasera.jpg';
+import paseraMontilla from '../assets/fotos/pasera-montilla.jpg';
+import terreno from '../assets/fotos/terreno.jpg';
+import vidEspaldera from '../assets/fotos/vid-espaldera.jpg';
+import soldado from '../assets/fotos/soldado.jpg';
+import depositos from '../assets/fotos/depositos.jpg';
+
+const escalas = [
+  {
+    id: 'criadera-2',
+    sello: 'Arriba',
+    titulo: '2.ª criadera',
+    texto:
+      'La fila más joven. Recibe el vino nuevo del año y empieza a perder el carácter de mosto para ganar el de la bodega.',
+  },
+  {
+    id: 'criadera-1',
+    sello: 'En medio',
+    titulo: '1.ª criadera',
+    texto:
+      'Se rellena con lo que baja de arriba. Aquí el vino ya lleva años de bota y empieza a redondearse sobre el roble americano.',
+  },
+  {
+    id: 'solera',
+    sello: 'Abajo, tocando el suelo',
+    titulo: 'La solera',
+    texto:
+      'De aquí, y sólo de aquí, se saca lo que se embotella. Nunca se vacía del todo, así que cada botella lleva un poco de todos los años anteriores. Las nuestras superan los 25 años; la del Marqués de la Vega, los 30.',
+  },
+];
+---
+
+<Base
+  titulo="Producción"
+  descripcion="De la pasera a la bota: la uva Pedro Ximénez, los suelos albarizos de Montilla-Moriles, el soleado hasta la pasificación y el sistema de criaderas y soleras."
+>
+  <header class="portada grano">
+    <div class="portada__foto">
+      <Image
+        src={paseraMontilla}
+        alt="Paseras de Montilla con la uva extendida al sol"
+        widths={[720, 1200, 1800]}
+        sizes="100vw"
+        loading="eager"
+      />
+    </div>
+    <div class="contenedor portada__texto">
+      <p class="sello">Nuestras paseras en Montilla</p>
+      <h1 class="portada__titulo display">Vinos que te<br />elevan al cielo</h1>
+      <p class="portada__entrada">
+        Las particulares condiciones climatológicas que se dan en el marco de nuestra denominación de origen
+        hacen de ella una zona única en el mundo para el soleado de las uvas en las paseras.
+      </p>
+    </div>
+  </header>
+
+  <!-- ---------------------------------------------------------- leyenda -->
+  <section class="papel seccion">
+    <div class="contenedor leyenda">
+      <div class="leyenda__texto revelar">
+        <p class="sello">Dos mil años de vino</p>
+        <h2 class="leyenda__titulo display">La leyenda del soldado</h2>
+        <div class="lectura">
+          <p>
+            Existen varias leyendas acerca del origen de este vino. Desde que fue un soldado llamado Pedro
+            Ximénez quien, desde el Valle del Rhin, trajo la primera cepa hasta su Córdoba natal; hasta quien
+            asegura que el origen se encuentra en Portugal o Grecia.
+          </p>
+          <p>
+            Lo cierto es que la genealogía de los viñedos de la región de Montilla-Moriles se remonta a la
+            época romana, donde hace más de 2.000 años el vino, junto con el aceite, se exportaba en ánforas
+            que cruzaban el Mediterráneo con destino a la capital del Imperio Romano.
+          </p>
+          <p class="italica leyenda__remate">
+            Los restos de la cerámica cordobesa encontrada en la casa de Séneca dan fe de que el ilustre
+            filósofo abastecía su casa con vinos de esta región andaluza.
+          </p>
+        </div>
+      </div>
+      <figure class="leyenda__foto revelar" data-retardo="1">
+        <Image
+          src={soldado}
+          alt="Ilustración del soldado Pedro Ximénez"
+          widths={[380, 640, 900]}
+          sizes="(max-width: 62rem) 70vw, 24rem"
+          loading="lazy"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------- uva -->
+  <section class="seccion">
+    <div class="contenedor duo">
+      <figure class="duo__foto revelar">
+        <Image
+          src={vidEspaldera}
+          alt="Vid en espaldera en Montilla"
+          widths={[520, 860, 1200]}
+          sizes="(max-width: 62rem) 92vw, 32rem"
+          loading="lazy"
+        />
+      </figure>
+      <div class="duo__texto revelar" data-retardo="1">
+        <p class="sello">La variedad</p>
+        <h2 class="duo__titulo display">Pedro Ximénez</h2>
+        <div class="lectura">
+          <p>
+            Pedro Ximénez es una variedad de uva morfológicamente de aspecto redonda, de piel fina, casi
+            transparente.
+          </p>
+          <p>
+            Encuentra su hábitat ideal en climas secos y calurosos, en los que proporciona vinos generosos de
+            gran finura y elevado grado alcohólico natural.
+          </p>
+          <p>
+            Su altísima sensibilidad a los climas húmedos ha provocado que dejase de cultivarse en marcos
+            costeros, centrándose su producción más exclusiva y de mayor calidad en nuestro entorno
+            Montilla-Moriles.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------------- suelo -->
+  <section class="papel seccion">
+    <div class="contenedor duo duo--invertido">
+      <div class="duo__texto revelar">
+        <p class="sello">El terruño</p>
+        <h2 class="duo__titulo display">Tierras albarizas</h2>
+        <div class="lectura">
+          <p>
+            El suelo es un factor primordial en la calidad de todos los vinos. En el marco de Montilla-Moriles
+            predominan tierras albarizas, algunas de ellas con un alto contenido en sílice, ideal para el
+            cultivo de nuestra Pedro Ximénez.
+          </p>
+          <p>
+            Este mineral provoca una intensa refracción de la luz que adelanta en varios días la madurez de la
+            uva con respecto al resto de la zona, proporcionando mostos a finales de agosto, con una gran
+            riqueza en azúcares.
+          </p>
+          <p>
+            La existencia de suelos aireados, profundos, secos y ricos en carbonato cálcico, hacen del terreno
+            de la campiña cordobesa un perfecto sustrato para esta variedad.
+          </p>
+        </div>
+      </div>
+      <figure class="duo__foto revelar" data-retardo="1">
+        <Image
+          src={terreno}
+          alt="Suelo albarizo de la campiña cordobesa"
+          widths={[520, 860, 1200]}
+          sizes="(max-width: 62rem) 92vw, 32rem"
+          loading="lazy"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- pasera -->
+  <section class="soleado">
+    <div class="soleado__foto">
+      <Image
+        src={pasera}
+        alt="Racimos de Pedro Ximénez pasificándose al sol"
+        widths={[720, 1200, 1800]}
+        sizes="100vw"
+        loading="lazy"
+      />
+    </div>
+    <div class="soleado__panel grano">
+      <div class="contenedor soleado__texto">
+        <p class="sello">De 8 a 16 días</p>
+        <h2 class="soleado__titulo display">El soleado</h2>
+        <p class="lectura">
+          La uva se extiende en la pasera y se deja al sol hasta la pasificación. Pierde agua, concentra
+          azúcar y deja de ser uva para ser pasa. Una vez alcanzado su nivel óptimo, se moltura.
+        </p>
+        <p class="soleado__dato display">
+          272&nbsp;&ndash;&nbsp;415 <span class="soleado__unidad sello">gramos de azúcar por litro</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------- criaderas y soleras -->
+  <section class="soleras seccion" data-soleras>
+    <div class="contenedor">
+      <header class="soleras__cabecera revelar">
+        <p class="sello">El sistema</p>
+        <h2 class="soleras__titulo display">Criaderas y soleras</h2>
+        <p class="soleras__entrada lectura">
+          No se embotella una añada: se embotella una media móvil de todas. El vino va bajando de escala en
+          escala y cada fila se rellena con la de encima.
+        </p>
+      </header>
+
+      <div class="soleras__interior">
+        <!-- Diagrama pegajoso: las botas se iluminan según el paso en pantalla -->
+        <figure class="diagrama">
+          <svg viewBox="0 0 320 260" role="img" aria-labelledby="titulo-diagrama">
+            <title id="titulo-diagrama">
+              Esquema de criaderas y soleras: tres filas de botas apiladas, el vino desciende de la fila
+              superior a la inferior y sólo se embotella desde la solera, la fila que toca el suelo.
+            </title>
+
+            {
+              [
+                { fila: 'criadera-2', y: 16 },
+                { fila: 'criadera-1', y: 96 },
+                { fila: 'solera', y: 176 },
+              ].map(({ fila, y }) => (
+                <g class="diagrama__fila" data-fila={fila}>
+                  {[0, 1, 2].map((c) => (
+                    <g transform={`translate(${18 + c * 98}, ${y})`}>
+                      <rect class="bota" x="0" y="0" width="88" height="64" rx="9" />
+                      <rect class="bota__vino" x="6" y="34" width="76" height="24" rx="5" />
+                      <line class="bota__duela" x1="30" y1="4" x2="30" y2="60" />
+                      <line class="bota__duela" x1="58" y1="4" x2="58" y2="60" />
+                    </g>
+                  ))}
+                </g>
+              ))
+            }
+
+            <!-- caída del vino entre filas -->
+            <g class="diagrama__caidas" aria-hidden="true">
+              <path class="caida" d="M62 80 L62 96" />
+              <path class="caida" d="M160 80 L160 96" />
+              <path class="caida" d="M258 80 L258 96" />
+              <path class="caida" d="M62 160 L62 176" />
+              <path class="caida" d="M160 160 L160 176" />
+              <path class="caida" d="M258 160 L258 176" />
+            </g>
+
+            <path class="saca" d="M160 240 L160 252" aria-hidden="true"></path>
+            <text class="saca__texto" x="160" y="258" text-anchor="middle">a la botella</text>
+          </svg>
+        </figure>
+
+        <ol class="pasos">
+          {
+            escalas.map((e) => (
+              <li class="paso" data-paso={e.id}>
+                <p class="sello">{e.sello}</p>
+                <h3 class="paso__titulo display">{e.titulo}</h3>
+                <p class="paso__texto">{e.texto}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------- cierre -->
+  <section class="cierre papel seccion">
+    <div class="contenedor cierre__interior">
+      <div class="revelar">
+        <p class="sello">Y de ahí, a la mesa</p>
+        <h2 class="cierre__titulo display">Pruébalo</h2>
+        <p class="lectura">
+          Todo esto acaba en ocho botellas. Dos Pedro Ximénez de la casa y cinco generosos que puedes catar
+          juntos en un solo pack.
+        </p>
+        <a class="boton" href="/vinos">
+          Ver los vinos
+          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+      <figure class="cierre__foto revelar" data-retardo="1">
+        <Image
+          src={depositos}
+          alt="Depósitos de acero inoxidable con Pedro Ximénez"
+          widths={[480, 800, 1200]}
+          sizes="(max-width: 56rem) 90vw, 28rem"
+          loading="lazy"
+        />
+      </figure>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .portada {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-height: 68svh;
+    padding-block: var(--e-7) var(--e-5);
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .portada__foto {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .portada__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .portada::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      0deg,
+      var(--azabache) 4%,
+      color-mix(in srgb, var(--azabache) 66%, transparent) 50%,
+      color-mix(in srgb, var(--azabache) 40%, transparent) 100%
+    );
+  }
+
+  .portada__titulo {
+    font-size: var(--t-5);
+    margin-block: 0.3em 0.45em;
+  }
+
+  .portada__entrada {
+    max-width: 38rem;
+    font-size: var(--t-1);
+    color: color-mix(in srgb, var(--albariza) 84%, transparent);
+  }
+
+  /* --------------------------------------------------------- leyenda */
+
+  .leyenda {
+    display: grid;
+    gap: var(--e-4);
+    align-items: center;
+  }
+
+  @media (width >= 62rem) {
+    .leyenda {
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: var(--e-5);
+    }
+  }
+
+  .leyenda__titulo {
+    font-size: var(--t-3);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .leyenda__remate {
+    font-size: var(--t-1);
+    color: var(--caoba);
+  }
+
+  .leyenda__foto {
+    margin: 0;
+  }
+
+  .leyenda__foto :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  /* ------------------------------------------------------------- duo */
+
+  .duo {
+    display: grid;
+    gap: var(--e-4);
+    align-items: center;
+  }
+
+  @media (width >= 62rem) {
+    .duo {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--e-5);
+    }
+
+    .duo--invertido .duo__texto {
+      order: 2;
+    }
+  }
+
+  .duo__titulo {
+    font-size: var(--t-3);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .duo__foto {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .duo__foto :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 4;
+    object-fit: cover;
+    transition: scale 1s var(--salida);
+  }
+
+  .duo__foto:hover :global(img) {
+    scale: 1.04;
+  }
+
+  /* --------------------------------------------------------- soleado */
+
+  .soleado {
+    position: relative;
+    display: grid;
+  }
+
+  .soleado__foto,
+  .soleado__panel {
+    grid-area: 1 / 1;
+  }
+
+  .soleado__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    min-height: 30rem;
+    object-fit: cover;
+  }
+
+  .soleado__panel {
+    position: relative;
+    display: grid;
+    align-items: center;
+    background: color-mix(in srgb, var(--azabache) 78%, transparent);
+  }
+
+  .soleado__texto {
+    padding-block: var(--e-5);
+    max-width: 44rem;
+  }
+
+  .soleado__titulo {
+    font-size: var(--t-4);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .soleado__dato {
+    margin-top: var(--e-3);
+    font-size: var(--t-4);
+    color: var(--oro-claro);
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .soleado__unidad {
+    color: var(--texto-tenue);
+  }
+
+  /* --------------------------------------------------------- soleras */
+
+  .soleras__cabecera {
+    max-width: 42rem;
+    margin-bottom: var(--e-4);
+  }
+
+  .soleras__titulo {
+    font-size: var(--t-4);
+    margin-block: 0.3em 0.45em;
+  }
+
+  .soleras__entrada {
+    color: var(--texto-tenue);
+  }
+
+  .soleras__interior {
+    display: grid;
+    gap: var(--e-4);
+  }
+
+  @media (width >= 56rem) {
+    .soleras__interior {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--e-5);
+      align-items: start;
+    }
+  }
+
+  .diagrama {
+    margin: 0;
+  }
+
+  @media (width >= 56rem) {
+    .diagrama {
+      position: sticky;
+      top: 7rem;
+    }
+  }
+
+  .diagrama svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .bota {
+    fill: color-mix(in srgb, var(--caoba) 42%, var(--azabache));
+    stroke: color-mix(in srgb, var(--oro) 34%, transparent);
+    stroke-width: 1;
+    transition:
+      fill 0.55s var(--salida),
+      stroke 0.55s var(--salida);
+  }
+
+  .bota__vino {
+    fill: color-mix(in srgb, var(--caoba) 70%, var(--azabache));
+    transition:
+      fill 0.55s var(--salida),
+      opacity 0.55s var(--salida);
+  }
+
+  .bota__duela {
+    stroke: color-mix(in srgb, var(--oro) 22%, transparent);
+    stroke-width: 1;
+    transition: stroke 0.55s var(--salida);
+  }
+
+  /* La fila que toca el paso visible se enciende */
+  .diagrama__fila.es-activa .bota {
+    fill: color-mix(in srgb, var(--caoba) 70%, var(--azabache));
+    stroke: var(--oro);
+  }
+
+  .diagrama__fila.es-activa .bota__vino {
+    fill: var(--oro);
+  }
+
+  .diagrama__fila.es-activa .bota__duela {
+    stroke: color-mix(in srgb, var(--oro) 60%, transparent);
+  }
+
+  .caida,
+  .saca {
+    stroke: color-mix(in srgb, var(--oro) 55%, transparent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 4 6;
+    animation: gotear 1.6s linear infinite;
+  }
+
+  @keyframes gotear {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .caida,
+    .saca {
+      animation: none;
+    }
+  }
+
+  .saca__texto {
+    fill: var(--texto-tenue);
+    font-family: var(--sello);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+
+  .pasos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--e-4);
+  }
+
+  @media (width >= 56rem) {
+    .pasos {
+      gap: var(--e-6);
+      padding-block: var(--e-4) var(--e-6);
+    }
+  }
+
+  .paso {
+    border-top: 1px solid var(--filete);
+    padding-top: var(--e-2);
+    opacity: 0.45;
+    transition: opacity 0.55s var(--salida);
+  }
+
+  .paso.es-activo {
+    opacity: 1;
+  }
+
+  .paso__titulo {
+    font-size: var(--t-2);
+    margin-block: 0.3em 0.4em;
+  }
+
+  .paso__texto {
+    color: var(--texto-tenue);
+  }
+
+  /* ---------------------------------------------------------- cierre */
+
+  .cierre__interior {
+    display: grid;
+    gap: var(--e-4);
+    align-items: center;
+  }
+
+  @media (width >= 56rem) {
+    .cierre__interior {
+      grid-template-columns: 1fr 0.8fr;
+      gap: var(--e-5);
+    }
+  }
+
+  .cierre__titulo {
+    font-size: var(--t-3);
+    margin-block: 0.3em 0.5em;
+  }
+
+  .cierre__interior .boton {
+    margin-top: var(--e-3);
+  }
+
+  .cierre__foto {
+    margin: 0;
+  }
+
+  .cierre__foto :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+</style>
+
+<script>
+  function montarSoleras() {
+    const seccion = document.querySelector<HTMLElement>('[data-soleras]');
+    if (!seccion) return;
+
+    const pasos = [...seccion.querySelectorAll<HTMLElement>('[data-paso]')];
+    const filas = [...seccion.querySelectorAll<SVGGElement>('[data-fila]')];
+    if (!pasos.length) return;
+
+    const encender = (id: string) => {
+      for (const p of pasos) p.classList.toggle('es-activo', p.dataset.paso === id);
+      for (const f of filas) f.classList.toggle('es-activa', f.dataset.fila === id);
+    };
+
+    // El paso más centrado en la ventana es el que manda.
+    const io = new IntersectionObserver(
+      (entradas) => {
+        const visible = entradas
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) encender((visible.target as HTMLElement).dataset.paso!);
+      },
+      { rootMargin: '-35% 0px -35% 0px', threshold: [0, 0.5, 1] },
+    );
+
+    pasos.forEach((p) => io.observe(p));
+    encender(pasos[0]!.dataset.paso!);
+  }
+
+  montarSoleras();
+  document.addEventListener('astro:page-load', montarSoleras);
+</script>

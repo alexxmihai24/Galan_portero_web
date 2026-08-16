@@ -1,0 +1,297 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Vitrina from '../../components/Vitrina.astro';
+import {
+  vinos,
+  marquesDeLaVega,
+  cincoEssences,
+  pack,
+  euros,
+  enlaceCompraPack,
+} from '../../data/vinos';
+
+import depositos from '../../assets/fotos/depositos.jpg';
+
+const desde = (v: (typeof vinos)[number]) => Math.min(...v.variaciones.map((x) => x.precio));
+---
+
+<Base
+  titulo="Vinos"
+  descripcion="Pedro Ximénez Marqués de la Vega y la gama 5 Essences: Amontillado, Palo Cortado, Oloroso, Cream y Pedro Ximénez. Vinos generosos D.O.P. Montilla-Moriles."
+>
+  <header class="portada grano">
+    <div class="portada__foto">
+      <Image
+        src={depositos}
+        alt="Depósitos de Pedro Ximénez en la bodega"
+        widths={[720, 1200, 1800]}
+        sizes="100vw"
+        loading="eager"
+      />
+    </div>
+    <div class="contenedor portada__texto">
+      <p class="sello">Nuestros vinos</p>
+      <h1 class="portada__titulo display">Ocho maneras<br />de mirar la misma uva</h1>
+      <p class="portada__entrada">
+        Dos Pedro Ximénez de la casa, cinco generosos de la gama 5 Essences y el pack que los reúne. Todos con
+        Denominación de Origen Protegida Montilla-Moriles.
+      </p>
+    </div>
+  </header>
+
+  <!-- ------------------------------------------------- marqués de la vega -->
+  <section class="seccion">
+    <div class="contenedor">
+      <header class="grupo__cabecera revelar">
+        <p class="sello">Gama</p>
+        <h2 class="grupo__titulo display">Marqués de la Vega</h2>
+        <p class="grupo__entrada">Los dos Pedro Ximénez que dan nombre a la casa.</p>
+      </header>
+
+      <ul class="catalogo catalogo--dos">
+        {
+          marquesDeLaVega.map((v, i) => (
+            <li class="revelar" data-retardo={i + 1}>
+              <a class="tarjeta" href={`/vinos/${v.slug}`}>
+                <figure class="tarjeta__foto">
+                  <Image
+                    src={v.imagen}
+                    alt={v.nombre}
+                    widths={[360, 620, 900]}
+                    sizes="(max-width: 48rem) 80vw, 26rem"
+                    loading="lazy"
+                  />
+                </figure>
+                <div class="tarjeta__cuerpo">
+                  <p class="sello sello--tenue">{v.estilo}</p>
+                  <h3 class="tarjeta__nombre display">{v.corto}</h3>
+                  <p class="tarjeta__gancho italica">{v.gancho}</p>
+                  <p class="tarjeta__precio">
+                    Desde <strong>{euros(desde(v))}</strong>
+                  </p>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- la vitrina, ahora como selector del catálogo -->
+  <Vitrina />
+
+  <!-- ------------------------------------------------------- 5 essences -->
+  <section class="seccion">
+    <div class="contenedor">
+      <header class="grupo__cabecera revelar">
+        <p class="sello">Gama</p>
+        <h2 class="grupo__titulo display">5 Essences</h2>
+        <p class="grupo__entrada">
+          Un Amontillado, un Palo Cortado, un Oloroso, un Cream y una edición especial de Pedro Ximénez.
+        </p>
+      </header>
+
+      <ul class="catalogo">
+        {
+          cincoEssences.map((v, i) => (
+            <li class="revelar" data-retardo={(i % 4) + 1}>
+              <a class="tarjeta" href={`/vinos/${v.slug}`}>
+                <figure class="tarjeta__foto">
+                  <Image
+                    src={v.imagen}
+                    alt={v.nombre}
+                    widths={[280, 480, 720]}
+                    sizes="(max-width: 48rem) 45vw, 18rem"
+                    loading="lazy"
+                  />
+                </figure>
+                <div class="tarjeta__cuerpo">
+                  <p class="sello sello--tenue">{v.estilo}</p>
+                  <h3 class="tarjeta__nombre display">{v.corto}</h3>
+                  <p class="tarjeta__precio">
+                    Desde <strong>{euros(desde(v))}</strong>
+                  </p>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+
+        <li class="revelar" data-retardo="4">
+          <div class="tarjeta tarjeta--pack">
+            <figure class="tarjeta__foto">
+              <Image
+                src={pack.imagen}
+                alt={pack.nombre}
+                widths={[280, 480, 720]}
+                sizes="(max-width: 48rem) 45vw, 18rem"
+                loading="lazy"
+              />
+            </figure>
+            <div class="tarjeta__cuerpo">
+              <p class="sello sello--tenue">Las cinco</p>
+              <h3 class="tarjeta__nombre display">{pack.nombre}</h3>
+              <p class="tarjeta__precio">
+                <strong>{euros(pack.precio)}</strong>
+              </p>
+              <a class="boton tarjeta__boton" href={enlaceCompraPack()} rel="noopener">
+                Comprar
+                <span class="boton__flecha" aria-hidden="true">&rarr;</span>
+              </a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .portada {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-height: 62svh;
+    padding-block: var(--e-7) var(--e-5);
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .portada__foto {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .portada__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .portada::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      0deg,
+      var(--azabache) 4%,
+      color-mix(in srgb, var(--azabache) 62%, transparent) 48%,
+      color-mix(in srgb, var(--azabache) 45%, transparent) 100%
+    );
+  }
+
+  .portada__titulo {
+    font-size: var(--t-5);
+    margin-block: 0.3em 0.45em;
+  }
+
+  .portada__entrada {
+    max-width: 36rem;
+    font-size: var(--t-1);
+    color: color-mix(in srgb, var(--albariza) 84%, transparent);
+  }
+
+  .grupo__cabecera {
+    max-width: 42rem;
+    margin-bottom: var(--e-4);
+  }
+
+  .grupo__titulo {
+    font-size: var(--t-3);
+    margin-block: 0.3em 0.4em;
+  }
+
+  .grupo__entrada {
+    color: var(--texto-tenue);
+  }
+
+  .catalogo {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--e-2);
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  }
+
+  .catalogo--dos {
+    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  }
+
+  .tarjeta {
+    height: 100%;
+    text-decoration: none;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    background: var(--azabache-90);
+    border: 1px solid var(--filete);
+    transition:
+      border-color 0.5s var(--salida),
+      transform 0.5s var(--salida);
+  }
+
+  .tarjeta:hover,
+  .tarjeta:focus-visible {
+    border-color: color-mix(in srgb, var(--oro) 65%, transparent);
+    transform: translateY(-4px);
+  }
+
+  .tarjeta__foto {
+    margin: 0;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--azabache) 88%, var(--caoba));
+  }
+
+  .tarjeta__foto :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    padding: var(--e-3);
+    transition: scale 0.7s var(--salida);
+  }
+
+  .tarjeta:hover .tarjeta__foto :global(img) {
+    scale: 1.06;
+  }
+
+  .tarjeta__cuerpo {
+    padding: var(--e-3);
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+  }
+
+  .tarjeta__nombre {
+    font-size: var(--t-1);
+  }
+
+  .tarjeta__gancho {
+    color: var(--texto-tenue);
+  }
+
+  .tarjeta__precio {
+    font-size: var(--t--1);
+    color: var(--texto-tenue);
+  }
+
+  .tarjeta__precio strong {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: var(--t-1);
+    color: var(--albariza);
+  }
+
+  .tarjeta--pack {
+    border-color: color-mix(in srgb, var(--oro) 45%, transparent);
+  }
+
+  .tarjeta__boton {
+    margin-top: 0.5rem;
+    justify-content: center;
+  }
+</style>

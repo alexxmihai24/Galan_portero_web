@@ -1,0 +1,329 @@
+---
+import { TIENDA } from '../data/vinos';
+
+const rutas = [
+  { href: '/vinos', texto: 'Vinos' },
+  { href: '/bodega', texto: 'La bodega' },
+  { href: '/produccion', texto: 'Producción' },
+  { href: '/personalizados', texto: 'Personalizados' },
+  { href: '/contacto', texto: 'Contacto' },
+];
+
+const actual = Astro.url.pathname;
+---
+
+<header class="cabecera" data-cabecera>
+  <div class="cabecera__barra contenedor">
+    <a class="marca" href="/" aria-label="Bodegas Galán Portero, inicio">
+      <span class="marca__nombre">Galán Portero</span>
+      <span class="marca__pie">Montilla-Moriles</span>
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      <ul class="nav__lista">
+        {
+          rutas.map((r) => (
+            <li>
+              <a
+                href={r.href}
+                class="nav__enlace"
+                aria-current={actual === r.href || actual.startsWith(r.href + '/') ? 'page' : undefined}
+              >
+                {r.texto}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="cabecera__acciones">
+      <a class="carrito" href={`${TIENDA}/carrito`} rel="noopener">
+        <span>Carrito</span>
+      </a>
+      <button class="hamburguesa" type="button" aria-expanded="false" aria-controls="menu-movil" data-abrir>
+        <span class="oculto-visual">Abrir menú</span>
+        <span class="hamburguesa__linea"></span>
+        <span class="hamburguesa__linea"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="menu" id="menu-movil" hidden data-menu>
+    <ul class="menu__lista">
+      {
+        rutas.map((r, i) => (
+          <li style={`--i:${i}`}>
+            <a href={r.href}>{r.texto}</a>
+          </li>
+        ))
+      }
+      <li style={`--i:${rutas.length}`}>
+        <a href={`${TIENDA}/carrito`} rel="noopener">
+          Carrito
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<style>
+  .cabecera {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 100;
+    transition:
+      background-color 0.5s var(--salida),
+      backdrop-filter 0.5s var(--salida),
+      border-color 0.5s var(--salida);
+    border-bottom: 1px solid transparent;
+  }
+
+  /* Solo se vuelve sólida al bajar; sobre el hero flota. */
+  .cabecera[data-fija] {
+    background: color-mix(in srgb, var(--azabache) 88%, transparent);
+    backdrop-filter: blur(14px) saturate(1.2);
+    border-bottom-color: color-mix(in srgb, var(--oro) 22%, transparent);
+  }
+
+  .cabecera__barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--e-3);
+    padding-block: 1.15rem;
+  }
+
+  .marca {
+    text-decoration: none;
+    display: grid;
+    gap: 0.28em;
+    color: var(--albariza);
+  }
+
+  .marca__nombre {
+    font-family: var(--display);
+    font-size: var(--t-1);
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+  }
+
+  .marca__pie {
+    font-family: var(--sello);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: color-mix(in srgb, var(--oro) 85%, transparent);
+  }
+
+  .nav {
+    display: none;
+  }
+
+  @media (width >= 62rem) {
+    .nav {
+      display: block;
+    }
+  }
+
+  .nav__lista {
+    display: flex;
+    gap: var(--e-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav__enlace {
+    font-family: var(--sello);
+    font-size: var(--t--2);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    text-decoration: none;
+    color: color-mix(in srgb, var(--albariza) 82%, transparent);
+    /* 0.62em deja el enlace en 24 px de alto: el mínimo de WCAG 2.5.8 */
+    padding-block: 0.62em;
+    position: relative;
+    transition: color 0.35s var(--salida);
+  }
+
+  .nav__enlace::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 100%;
+    background: var(--oro);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--salida);
+  }
+
+  .nav__enlace:hover,
+  .nav__enlace:focus-visible,
+  .nav__enlace[aria-current='page'] {
+    color: var(--albariza);
+  }
+
+  .nav__enlace:hover::after,
+  .nav__enlace:focus-visible::after,
+  .nav__enlace[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  .cabecera__acciones {
+    display: flex;
+    align-items: center;
+    gap: var(--e-2);
+  }
+
+  .carrito {
+    font-family: var(--sello);
+    font-size: var(--t--2);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    text-decoration: none;
+    color: var(--oro);
+    border: 1px solid color-mix(in srgb, var(--oro) 45%, transparent);
+    padding: 0.7em 1.1em;
+    transition:
+      background-color 0.35s var(--salida),
+      color 0.35s var(--salida);
+  }
+
+  .carrito:hover,
+  .carrito:focus-visible {
+    background: var(--oro);
+    color: var(--azabache);
+  }
+
+  @media (width < 34rem) {
+    .carrito {
+      display: none;
+    }
+  }
+
+  .hamburguesa {
+    display: grid;
+    gap: 6px;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-content: center;
+    background: none;
+    border: 1px solid color-mix(in srgb, var(--albariza) 25%, transparent);
+    cursor: pointer;
+  }
+
+  @media (width >= 62rem) {
+    .hamburguesa {
+      display: none;
+    }
+  }
+
+  .hamburguesa__linea {
+    display: block;
+    width: 1.15rem;
+    height: 1px;
+    background: var(--albariza);
+    transition: transform 0.35s var(--salida);
+  }
+
+  .hamburguesa[aria-expanded='true'] .hamburguesa__linea:first-child {
+    transform: translateY(3.5px) rotate(45deg);
+  }
+
+  .hamburguesa[aria-expanded='true'] .hamburguesa__linea:last-child {
+    transform: translateY(-3.5px) rotate(-45deg);
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    background: var(--azabache);
+    display: grid;
+    place-content: center;
+    z-index: 99;
+  }
+
+  /* `display:grid` de arriba gana al `hidden` de la hoja del navegador. */
+  .menu[hidden] {
+    display: none;
+  }
+
+  .menu__lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--e-2);
+    text-align: center;
+  }
+
+  .menu__lista a {
+    font-family: var(--display);
+    font-size: var(--t-3);
+    text-decoration: none;
+    color: var(--albariza);
+    opacity: 0;
+    transform: translateY(0.8rem);
+    animation: menu-entrada 0.5s var(--salida) forwards;
+    animation-delay: calc(60ms * var(--i) + 80ms);
+    display: block;
+  }
+
+  @keyframes menu-entrada {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu__lista a {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  function montarCabecera() {
+    const cabecera = document.querySelector<HTMLElement>('[data-cabecera]');
+    const boton = document.querySelector<HTMLButtonElement>('[data-abrir]');
+    const menu = document.querySelector<HTMLElement>('[data-menu]');
+    if (!cabecera || !boton || !menu) return;
+
+    // Sólida en cuanto se despega del hero.
+    const centinela = () => {
+      cabecera.toggleAttribute('data-fija', window.scrollY > 24);
+    };
+    centinela();
+    window.addEventListener('scroll', centinela, { passive: true });
+
+    const alternar = (abrir: boolean) => {
+      boton.setAttribute('aria-expanded', String(abrir));
+      menu.hidden = !abrir;
+      document.body.style.overflow = abrir ? 'hidden' : '';
+    };
+
+    boton.addEventListener('click', () => {
+      alternar(boton.getAttribute('aria-expanded') !== 'true');
+    });
+
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).tagName === 'A') alternar(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && boton.getAttribute('aria-expanded') === 'true') {
+        alternar(false);
+        boton.focus();
+      }
+    });
+  }
+
+  montarCabecera();
+  document.addEventListener('astro:page-load', montarCabecera);
+</script>

@@ -1,0 +1,220 @@
+---
+import { Image } from 'astro:assets';
+import { TIENDA, ENVIO_GRATIS_DESDE } from '../data/vinos';
+import kitDigital from '../assets/marca/kit-digital.png';
+
+const anio = new Date().getFullYear();
+
+const redes = [
+  { href: 'https://www.facebook.com/bodegasgalanportero/', texto: 'Facebook' },
+  { href: 'https://www.instagram.com/bodegasgalanportero/', texto: 'Instagram' },
+  { href: 'https://twitter.com/galanportero', texto: 'X' },
+  { href: 'https://es.linkedin.com/in/manuel-galán-50137146', texto: 'LinkedIn' },
+];
+---
+
+<footer class="pie">
+  <div class="contenedor">
+    <div class="pie__rejilla">
+      <div class="pie__marca">
+        <p class="display pie__nombre">Bodegas<br />Galán Portero</p>
+        <p class="sello sello--tenue">D.O.P. Montilla-Moriles</p>
+        <p class="pie__nota italica">Envíos gratis a península desde {ENVIO_GRATIS_DESDE} €.</p>
+      </div>
+
+      <div>
+        <h2 class="sello">Bodega</h2>
+        <address class="pie__dir">
+          Av. del Marqués de la Vega de Armijo, 76<br />
+          14550 Montilla, Córdoba
+        </address>
+        <h2 class="sello">Lagar El Puntal</h2>
+        <address class="pie__dir">
+          Carretera A-3130, km 24<br />
+          14550 Montilla, Córdoba
+        </address>
+      </div>
+
+      <div>
+        <h2 class="sello">Contacto</h2>
+        <ul class="pie__lista">
+          <li><a class="enlace" href="tel:+34957664237">957 66 42 37</a></li>
+          <li><a class="enlace" href="mailto:info@bodegasgalanportero.com">info@bodegasgalanportero.com</a></li>
+        </ul>
+        <h2 class="sello">Síguenos</h2>
+        <ul class="pie__lista">
+          {
+            redes.map((r) => (
+              <li>
+                <a class="enlace" href={r.href} rel="noopener noreferrer" target="_blank">
+                  {r.texto}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="sello">Navegar</h2>
+        <ul class="pie__lista">
+          <li><a class="enlace" href="/vinos">Vinos</a></li>
+          <li><a class="enlace" href="/bodega">La bodega</a></li>
+          <li><a class="enlace" href="/produccion">Producción</a></li>
+          <li><a class="enlace" href="/personalizados">Personalizados</a></li>
+          <li><a class="enlace" href="/contacto">Contacto</a></li>
+        </ul>
+        <h2 class="sello">Tienda</h2>
+        <ul class="pie__lista">
+          <li><a class="enlace" href={`${TIENDA}/carrito`} rel="noopener">Carrito</a></li>
+          <li><a class="enlace" href={`${TIENDA}/mi-cuenta`} rel="noopener">Mi cuenta</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="filete" />
+
+    <div class="pie__legal">
+      <p>
+        &copy; {anio} Bodegas Galán Portero. Beber con moderación. Venta prohibida a menores de 18 años.
+      </p>
+      <ul class="pie__legal-lista">
+        <li><a class="enlace" href={`${TIENDA}/politica-de-privacidad`} rel="noopener">Privacidad</a></li>
+        <li><a class="enlace" href={`${TIENDA}/terminos-y-condiciones`} rel="noopener">Términos</a></li>
+        <li>
+          <a class="enlace" href={`${TIENDA}/declaracion-de-accesibilidad`} rel="noopener">Accesibilidad</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Obligatorio mientras dure la justificación de la subvención. -->
+    <div class="pie__ayudas">
+      <Image src={kitDigital} alt="Financiado por la Unión Europea — NextGenerationEU y Kit Digital" widths={[420, 620]} sizes="(max-width: 40rem) 90vw, 32rem" loading="lazy" />
+      <p>
+        Bodegas Galán Portero ha recibido una ayuda de la Unión Europea con cargo al Programa Operativo FEDER
+        de Andalucía 2014-2020, financiada como parte de la respuesta de la Unión a la pandemia de COVID-19
+        (REACT-UE), para compensar el sobrecoste energético de gas natural y/o electricidad a pymes y autónomos
+        especialmente afectados por el incremento de los precios del gas natural y la electricidad provocados
+        por el impacto de la guerra de agresión de Rusia contra Ucrania.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .pie {
+    background: var(--azabache-90);
+    color: var(--albariza);
+    padding-block: var(--e-5) var(--e-3);
+    border-top: 1px solid color-mix(in srgb, var(--oro) 24%, transparent);
+  }
+
+  .pie__rejilla {
+    display: grid;
+    gap: var(--e-4);
+    grid-template-columns: 1fr;
+    padding-bottom: var(--e-4);
+  }
+
+  @media (width >= 44rem) {
+    .pie__rejilla {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (width >= 68rem) {
+    .pie__rejilla {
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: var(--e-3);
+    }
+  }
+
+  .pie__nombre {
+    font-size: var(--t-2);
+    margin-bottom: 0.5rem;
+  }
+
+  .pie__nota {
+    margin-top: var(--e-2);
+    color: var(--texto-tenue);
+    font-size: var(--t--1);
+  }
+
+  .pie h2 {
+    margin-bottom: 0.9rem;
+  }
+
+  .pie h2:not(:first-child) {
+    margin-top: var(--e-3);
+  }
+
+  .pie__dir {
+    font-style: normal;
+    font-size: var(--t--1);
+    color: color-mix(in srgb, var(--albariza) 78%, transparent);
+    line-height: 1.7;
+  }
+
+  .pie__lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    font-size: var(--t--1);
+    color: color-mix(in srgb, var(--albariza) 78%, transparent);
+  }
+
+  /* Estos enlaces van en lista, no dentro de una frase, así que no les vale la
+     excepción de WCAG 2.5.8: hay que darles los 24 px de alto a mano. */
+  .pie__lista a,
+  .pie__legal-lista a {
+    display: inline-block;
+    padding-block: 0.32rem;
+    min-width: 1.5rem;
+  }
+
+  .pie__legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--e-2);
+    padding-block: var(--e-3);
+    font-size: var(--t--2);
+    color: var(--texto-tenue);
+    font-family: var(--sello);
+    letter-spacing: 0.04em;
+  }
+
+  .pie__legal-lista {
+    display: flex;
+    gap: var(--e-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .pie__ayudas {
+    display: grid;
+    gap: var(--e-2);
+    align-items: center;
+    padding-top: var(--e-3);
+    border-top: 1px solid color-mix(in srgb, var(--albariza) 10%, transparent);
+    font-size: 0.66rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--albariza) 45%, transparent);
+  }
+
+  @media (width >= 56rem) {
+    .pie__ayudas {
+      grid-template-columns: 20rem 1fr;
+      gap: var(--e-3);
+    }
+  }
+
+  .pie__ayudas :global(img) {
+    background: var(--albariza);
+    padding: 0.6rem 0.9rem;
+    width: 100%;
+    height: auto;
+  }
+</style>

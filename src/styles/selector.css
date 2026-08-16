@@ -1,0 +1,136 @@
+/* Estilos de la isla React `SelectorCantidad`. Van aparte porque los estilos
+   con `scope` de Astro no alcanzan al marcado que pinta React. */
+
+.selector {
+  display: grid;
+  gap: var(--e-2);
+}
+
+.selector__grupo {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.selector__grupo legend {
+  padding: 0;
+  margin-bottom: 0.75rem;
+}
+
+.selector__opciones {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+}
+
+.selector__opcion {
+  display: grid;
+  gap: 0.3rem;
+  justify-items: start;
+  text-align: left;
+  padding: 0.95rem 1.1rem;
+  background: transparent;
+  border: 1px solid var(--filete);
+  cursor: pointer;
+  transition:
+    border-color 0.35s var(--salida),
+    background-color 0.35s var(--salida);
+}
+
+.selector__opcion:hover {
+  border-color: color-mix(in srgb, var(--oro) 60%, transparent);
+}
+
+.selector__opcion.es-elegida {
+  border-color: var(--oro);
+  background: color-mix(in srgb, var(--oro) 10%, transparent);
+}
+
+.selector__etiqueta {
+  font-family: var(--sello);
+  font-size: var(--t--2);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.selector__formato {
+  font-size: var(--t--2);
+  color: var(--texto-tenue);
+}
+
+.selector__precio {
+  font-family: var(--display);
+  font-size: var(--t-1);
+  margin-top: 0.15rem;
+}
+
+.selector__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--e-2);
+  padding-top: var(--e-1);
+}
+
+.contador {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.contador__mandos {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--filete);
+}
+
+.contador__mandos button {
+  width: 2.6rem;
+  height: 2.6rem;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: var(--t-1);
+  line-height: 1;
+  transition: background-color 0.3s var(--salida);
+}
+
+.contador__mandos button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--oro) 18%, transparent);
+}
+
+.contador__mandos button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.contador__mandos output {
+  min-width: 2.4rem;
+  text-align: center;
+  font-family: var(--display);
+  font-size: var(--t-1);
+}
+
+.selector__total {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: end;
+}
+
+.selector__total strong {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: var(--t-2);
+  line-height: 1;
+}
+
+.selector__comprar {
+  justify-content: center;
+  margin-top: var(--e-1);
+}
+
+.selector__nota {
+  font-size: var(--t--2);
+  color: var(--texto-tenue);
+  line-height: 1.55;
+}
