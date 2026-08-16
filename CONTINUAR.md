@@ -11,7 +11,13 @@ Sitio completo y compilando. 14 páginas, 0 errores de `astro check`.
 npm run dev      # http://localhost:4321
 npm run build    # dist/
 npm run check    # typecheck
+node scripts/auditar-responsive.mjs   # con el dev server levantado
 ```
+
+Repo: https://github.com/alexxmihai24/Galan_portero_web
+
+⚠️ `C:/Users/Alex` entero es un repo git apuntando a `metalica_arroyo.git`. Este
+proyecto tiene su **propio** `.git`. Commitear siempre desde esta carpeta.
 
 ## Decisiones cerradas
 
@@ -52,10 +58,22 @@ mueve el marco. Al pinchar, el panel de la izquierda hace crossfade a la cata.
 4. Si da el visto bueno: dominio y sustituir el WordPress. Ojo — el WooCommerce
    tiene que seguir vivo, porque es quien cobra.
 
+## Responsive
+
+`scripts/auditar-responsive.mjs` carga las 8 rutas en Chromium a 320, 360, 414,
+768, 1024 y 1440 px y falla si encuentra un desborde horizontal o un enlace por
+debajo de 24×24 px (WCAG 2.5.8). **48 vistas en verde.** Pasarlo después de
+cualquier cambio de maquetación; deja capturas en `capturas/` (ignorada).
+
+El `overflow-x: hidden` del body escondería los desbordes, por eso el script los
+mide con `getBoundingClientRect()` y no con `scrollWidth`.
+
 ## Pendiente conocido
 
-- Sin Lighthouse real todavía (sólo auditoría estática: 98 imágenes con `alt`,
-  1 `h1` por página, contrastes AA verificados).
+- Sin Lighthouse real todavía (sólo auditoría estática y responsive: 98 imágenes
+  con `alt`, 1 `h1` por página, contrastes AA verificados).
+- La foto del hero (Lagar El Puntal) tiene la sombra del fotógrafo en la esquina
+  inferior derecha. El degradado la disimula, pero conviene reemplazarla.
 - Las páginas legales (privacidad, términos, accesibilidad) enlazan a las del
   WordPress. Si se apaga el WP, hay que traerlas.
 - El aviso FEDER/REACT-UE y los logos del Kit Digital están en el pie y son
