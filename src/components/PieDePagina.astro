@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { TIENDA, ENVIO_GRATIS_DESDE } from '../data/vinos';
 import kitDigital from '../assets/marca/kit-digital.png';
+import logosAyudas from '../assets/marca/logos-do.png';
 
 const anio = new Date().getFullYear();
 
@@ -89,7 +90,22 @@ const redes = [
 
     <!-- Obligatorio mientras dure la justificación de la subvención. -->
     <div class="pie__ayudas">
-      <Image src={kitDigital} alt="Financiado por la Unión Europea — NextGenerationEU y Kit Digital" widths={[420, 620]} sizes="(max-width: 40rem) 90vw, 32rem" loading="lazy" />
+      <div class="pie__sellos">
+        <Image
+          src={kitDigital}
+          alt="Financiado por la Unión Europea — NextGenerationEU y Kit Digital"
+          widths={[420, 620]}
+          sizes="(max-width: 40rem) 90vw, 26rem"
+          loading="lazy"
+        />
+        <Image
+          src={logosAyudas}
+          alt="Financiado por la Unión Europea · Junta de Andalucía · Andalucía se mueve con Europa"
+          widths={[420, 620]}
+          sizes="(max-width: 40rem) 90vw, 26rem"
+          loading="lazy"
+        />
+      </div>
       <p>
         Bodegas Galán Portero ha recibido una ayuda de la Unión Europea con cargo al Programa Operativo FEDER
         de Andalucía 2014-2020, financiada como parte de la respuesta de la Unión a la pandemia de COVID-19
@@ -199,9 +215,10 @@ const redes = [
     align-items: center;
     padding-top: var(--e-3);
     border-top: 1px solid color-mix(in srgb, var(--albariza) 10%, transparent);
-    font-size: 0.66rem;
-    line-height: 1.6;
-    color: color-mix(in srgb, var(--albariza) 45%, transparent);
+    font-size: 0.72rem;
+    line-height: 1.65;
+    /* 45% se quedaba en 3.9:1 sobre el pie. 58% da 5.7:1 y pasa AA. */
+    color: color-mix(in srgb, var(--albariza) 58%, transparent);
   }
 
   @media (width >= 56rem) {
@@ -211,7 +228,12 @@ const redes = [
     }
   }
 
-  .pie__ayudas :global(img) {
+  .pie__sellos {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .pie__sellos :global(img) {
     background: var(--albariza);
     padding: 0.6rem 0.9rem;
     width: 100%;

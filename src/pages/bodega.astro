@@ -1,11 +1,12 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 
-import pasera from '../assets/fotos/pasera.jpg';
 import patio from '../assets/fotos/patio.jpg';
-import vides from '../assets/fotos/vides.jpg';
+import campina from '../assets/fotos/pasera-montilla.jpg';
+import naveBotas from '../assets/fotos/solera-montilla.jpg';
 import solera from '../assets/fotos/solera.jpg';
+import vinedo from '../assets/fotos/vid-espaldera.jpg';
 
 const capitulos = [
   {
@@ -15,8 +16,8 @@ const capitulos = [
       'Su origen se establece a mediados del siglo XX. Los fundadores, Don Antonio Galán López y Doña Soledad Portero Urbano, eran un matrimonio montillano dedicado a la labor en el campo.',
       'Habían luchado por crecer, en distintas localizaciones de la campiña cordobesa, en proyectos que los llevaban a comprar, cultivar y recolectar, cambiando de tierras cuando surgía una posibilidad de mejora.',
     ],
-    foto: vides,
-    alt: 'Viñedo de la campiña cordobesa',
+    foto: campina,
+    alt: 'Tierras de labor de la campiña cordobesa, con Montilla sobre el cerro al fondo',
   },
   {
     sello: 'La bodega',
@@ -25,8 +26,8 @@ const capitulos = [
       'En ese tiempo, con unos hijos ya dispuestos para ayudar en las labores familiares, se decidió fundar una pequeña bodega, un negocio familiar donde, a raíz de los estupendos viñedos de la comarca, elaborar vinos de calidad.',
       'Los inicios fueron duros, luchando por encontrar un hueco en un mercado establecido y nada fácil, como es el del vino montillano.',
     ],
-    foto: patio,
-    alt: 'Patio de la bodega en Montilla',
+    foto: naveBotas,
+    alt: 'Nave de la bodega con las botas de roble apiladas en filas',
   },
   {
     sello: 'La decisión',
@@ -35,8 +36,8 @@ const capitulos = [
       'Como era lo más habitual, empezaron elaborando vinos finos, cuidando con esmero la elaboración, pero pronto se dieron cuenta de la dificultad, competencia y fluctuaciones de precios de estos mercados, y en consecuencia se decidieron por algo arriesgado pero ilusionante: elaborar vinos dulces Pedro Ximénez. Vinos elaborados a partir del soleado de la uva hasta la pasificación.',
       'Con su viña, Antonio y sus hijos elaboraron con esfuerzo grandes vinos dulces y de reconocida calidad, aprovechando que el terreno, el clima, y sobre todo la variedad de la uva, Pedro Ximénez, se prestaban de manera única a elaborar el vino enseña desde entonces de la bodega.',
     ],
-    foto: pasera,
-    alt: 'Uva Pedro Ximénez soleándose en la pasera',
+    foto: solera,
+    alt: 'Botas de Pedro Ximénez a contraluz en la penumbra de la bodega',
   },
 ];
 ---
@@ -47,7 +48,7 @@ const capitulos = [
 >
   <header class="portada grano">
     <div class="portada__foto">
-      <Image
+      <Picture formats={['avif']} fallbackFormat="webp"
         src={patio}
         alt="Patio encalado de la bodega en Montilla, con el zócalo amarillo y la torre al fondo"
         widths={[720, 1200, 1800]}
@@ -113,8 +114,8 @@ const capitulos = [
   <section class="cierre">
     <div class="cierre__foto">
       <Image
-        src={solera}
-        alt="Botas de roble americano en la bodega"
+        src={vinedo}
+        alt="Viñedo propio en espaldera bajo el cielo de la campiña"
         widths={[720, 1200, 1800]}
         sizes="100vw"
         loading="lazy"

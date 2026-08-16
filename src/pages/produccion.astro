@@ -1,13 +1,14 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import Video from '../components/Video.astro';
 
-import pasera from '../assets/fotos/pasera.jpg';
-import paseraMontilla from '../assets/fotos/pasera-montilla.jpg';
+import globos from '../assets/fotos/pasera.jpg';
 import terreno from '../assets/fotos/terreno.jpg';
-import vidEspaldera from '../assets/fotos/vid-espaldera.jpg';
+import vides from '../assets/fotos/vides.jpg';
 import soldado from '../assets/fotos/soldado.jpg';
 import depositos from '../assets/fotos/depositos.jpg';
+import videoPoster from '../assets/fotos/video-poster.jpg';
 
 const escalas = [
   {
@@ -40,9 +41,9 @@ const escalas = [
 >
   <header class="portada grano">
     <div class="portada__foto">
-      <Image
-        src={paseraMontilla}
-        alt="Paseras de Montilla con la uva extendida al sol"
+      <Picture formats={['avif']} fallbackFormat="webp"
+        src={globos}
+        alt="Globos aerostáticos sobre los rastrojos de la campiña de Montilla al atardecer"
         widths={[720, 1200, 1800]}
         sizes="100vw"
         loading="eager"
@@ -98,8 +99,8 @@ const escalas = [
     <div class="contenedor duo">
       <figure class="duo__foto revelar">
         <Image
-          src={vidEspaldera}
-          alt="Vid en espaldera en Montilla"
+          src={vides}
+          alt="Cepa de Pedro Ximénez con la hoja abierta, en la viña de la bodega"
           widths={[520, 860, 1200]}
           sizes="(max-width: 62rem) 92vw, 32rem"
           loading="lazy"
@@ -153,7 +154,7 @@ const escalas = [
       <figure class="duo__foto revelar" data-retardo="1">
         <Image
           src={terreno}
-          alt="Suelo albarizo de la campiña cordobesa"
+          alt="Tierra albariza recién labrada, con Montilla sobre el cerro al fondo"
           widths={[520, 860, 1200]}
           sizes="(max-width: 62rem) 92vw, 32rem"
           loading="lazy"
@@ -162,19 +163,13 @@ const escalas = [
     </div>
   </section>
 
-  <!-- --------------------------------------------------------- pasera -->
-  <section class="soleado">
-    <div class="soleado__foto">
-      <Image
-        src={pasera}
-        alt="Racimos de Pedro Ximénez pasificándose al sol"
-        widths={[720, 1200, 1800]}
-        sizes="100vw"
-        loading="lazy"
-      />
-    </div>
-    <div class="soleado__panel grano">
-      <div class="contenedor soleado__texto">
+  <!-- --------------------------------------------------------- soleado -->
+  <!-- Aquí va el vídeo y no una foto: la bodega grabó la pasera y el lagar, que
+       es exactamente lo que cuenta este apartado, y no hay ninguna foto de la
+       uva soleándose en toda su biblioteca de medios. -->
+  <section class="soleado seccion">
+    <div class="contenedor soleado__interior">
+      <div class="soleado__texto revelar">
         <p class="sello">De 8 a 16 días</p>
         <h2 class="soleado__titulo display">El soleado</h2>
         <p class="lectura">
@@ -184,6 +179,15 @@ const escalas = [
         <p class="soleado__dato display">
           272&nbsp;&ndash;&nbsp;415 <span class="soleado__unidad sello">gramos de azúcar por litro</span>
         </p>
+      </div>
+
+      <div class="soleado__video revelar" data-retardo="1">
+        <Video
+          id="5CM6mH3N1vk"
+          titulo="Pasera y Lagar de Bodegas Galán Portero: así se hace el Pedro Ximénez"
+          poster={videoPoster}
+        />
+        <p class="soleado__pie">Grabado en la pasera y el lagar de la bodega.</p>
       </div>
     </div>
   </section>
@@ -411,32 +415,21 @@ const escalas = [
   /* --------------------------------------------------------- soleado */
 
   .soleado {
-    position: relative;
+    background: var(--azabache-90);
+    border-block: 1px solid color-mix(in srgb, var(--oro) 18%, transparent);
+  }
+
+  .soleado__interior {
     display: grid;
-  }
-
-  .soleado__foto,
-  .soleado__panel {
-    grid-area: 1 / 1;
-  }
-
-  .soleado__foto :global(img) {
-    width: 100%;
-    height: 100%;
-    min-height: 30rem;
-    object-fit: cover;
-  }
-
-  .soleado__panel {
-    position: relative;
-    display: grid;
+    gap: var(--e-4);
     align-items: center;
-    background: color-mix(in srgb, var(--azabache) 78%, transparent);
   }
 
-  .soleado__texto {
-    padding-block: var(--e-5);
-    max-width: 44rem;
+  @media (width >= 62rem) {
+    .soleado__interior {
+      grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+      gap: var(--e-5);
+    }
   }
 
   .soleado__titulo {
@@ -446,7 +439,7 @@ const escalas = [
 
   .soleado__dato {
     margin-top: var(--e-3);
-    font-size: var(--t-4);
+    font-size: var(--t-3);
     color: var(--oro-claro);
     display: grid;
     gap: 0.5rem;
@@ -454,6 +447,14 @@ const escalas = [
 
   .soleado__unidad {
     color: var(--texto-tenue);
+  }
+
+  .soleado__pie {
+    margin-top: var(--e-2);
+    font-size: var(--t--2);
+    color: var(--texto-tenue);
+    font-family: var(--sello);
+    letter-spacing: 0.06em;
   }
 
   /* --------------------------------------------------------- soleras */
@@ -583,15 +584,31 @@ const escalas = [
     }
   }
 
+  /* El paso activo se marca con color y filete, no bajando la opacidad: atenuar
+     el texto hasta 2.3:1 lo dejaba ilegible hasta que le tocaba el turno. */
   .paso {
     border-top: 1px solid var(--filete);
     padding-top: var(--e-2);
-    opacity: 0.45;
-    transition: opacity 0.55s var(--salida);
+    padding-left: var(--e-2);
+    margin-left: calc(var(--e-2) * -1);
+    box-shadow: inset 2px 0 0 transparent;
+    transition:
+      box-shadow 0.55s var(--salida),
+      border-top-color 0.55s var(--salida);
   }
 
   .paso.es-activo {
-    opacity: 1;
+    border-top-color: var(--oro);
+    box-shadow: inset 2px 0 0 var(--oro);
+  }
+
+  .paso__titulo,
+  .paso .sello {
+    transition: color 0.55s var(--salida);
+  }
+
+  .paso.es-activo .paso__titulo {
+    color: var(--oro-claro);
   }
 
   .paso__titulo {

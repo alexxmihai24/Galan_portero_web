@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Vitrina from '../../components/Vitrina.astro';
 import {
@@ -11,7 +11,7 @@ import {
   enlaceCompraPack,
 } from '../../data/vinos';
 
-import depositos from '../../assets/fotos/depositos.jpg';
+import copas from '../../assets/fotos/copas.jpg';
 
 const desde = (v: (typeof vinos)[number]) => Math.min(...v.variaciones.map((x) => x.precio));
 ---
@@ -22,9 +22,9 @@ const desde = (v: (typeof vinos)[number]) => Math.min(...v.variaciones.map((x) =
 >
   <header class="portada grano">
     <div class="portada__foto">
-      <Image
-        src={depositos}
-        alt="Depósitos de Pedro Ximénez en la bodega"
+      <Picture formats={['avif']} fallbackFormat="webp"
+        src={copas}
+        alt="Cuatro copas sobre una bota, del ámbar del Amontillado al azabache del Pedro Ximénez"
         widths={[720, 1200, 1800]}
         sizes="100vw"
         loading="eager"

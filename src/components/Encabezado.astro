@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import { TIENDA } from '../data/vinos';
+import logo from '../assets/marca/logo-blanco.png';
 
 const rutas = [
   { href: '/vinos', texto: 'Vinos' },
@@ -15,8 +17,7 @@ const actual = Astro.url.pathname;
 <header class="cabecera" data-cabecera>
   <div class="cabecera__barra contenedor">
     <a class="marca" href="/" aria-label="Bodegas Galán Portero, inicio">
-      <span class="marca__nombre">Galán Portero</span>
-      <span class="marca__pie">Montilla-Moriles</span>
+      <Image src={logo} alt="Bodegas Galán Portero, desde 1950" widths={[190, 380]} sizes="190px" loading="eager" />
     </a>
 
     <nav class="nav" aria-label="Principal">
@@ -95,25 +96,19 @@ const actual = Astro.url.pathname;
   }
 
   .marca {
-    text-decoration: none;
-    display: grid;
-    gap: 0.28em;
-    color: var(--albariza);
+    display: block;
+    line-height: 0;
   }
 
-  .marca__nombre {
-    font-family: var(--display);
-    font-size: var(--t-1);
-    line-height: 0.9;
-    letter-spacing: -0.01em;
+  .marca :global(img) {
+    width: 11.9rem;
+    height: auto;
   }
 
-  .marca__pie {
-    font-family: var(--sello);
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.28em;
-    color: color-mix(in srgb, var(--oro) 85%, transparent);
+  @media (width < 34rem) {
+    .marca :global(img) {
+      width: 9.5rem;
+    }
   }
 
   .nav {

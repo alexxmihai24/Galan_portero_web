@@ -1,14 +1,14 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Vitrina from '../components/Vitrina.astro';
 import { marquesDeLaVega, pack, euros, enlaceCompraPack, ENVIO_GRATIS_DESDE } from '../data/vinos';
 
 import lagarPuntal from '../assets/fotos/lagar.jpg';
 import barrica from '../assets/fotos/barrica.jpg';
-import solera from '../assets/fotos/solera.jpg';
-import patio from '../assets/fotos/patio.jpg';
-import copas from '../assets/fotos/copas.jpg';
+import copaBlanca from '../assets/fotos/copa-blanca.jpg';
+import bodegaEdificio from '../assets/fotos/lagar-montilla.jpg';
+import brindis from '../assets/fotos/woman.jpg';
 
 const rasgos = [
   { cifra: '1950', pie: 'Desde mediados del siglo XX' },
@@ -25,7 +25,7 @@ const rasgos = [
   <!-- ------------------------------------------------------------- hero -->
   <section class="hero grano">
     <div class="hero__foto">
-      <Image
+      <Picture formats={['avif']} fallbackFormat="webp"
         src={lagarPuntal}
         alt="El Lagar El Puntal, cortijo blanco sobre el viñedo de Pedro Ximénez en la campiña de Montilla"
         widths={[720, 1200, 1800, 2400]}
@@ -109,16 +109,16 @@ const rasgos = [
         <figure class="px__foto px__foto--alta revelar" data-retardo="1">
           <Image
             src={barrica}
-            alt="Barricas de roble americano en la bodega"
+            alt="Botas de roble numeradas, apiladas en la bodega"
             widths={[420, 720, 1000]}
             sizes="(max-width: 62rem) 45vw, 22rem"
             loading="lazy"
           />
         </figure>
-        <figure class="px__foto revelar" data-retardo="2">
+        <figure class="px__foto px__foto--recorte revelar" data-retardo="2">
           <Image
-            src={copas}
-            alt="Copas de vino generoso servidas"
+            src={copaBlanca}
+            alt="Copa con el Pedro Ximénez: caoba oscuro, casi azabache"
             widths={[420, 720, 1000]}
             sizes="(max-width: 62rem) 45vw, 20rem"
             loading="lazy"
@@ -137,7 +137,7 @@ const rasgos = [
       <figure class="pack__foto revelar">
         <Image
           src={pack.imagen}
-          alt="Caja horizontal del Pack 5 Essences con las cinco botellas a la vista"
+          alt="Las cinco botellas de la gama 5 Essences: Oloroso, Palo Cortado, Pedro Ximénez, Cream y Amontillado"
           widths={[520, 860, 1200]}
           sizes="(max-width: 56rem) 90vw, 34rem"
           loading="lazy"
@@ -209,8 +209,8 @@ const rasgos = [
   <section class="historia">
     <div class="historia__foto">
       <Image
-        src={solera}
-        alt="Botas apiladas en el sistema de criaderas y soleras"
+        src={bodegaEdificio}
+        alt="Fachada encalada de la bodega de Galán Portero en Montilla"
         widths={[720, 1200, 1800]}
         sizes="100vw"
         loading="lazy"
@@ -250,8 +250,8 @@ const rasgos = [
       </div>
       <figure class="eventos__foto revelar" data-retardo="1">
         <Image
-          src={patio}
-          alt="Patio de la bodega en Montilla"
+          src={brindis}
+          alt="Brindis con una copa de vino de la bodega"
           widths={[480, 800, 1200]}
           sizes="(max-width: 56rem) 90vw, 28rem"
           loading="lazy"
@@ -455,6 +455,14 @@ const rasgos = [
 
   .px__foto--alta {
     margin-top: var(--e-4);
+  }
+
+  /* La foto de la copa viene recortada sobre blanco y ese blanco canta sobre el
+     papel albariza. `multiply` lo funde con el fondo y deja sólo la copa. */
+  .px__foto--recorte :global(img) {
+    mix-blend-mode: multiply;
+    object-fit: contain;
+    background: transparent;
   }
 
   /* ------------------------------------------------------------- pack */

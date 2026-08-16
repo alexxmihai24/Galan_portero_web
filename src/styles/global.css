@@ -118,6 +118,14 @@ video {
   max-width: 100%;
 }
 
+/* Sin esto, `max-width:100%` encoge el ancho pero deja el alto intrínseco y la
+   foto sale estirada. Las que van a sangre se lo saltan con su propio
+   `height:100%`, que tiene más especificidad. */
+img,
+video {
+  height: auto;
+}
+
 a {
   color: inherit;
 }
@@ -364,6 +372,11 @@ p {
   transform: none;
 }
 
+/* El revelado ligado al scroll sólo desplaza, no desvanece.
+   Con opacidad, el texto pasa un buen rato por debajo de 2:1 mientras entra en
+   pantalla, y eso es ilegible de verdad, no sólo para el auditor. El deslizamiento
+   da la misma sensación sin tocar nunca el contraste. La variante con
+   IntersectionObserver sí puede desvanecer: salta a visible de golpe. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .revelar {
@@ -372,18 +385,16 @@ p {
       transition: none;
       animation: revelar-entrada linear both;
       animation-timeline: view();
-      animation-range: entry 5% cover 26%;
+      animation-range: entry 0% entry 90%;
     }
   }
 }
 
 @keyframes revelar-entrada {
   from {
-    opacity: 0;
     transform: translateY(1.75rem);
   }
   to {
-    opacity: 1;
     transform: none;
   }
 }

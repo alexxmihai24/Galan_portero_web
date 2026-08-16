@@ -1,10 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import { pack } from '../data/vinos';
 
-import copas from '../assets/fotos/copas.jpg';
-import patio from '../assets/fotos/patio.jpg';
-import cincoEsencias from '../assets/botellas/pack-5-essences.jpg';
+import brindis from '../assets/fotos/woman.jpg';
+import cata from '../assets/fotos/woman-wine.jpg';
 
 const ocasiones = ['Bodas', 'Comuniones', 'Bautizos', 'Empresa', 'Aniversarios', 'Ferias y congresos'];
 ---
@@ -30,8 +30,8 @@ const ocasiones = ['Bodas', 'Comuniones', 'Bautizos', 'Empresa', 'Aniversarios',
 
       <figure class="cabeza__foto">
         <Image
-          src={cincoEsencias}
-          alt="Caja de vinos de Bodegas Galán Portero"
+          src={pack.imagen}
+          alt="Las cinco botellas de 5 Essences, con la etiqueta a la vista"
           widths={[480, 800, 1200]}
           sizes="(max-width: 56rem) 90vw, 28rem"
           loading="eager"
@@ -95,8 +95,8 @@ const ocasiones = ['Bodas', 'Comuniones', 'Bautizos', 'Empresa', 'Aniversarios',
   <!-- ----------------------------------------------------------- cierre -->
   <section class="cierre">
     <div class="cierre__fotos">
-      <figure><Image src={copas} alt="Copas servidas en una celebración" widths={[420, 760]} sizes="50vw" loading="lazy" /></figure>
-      <figure><Image src={patio} alt="Patio de la bodega" widths={[420, 760]} sizes="50vw" loading="lazy" /></figure>
+      <figure><Image src={brindis} alt="Dos personas brindando con vino de la bodega" widths={[420, 760]} sizes="50vw" loading="lazy" /></figure>
+      <figure><Image src={cata} alt="Mujer catando una copa de vino generoso" widths={[420, 760]} sizes="50vw" loading="lazy" /></figure>
     </div>
     <div class="cierre__panel grano">
       <div class="contenedor cierre__texto">

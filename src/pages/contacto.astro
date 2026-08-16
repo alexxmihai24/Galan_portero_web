@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import patio from '../assets/fotos/patio.jpg';
+import fachada from '../assets/fotos/lagar-montilla.jpg';
 
 const sedes = [
   {
@@ -48,8 +48,8 @@ const mapa = (consulta: string) => `https://www.google.com/maps/search/?api=1&qu
 
       <figure class="cabeza__foto">
         <Image
-          src={patio}
-          alt="Patio de la bodega en Montilla"
+          src={fachada}
+          alt="Fachada de la bodega en Montilla, con el portón y el zócalo amarillo"
           widths={[480, 800, 1200]}
           sizes="(max-width: 56rem) 90vw, 26rem"
           loading="eager"
@@ -306,7 +306,7 @@ const mapa = (consulta: string) => `https://www.google.com/maps/search/?api=1&qu
   .campo__opcional {
     text-transform: none;
     letter-spacing: 0.04em;
-    opacity: 0.7;
+    /* El color de la etiqueta ya viene atenuado; un 0.7 encima lo dejaba en 3.8:1. */
   }
 
   .campo input,

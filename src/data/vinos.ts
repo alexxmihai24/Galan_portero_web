@@ -5,7 +5,7 @@ import cream from '../assets/botellas/5e-cream.jpg';
 import paloCortado from '../assets/botellas/5e-palo-cortado.jpg';
 import pedroXimenez from '../assets/botellas/5e-pedro-ximenez.jpg';
 import amontillado from '../assets/botellas/5e-amontillado.jpg';
-import packImg from '../assets/botellas/pack-5-essences.jpg';
+import packImg from '../assets/botellas/pack-px.jpg';
 import soleraFundador from '../assets/botellas/mv-solera-fundador.jpg';
 import cosecha from '../assets/botellas/mv-cosecha.jpg';
 
