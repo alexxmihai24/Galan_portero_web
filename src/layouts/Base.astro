@@ -2,22 +2,27 @@
 import { ClientRouter } from 'astro:transitions';
 import Encabezado from '../components/Encabezado.astro';
 import PieDePagina from '../components/PieDePagina.astro';
+import Cesta from '../components/Cesta.astro';
 
-import '@fontsource-variable/bodoni-moda';
-import '@fontsource-variable/newsreader';
-import '@fontsource-variable/archivo';
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/fraunces';
+import '@fontsource-variable/fraunces/wght-italic.css';
 import '../styles/global.css';
+// La grotesca es la de casi todo el texto: se pide antes que nada para que no salte al llegar.
+import grotesca from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
 
 interface Props {
   titulo: string;
   descripcion: string;
   /** Ruta de imagen social; por defecto la foto de la pasera */
   imagen?: string;
+  /** Cuenta y admin: fuera de los buscadores */
+  privada?: boolean;
 }
 
-const { titulo, descripcion, imagen = '/og-default.jpg' } = Astro.props;
+const { titulo, descripcion, imagen = '/og-default.jpg', privada = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const tituloCompleto = titulo === 'inicio' ? 'Bodegas Galán Portero' : `${titulo} · Bodegas Galán Portero`;
+const tituloCompleto = titulo === 'inicio' ? 'Bodegas Galán Portero · Pedro Ximénez de Montilla' : `${titulo} · Bodegas Galán Portero`;
 ---
 
 <!doctype html>
@@ -27,11 +32,12 @@ const tituloCompleto = titulo === 'inicio' ? 'Bodegas Galán Portero' : `${titul
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{tituloCompleto}</title>
     <meta name="description" content={descripcion} />
-    <link rel="canonical" href={canonical} />
+    {privada ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
     <link rel="icon" href="/icono-32.png" sizes="32x32" type="image/png" />
     <link rel="icon" href="/icono-512.png" sizes="512x512" type="image/png" />
     <link rel="apple-touch-icon" href="/icono-180.png" />
-    <meta name="theme-color" content="#17110e" />
+    <meta name="theme-color" content="#f6f2ea" />
+    <link rel="preload" href={grotesca} as="font" type="font/woff2" crossorigin />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Bodegas Galán Portero" />
@@ -41,9 +47,13 @@ const tituloCompleto = titulo === 'inicio' ? 'Bodegas Galán Portero' : `${titul
     <meta property="og:image" content={new URL(imagen, Astro.site).href} />
     <meta property="og:locale" content="es_ES" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@galanportero" />
 
     <ClientRouter />
+
+    <script is:inline>
+      // Antes de pintar: si el navegador no anima con el scroll, lo hará un IntersectionObserver.
+      if (!CSS.supports('animation-timeline', 'view()')) document.documentElement.classList.add('sin-timeline');
+    </script>
 
     <script
       is:inline
@@ -55,6 +65,7 @@ const tituloCompleto = titulo === 'inicio' ? 'Bodegas Galán Portero' : `${titul
         url: 'https://bodegasgalanportero.com',
         telephone: '+34957664237',
         email: 'info@bodegasgalanportero.com',
+        foundingDate: '1950',
         address: {
           '@type': 'PostalAddress',
           streetAddress: 'Av. del Marqués de la Vega de Armijo, 76',
@@ -63,11 +74,7 @@ const tituloCompleto = titulo === 'inicio' ? 'Bodegas Galán Portero' : `${titul
           addressRegion: 'Córdoba',
           addressCountry: 'ES',
         },
-        sameAs: [
-          'https://www.facebook.com/bodegasgalanportero/',
-          'https://www.instagram.com/bodegasgalanportero/',
-          'https://twitter.com/galanportero',
-        ],
+        sameAs: ['https://www.facebook.com/bodegasgalanportero/', 'https://www.instagram.com/bodegasgalanportero/'],
       })}
     />
   </head>
@@ -79,31 +86,10 @@ const tituloCompleto = titulo === 'inicio' ? 'Bodegas Galán Portero' : `${titul
       <slot />
     </main>
     <PieDePagina />
+    <Cesta />
 
     <script>
-      // Reserva para navegadores sin `animation-timeline: view()` (Safari, Firefox).
-      // Donde el timeline nativo existe, el CSS ya gana y esto no toca nada.
-      const soportaTimeline = CSS.supports('animation-timeline', 'view()');
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      function activarRevelados() {
-        if (soportaTimeline || reduce) return;
-        const objetivos = document.querySelectorAll<HTMLElement>('.revelar:not(.visible)');
-        const io = new IntersectionObserver(
-          (entradas) => {
-            for (const e of entradas) {
-              if (!e.isIntersecting) continue;
-              e.target.classList.add('visible');
-              io.unobserve(e.target);
-            }
-          },
-          { rootMargin: '0px 0px -12% 0px', threshold: 0.05 },
-        );
-        objetivos.forEach((el) => io.observe(el));
-      }
-
-      activarRevelados();
-      document.addEventListener('astro:page-load', activarRevelados);
+      import '../scripts/interfaz.ts';
     </script>
   </body>
 </html>

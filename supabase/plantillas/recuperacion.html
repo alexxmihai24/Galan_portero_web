@@ -1,0 +1,11 @@
+<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #1c1511">
+  <h2 style="margin: 0 0 16px">Cambia tu contraseña</h2>
+  <p>Hemos recibido una petición para cambiar la contraseña de tu cuenta en <strong>Bodegas Galán Portero</strong>.</p>
+  <p style="margin: 28px 0">
+    <a href="{{ .SiteURL }}/cuenta/confirmar?token_hash={{ .TokenHash }}&type=recovery"
+       style="background: #1c1511; color: #ffffff; padding: 14px 24px; border-radius: 999px; text-decoration: none; font-weight: bold">
+      Elegir contraseña nueva
+    </a>
+  </p>
+  <p style="color: #6b5e55; font-size: 14px">El enlace caduca en una hora. Si no lo has pedido tú, ignora este mensaje: tu contraseña no cambia.</p>
+</div>

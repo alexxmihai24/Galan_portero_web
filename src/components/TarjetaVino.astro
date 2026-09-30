@@ -1,0 +1,135 @@
+---
+import { Image } from 'astro:assets';
+import Icono from './Icono.astro';
+import { euros } from '../data/vinos';
+import { principal, type PackTienda, type VinoTienda } from '../lib/catalogo';
+
+interface Props {
+  producto: VinoTienda | PackTienda;
+  pegatina?: string;
+  /** Primeras tarjetas visibles: sin carga diferida */
+  prioridad?: boolean;
+}
+const { producto, pegatina, prioridad = false } = Astro.props;
+
+const esPack = !('variaciones' in producto);
+const vino = esPack ? null : (producto as VinoTienda);
+const pack = esPack ? (producto as PackTienda) : null;
+
+let nombre: string, precio: number, detalle: string, sku: number | undefined;
+if (vino) {
+  const venta = principal(vino);
+  const mostrada = venta ?? vino.variaciones[0]!;
+  nombre = vino.corto;
+  precio = mostrada.precio;
+  detalle = `${vino.estilo} · ${mostrada.formato}`;
+  sku = venta?.id;
+} else {
+  nombre = pack!.nombre;
+  precio = pack!.precio;
+  detalle = 'Estuche con las cinco · 5 Essences';
+  sku = pack!.activo && pack!.stock !== 0 ? pack!.sku : undefined;
+}
+const recorte = vino?.recorte;
+const imagen = recorte ?? producto.imagen;
+
+// Para los filtros del catálogo
+const tipos = [
+  esPack ? 'packs' : '',
+  producto.gama === '5 Essences' ? '5-essences' : 'marques',
+  vino?.nombre.includes('Pedro Ximénez') ? 'pedro-ximenez' : '',
+  vino?.estilo === 'Vino seco' ? 'secos' : '',
+  vino && vino.estilo !== 'Vino seco' ? 'dulces' : '',
+]
+  .filter(Boolean)
+  .join(' ');
+const mono = vino?.monograma;
+---
+
+<article class="tarjeta revela" data-producto data-tipos={tipos}>
+  {pegatina && <span class="pegatina pegatina--albero pegatina--viva">{pegatina}</span>}
+  {mono && <span class:list={['pegatina pegatina--mono pegatina--viva tarjeta__mono', `mono--${mono}`]} aria-hidden="true">{mono}</span>}
+  <div class:list={['nicho', !recorte && 'nicho--oscuro']}>
+    <Image
+      src={imagen}
+      class={recorte ? 'recorte' : 'foto'}
+      alt={`Botella de ${nombre}`}
+      widths={recorte ? [180, 300, 420] : [320, 520, 760]}
+      sizes="(max-width: 640px) 45vw, (max-width: 1100px) 30vw, 320px"
+      loading={prioridad ? 'eager' : 'lazy'}
+      transition:name={`botella-${producto.slug}`}
+    />
+  </div>
+  <div class="tarjeta__cuerpo">
+    <div class="tarjeta__fila">
+      <h3 class="tarjeta__nombre">
+        <a class="tarjeta__enlace" href={`/vinos/${producto.slug}`}>{nombre}</a>
+      </h3>
+      <span class="precio">{euros(precio)}</span>
+    </div>
+    <p class="tarjeta__detalle">{detalle}</p>
+    <div class="tarjeta__accion">
+      {
+        sku ? (
+          <button
+            class="boton boton--comprar boton--pequeno boton--bloque"
+            type="button"
+            data-anadir
+            data-sku={sku}
+            data-nombre={nombre}
+            aria-label={`Añadir ${nombre} a la cesta`}
+          >
+            <Icono nombre="mas" tam={18} />
+            <span>Añadir<span class="tarjeta__largo"> a la cesta</span></span>
+          </button>
+        ) : (
+          <p class="agotado">Agotado</p>
+        )
+      }
+    </div>
+  </div>
+</article>
+
+<style>
+  /* Tarjetas estrechas (2 columnas en móvil): precio debajo y botón corto */
+  @container tarjeta (max-width: 250px) {
+    .tarjeta__fila {
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tarjeta__largo {
+      display: none;
+    }
+    .tarjeta__detalle {
+      font-size: 0.9rem;
+    }
+  }
+
+  .tarjeta__mono {
+    position: absolute;
+    z-index: 2;
+    top: 22px;
+    left: 18px;
+    right: auto;
+    --giro: -8deg;
+    font-size: 2rem;
+    border-color: var(--blanco);
+    color: var(--blanco);
+  }
+  .mono--am {
+    background: var(--am);
+  }
+  .mono--pc {
+    background: var(--pc);
+  }
+  .mono--ol {
+    background: var(--ol);
+  }
+  .mono--cr {
+    background: var(--cr);
+    color: var(--hierro);
+  }
+  .mono--px {
+    background: var(--px);
+  }
+</style>

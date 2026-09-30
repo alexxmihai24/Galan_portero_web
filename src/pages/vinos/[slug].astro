@@ -1,463 +1,674 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import SelectorCantidad from '../../components/SelectorCantidad';
-import { vinos, enlaceCompra, euros, ENVIO_GRATIS_DESDE, TIENDA } from '../../data/vinos';
-
+import Icono from '../../components/Icono.astro';
+import TarjetaVino from '../../components/TarjetaVino.astro';
+import { catalogo, type VariacionTienda } from '../../lib/catalogo';
+import { ENVIO_GRATIS_DESDE, euros } from '../../data/vinos';
 import solera from '../../assets/fotos/solera-2.jpg';
 
-export function getStaticPaths() {
-  return vinos.map((vino) => ({ params: { slug: vino.slug }, props: { vino } }));
-}
+export const prerender = false;
 
-const { vino } = Astro.props;
+const { vinos, pack } = await catalogo();
+const slug = Astro.params.slug;
+const vino = vinos.find((v) => v.slug === slug);
+const esPack = slug === pack.slug;
+if (!vino && !esPack) return new Response(null, { status: 404 }); // Astro pinta 404.astro
 
-// El enlace se arma en el servidor para no repetir la forma de la URL en el cliente.
-const opciones = vino.variaciones.map((v) => ({ ...v, enlace: enlaceCompra(vino, v) }));
-const minimo = Math.min(...vino.variaciones.map((v) => v.precio));
-const maximo = Math.max(...vino.variaciones.map((v) => v.precio));
+type Opcion = { sku: number; etiqueta: string; formato: string; precio: number; disponible: boolean };
+const opciones: Opcion[] = vino
+  ? vino.variaciones.map((x: VariacionTienda) => ({
+      sku: x.id,
+      etiqueta: x.etiqueta,
+      formato: x.formato,
+      precio: x.precio,
+      disponible: x.activo && x.stock !== 0,
+    }))
+  : [{ sku: pack.sku, etiqueta: 'Estuche', formato: 'Las cinco botellas', precio: pack.precio, disponible: pack.activo && pack.stock !== 0 }];
+const elegida = opciones.find((o) => o.disponible) ?? opciones[0]!;
+const hayVenta = opciones.some((o) => o.disponible);
 
-const otros = vinos.filter((v) => v.slug !== vino.slug).slice(0, 4);
+const nombre = vino ? vino.corto : pack.nombre;
+const imagen = vino?.recorte ?? (vino ? vino.imagen : pack.imagen);
+const recorte = Boolean(vino?.recorte);
+const otros = [...vinos.filter((v) => v.slug !== slug)].slice(0, esPack ? 4 : 3);
+const esencias = vinos.filter((v) => v.gama === '5 Essences');
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: vino ? vino.nombre : pack.nombre,
+  description: vino ? vino.resumen : pack.resumen,
+  brand: { '@type': 'Brand', name: vino ? vino.gama : '5 Essences' },
+  offers: opciones.map((o) => ({
+    '@type': 'Offer',
+    name: o.formato,
+    price: o.precio.toFixed(2),
+    priceCurrency: 'EUR',
+    availability: o.disponible ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    url: new URL(Astro.url.pathname, Astro.site).href,
+  })),
+};
 ---
 
-<Base titulo={vino.corto} descripcion={vino.resumen.slice(0, 180)}>
-  <article class="producto">
-    <nav class="miga contenedor" aria-label="Migas de pan">
-      <a class="enlace" href="/vinos">Vinos</a>
+<Base titulo={nombre} descripcion={vino ? `${vino.nombre}. ${vino.gancho}` : pack.gancho}>
+  <article class="ficha contenedor" data-producto>
+    <nav class="migas" aria-label="Estás en">
+      <a href="/vinos">Vinos</a>
       <span aria-hidden="true">/</span>
-      <span>{vino.gama}</span>
-      <span aria-hidden="true">/</span>
-      <span class="miga__actual">{vino.corto}</span>
+      <span aria-current="page">{nombre}</span>
     </nav>
 
-    <div class="contenedor producto__interior">
-      <figure class="producto__foto">
-        <Image
-          src={vino.imagen}
-          alt={vino.nombre}
-          widths={[420, 720, 1080]}
-          sizes="(max-width: 62rem) 88vw, 32rem"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </figure>
+    <div class="ficha__rejilla">
+      <div class="ficha__visual">
+        <div class:list={['nicho ficha__nicho', !recorte && 'nicho--oscuro']}>
+          <Image
+            src={imagen}
+            class={recorte ? 'recorte' : 'foto'}
+            alt={`Botella de ${vino ? vino.nombre : pack.nombre}`}
+            widths={recorte ? [260, 420, 600] : [480, 720, 1000]}
+            sizes="(max-width: 900px) 90vw, 520px"
+            loading="eager"
+            fetchpriority="high"
+            transition:name={`botella-${slug}`}
+          />
+        </div>
+        {vino?.monograma && <span class:list={['pegatina pegatina--mono ficha__mono', `mono--${vino.monograma}`]} aria-hidden="true">{vino.monograma}</span>}
+        {vino?.slug === 'pedro-ximenez-solera-fundador' && <span class="pegatina pegatina--albero ficha__joya">La joya de la casa</span>}
+      </div>
 
-      <div class="producto__ficha">
-        <p class="sello">{vino.gama} &middot; {vino.estilo}</p>
-        <h1 class="producto__nombre display">{vino.nombre}</h1>
-        <p class="producto__gancho italica">{vino.gancho}</p>
+      <div class="ficha__info">
+        <ul class="ficha__etiquetas" role="list">
+          <li>{vino ? vino.gama : '5 Essences'}</li>
+          {vino && <li>{vino.estilo}</li>}
+          <li>D.O.P. Montilla-Moriles</li>
+        </ul>
+        <h1 class="titular titular--2 ficha__titulo">{nombre}</h1>
+        <p class="ficha__gancho">{vino ? vino.gancho : pack.gancho}</p>
+        <p class="lectura">{vino ? vino.resumen : pack.resumen}</p>
 
-        <p class="producto__rango">
-          {minimo === maximo ? euros(minimo) : `${euros(minimo)} – ${euros(maximo)}`}
-        </p>
+        <form class="compra" data-form-compra data-nombre={nombre}>
+          {
+            vino ? (
+              <fieldset class="compra__formatos">
+                <legend class="etiqueta-campo">Formato</legend>
+                {opciones.map((o) => (
+                  <label class="formato">
+                    <input type="radio" name="sku" value={o.sku} data-precio={o.precio} checked={o.sku === elegida.sku} disabled={!o.disponible} />
+                    <span class="formato__etiqueta">{o.etiqueta}</span>
+                    <span class="formato__detalle">{o.formato}</span>
+                    <span class="formato__precio precio">{o.disponible ? euros(o.precio) : 'Agotado'}</span>
+                  </label>
+                ))}
+              </fieldset>
+            ) : (
+              <input type="hidden" name="sku" value={pack.sku} data-precio={pack.precio} />
+            )
+          }
 
-        <p class="producto__resumen">{vino.resumen}</p>
+          <div class="compra__fila">
+            <div class="cantidad">
+              <label class="etiqueta-campo" for="unidades">Unidades</label>
+              <div class="cantidad__mandos">
+                <button class="boton-icono" type="button" data-restar aria-label="Una unidad menos"><Icono nombre="menos" /></button>
+                <input id="unidades" name="unidades" type="number" inputmode="numeric" min="1" max="99" value="1" />
+                <button class="boton-icono" type="button" data-sumar aria-label="Una unidad más"><Icono nombre="mas" /></button>
+              </div>
+            </div>
+            <p class="compra__total">
+              <span class="etiqueta-campo">Total</span>
+              <output class="precio" data-total>{euros(elegida.precio)}</output>
+            </p>
+          </div>
 
-        <SelectorCantidad client:visible opciones={opciones} nombre={vino.corto} />
+          <button class="boton boton--comprar boton--bloque compra__boton" type="submit" disabled={!hayVenta}>
+            <Icono nombre="mas" />
+            {hayVenta ? 'Añadir a la cesta' : 'Agotado'}
+          </button>
+        </form>
 
-        <ul class="garantias">
-          <li>Envío gratis a península desde {ENVIO_GRATIS_DESDE} &euro;</li>
-          <li>Pago seguro en bodegasgalanportero.com</li>
-          <li>Denominación de Origen Protegida Montilla-Moriles</li>
+        <ul class="garantias" role="list">
+          <li><Icono nombre="sol" tam={20} /> Envío gratis a península desde {ENVIO_GRATIS_DESDE}&nbsp;€</li>
+          <li><Icono nombre="bolsa" tam={20} /> Pago seguro con tarjeta (Stripe)</li>
+          <li><Icono nombre="usuario" tam={20} /> Sigue tu pedido desde tu cuenta</li>
         </ul>
       </div>
     </div>
   </article>
 
-  <!-- --------------------------------------------------------- la cata -->
-  <section class="cata-larga papel seccion">
-    <div class="contenedor cata-larga__interior">
-      <header class="revelar">
-        <p class="sello">Nota de cata</p>
-        <h2 class="cata-larga__titulo display">Cómo se bebe</h2>
-      </header>
+  {
+    vino ? (
+      <section class="cata fondo-cal-2 seccion" aria-labelledby="cata-titulo">
+        <div class="contenedor">
+          <p class="antetitulo revela">Nota de cata oficial</p>
+          <h2 id="cata-titulo" class="titular titular--2 revela">
+            Análisis <span class="cursiva">sensorial.</span>
+          </h2>
+          <dl class="cata__rejilla">
+            <div class="cata__bloque cata__bloque--color revela">
+              <dt class="antetitulo">Color</dt>
+              <dd>{vino.cata.color}</dd>
+            </div>
+            <div class="cata__bloque revela">
+              <dt class="antetitulo">Nariz</dt>
+              <dd>{vino.cata.aroma}</dd>
+            </div>
+            <div class="cata__bloque revela">
+              <dt class="antetitulo">Boca</dt>
+              <dd>{vino.cata.boca}</dd>
+            </div>
+            <div class="cata__bloque cata__bloque--crianza revela">
+              <dt class="antetitulo">Crianza</dt>
+              <dd>{vino.crianza}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    ) : (
+      <section class="cata fondo-cal-2 seccion" aria-labelledby="incluye-titulo">
+        <div class="contenedor">
+          <p class="antetitulo">Lo que hay dentro</p>
+          <h2 id="incluye-titulo" class="titular titular--2">
+            Las cinco <span class="cursiva">esencias.</span>
+          </h2>
+          <ul class="incluye" role="list">
+            {esencias.map((v) => (
+              <li>
+                <a class:list={['incluye__vino', `mono--${v.monograma}`]} href={`/vinos/${v.slug}`}>
+                  <span class="incluye__mono" aria-hidden="true">{v.monograma}</span>
+                  <span class="incluye__nombre">{v.corto}</span>
+                  <span class="incluye__gancho">{v.gancho}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
 
-      <dl class="cata-larga__lista">
-        <div class="revelar" data-retardo="1">
-          <dt class="sello">Color</dt>
-          <dd>{vino.cata.color}</dd>
-        </div>
-        <div class="revelar" data-retardo="2">
-          <dt class="sello">Nariz</dt>
-          <dd>{vino.cata.aroma}</dd>
-        </div>
-        <div class="revelar" data-retardo="3">
-          <dt class="sello">Boca</dt>
-          <dd>{vino.cata.boca}</dd>
-        </div>
-        <div class="revelar" data-retardo="4">
-          <dt class="sello">Crianza</dt>
-          <dd>{vino.crianza}</dd>
-        </div>
-      </dl>
-    </div>
-  </section>
-
-  <!-- ------------------------------------------------------- criaderas -->
-  <section class="banda">
-    <div class="banda__foto">
-      <Image
-        src={solera}
-        alt="Botas del sistema de criaderas y soleras"
-        widths={[720, 1200, 1800]}
-        sizes="100vw"
-        loading="lazy"
-      />
-    </div>
-    <div class="banda__panel grano">
-      <div class="banda__texto">
-        <p class="sello">Criaderas y soleras</p>
-        <h2 class="banda__titulo display">El vino baja de escala en escala</h2>
+  <section class="soleras oscuro" aria-labelledby="soleras-titulo">
+    <div class="contenedor soleras__rejilla">
+      <div class="soleras__foto arco--redondo">
+        <Image src={solera} alt="Pasillo de botas de roble en la bodega" widths={[320, 480, 640]} sizes="(max-width: 800px) 70vw, 360px" />
+      </div>
+      <div class="soleras__texto">
+        <p class="antetitulo">Criaderas y soleras</p>
+        <h2 id="soleras-titulo" class="titular titular--2">El vino baja <span class="cursiva">de escala en escala.</span></h2>
         <p class="lectura">
-          Se saca de la solera, la fila que toca el suelo, y esa se rellena con la criadera de encima. Así
-          hasta arriba. Ningún año se embotella solo: cada botella lleva un poco de todos los anteriores.
+          Se saca de la solera, la fila que toca el suelo, y esa se rellena con la criadera de encima. Así hasta
+          arriba. Ningún año se embotella solo: cada botella lleva un poco de todos los anteriores.
         </p>
-        <a class="boton" href="/produccion">
-          Ver el proceso
-          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-        </a>
+        <a class="boton boton--albero" href="/produccion">Ver el proceso <Icono nombre="flecha" /></a>
       </div>
     </div>
   </section>
 
-  <!-- ------------------------------------------------------------ otros -->
-  <section class="seccion">
-    <div class="contenedor">
-      <h2 class="otros__titulo display revelar">También de la casa</h2>
-      <ul class="otros">
-        {
-          otros.map((v, i) => (
-            <li class="revelar" data-retardo={(i % 4) + 1}>
-              <a class="mini" href={`/vinos/${v.slug}`}>
-                <figure class="mini__foto">
-                  <Image
-                    src={v.imagen}
-                    alt={v.nombre}
-                    widths={[220, 400]}
-                    sizes="(max-width: 48rem) 42vw, 14rem"
-                    loading="lazy"
-                  />
-                </figure>
-                <p class="mini__nombre">{v.corto}</p>
-                <p class="mini__precio">Desde {euros(Math.min(...v.variaciones.map((x) => x.precio)))}</p>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
+  <section class="seccion contenedor" aria-labelledby="otros-titulo">
+    <p class="antetitulo">Explora la bodega</p>
+    <h2 id="otros-titulo" class="titular titular--2 otros__titulo">También <span class="cursiva">de la casa.</span></h2>
+    <ul class="otros" role="list">
+      {otros.map((v) => <li><TarjetaVino producto={v} /></li>)}
+      {!esPack && <li><TarjetaVino producto={pack} /></li>}
+    </ul>
   </section>
 
-  <script
-    is:inline
-    type="application/ld+json"
-    set:html={JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'Product',
-      name: vino.nombre,
-      description: vino.resumen,
-      brand: { '@type': 'Brand', name: 'Bodegas Galán Portero' },
-      category: vino.estilo,
-      offers: vino.variaciones.map((v) => ({
-        '@type': 'Offer',
-        name: v.formato,
-        price: v.precio,
-        priceCurrency: 'EUR',
-        availability: 'https://schema.org/InStock',
-        url: `${TIENDA}/producto/`,
-      })),
-    })}
-  />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(ld)} />
 </Base>
 
+<script>
+  import { euros } from '../../lib/pedido.ts';
+
+  function montarCompra() {
+    const form = document.querySelector<HTMLFormElement>('[data-form-compra]');
+    if (!form) return;
+    const unidades = form.querySelector<HTMLInputElement>('input[name="unidades"]')!;
+    const total = form.querySelector<HTMLOutputElement>('[data-total]')!;
+    const actualizar = () => {
+      const n = Math.max(1, Math.min(99, Math.round(Number(unidades.value) || 1)));
+      unidades.value = String(n);
+      const sel = form.querySelector<HTMLInputElement>('input[name="sku"]:checked, input[name="sku"][type="hidden"]');
+      total.textContent = euros(Math.round(Number(sel?.dataset.precio ?? 0) * 100) * n);
+    };
+    form.addEventListener('change', actualizar);
+    form.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('[data-sumar]')) unidades.value = String(Number(unidades.value) + 1);
+      else if (t.closest('[data-restar]')) unidades.value = String(Number(unidades.value) - 1);
+      else return;
+      actualizar();
+    });
+    actualizar();
+  }
+  document.addEventListener('astro:page-load', montarCompra);
+</script>
+
 <style>
-  .producto {
-    padding-top: calc(var(--e-6) + 1rem);
+  .ficha {
+    padding-block: 24px clamp(64px, 8vw, 112px);
   }
 
-  .miga {
+  .migas {
+    display: flex;
+    gap: 10px;
+    font-size: 0.9375rem;
+    color: var(--texto-2);
+  }
+
+  .migas a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    font-weight: 700;
+    color: var(--hierro);
+  }
+
+  .ficha__rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 80px);
+    margin-top: 24px;
+    align-items: start;
+  }
+
+  .ficha__visual {
+    position: sticky;
+    top: 112px;
+  }
+
+  .ficha__nicho {
+    aspect-ratio: 520 / 640;
+    background: var(--cal-2);
+  }
+
+  .ficha__nicho.nicho--oscuro {
+    background: #1e1c1a;
+  }
+
+  .ficha__mono {
+    position: absolute;
+    top: 12%;
+    left: -14px;
+    --giro: -8deg;
+    border-color: var(--cal);
+    color: var(--blanco);
+    font-size: 3rem;
+  }
+
+  .ficha__joya {
+    position: absolute;
+    top: 10%;
+    right: -14px;
+    --giro: 8deg;
+  }
+
+  .mono--am {
+    background: var(--am);
+  }
+  .mono--pc {
+    background: var(--pc);
+  }
+  .mono--ol {
+    background: var(--ol);
+  }
+  .mono--cr {
+    background: var(--cr);
+    color: var(--hierro);
+  }
+  .mono--px {
+    background: var(--px);
+  }
+
+  .ficha__info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .ficha__etiquetas {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
-    font-family: var(--sello);
-    font-size: var(--t--2);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--texto-tenue);
-    margin-bottom: var(--e-3);
-    align-items: center;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
   }
 
-  .miga a {
-    display: inline-block;
-    padding-block: 0.32rem;
+  .ficha__etiquetas li {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--cal-2);
+    font-size: 0.8125rem;
+    font-weight: 700;
   }
 
-  .miga__actual {
-    color: var(--oro);
+  .ficha__titulo {
+    font-size: clamp(3rem, 5.5vw, 5.5rem);
   }
 
-  .producto__interior {
+  .ficha__gancho {
+    font-family: var(--fraunces);
+    font-style: italic;
+    font-size: clamp(1.3rem, 1.2vw + 0.9rem, 1.75rem);
+    line-height: 1.3;
+    color: var(--albero-osc);
+  }
+
+  /* --- compra --- */
+  .compra {
     display: grid;
-    gap: var(--e-4);
-    align-items: start;
-    padding-bottom: var(--e-5);
+    gap: 20px;
+    padding: clamp(20px, 3vw, 32px);
+    border-radius: var(--radio-g);
+    background: var(--blanco);
   }
 
-  @media (width >= 62rem) {
-    .producto__interior {
-      grid-template-columns: 1fr 1fr;
-      gap: var(--e-5);
-    }
-  }
-
-  .producto__foto {
+  .compra__formatos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
     margin: 0;
-    background: linear-gradient(180deg, var(--azabache-80), color-mix(in srgb, var(--azabache) 90%, var(--caoba)));
-    border: 1px solid var(--filete);
-    padding: var(--e-4);
-    position: relative;
-    overflow: hidden;
+    padding: 0;
+    border: 0;
   }
 
-  /* Halo dorado detrás de la botella, el mismo lenguaje que la vitrina */
-  .producto__foto::before {
-    content: '';
+  .compra__formatos legend {
+    margin-bottom: 10px;
+  }
+
+  .formato {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 16px 18px;
+    border: 2px solid rgba(23, 20, 18, 0.15);
+    border-radius: 20px;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s;
+  }
+
+  .formato:hover {
+    border-color: rgba(23, 20, 18, 0.4);
+  }
+
+  .formato:has(input:checked) {
+    border-color: var(--persiana);
+    background: #eef3ef;
+  }
+
+  .formato:has(input:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .formato:has(input:focus-visible) {
+    outline: 3px solid var(--persiana);
+    outline-offset: 3px;
+  }
+
+  .formato input {
     position: absolute;
+    opacity: 0;
     inset: 0;
-    background: radial-gradient(
-      ellipse 62% 55% at 50% 42%,
-      color-mix(in srgb, var(--oro) 26%, transparent) 0%,
-      transparent 70%
-    );
+    margin: 0;
+    cursor: inherit;
   }
 
-  .producto__foto :global(img) {
-    position: relative;
-    width: 100%;
-    height: auto;
-    object-fit: contain;
+  .formato__etiqueta {
+    font-weight: 800;
   }
 
-  .producto__ficha {
+  .formato__detalle {
+    font-size: 0.875rem;
+    color: var(--texto-2);
+  }
+
+  .formato__precio {
+    margin-top: 8px;
+    font-size: 1.25rem;
+  }
+
+  .compra__fila {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+  }
+
+  .cantidad {
     display: grid;
-    gap: var(--e-2);
-    align-content: start;
+    gap: 8px;
   }
 
-  .producto__nombre {
-    font-size: var(--t-3);
+  .cantidad__mandos {
+    display: flex;
+    align-items: center;
+    border: 2px solid rgba(23, 20, 18, 0.18);
+    border-radius: 999px;
+    width: fit-content;
   }
 
-  .producto__gancho {
-    font-size: var(--t-1);
-    color: color-mix(in srgb, var(--albariza) 85%, transparent);
+  .cantidad__mandos input {
+    width: 3.2ch;
+    border: 0;
+    background: transparent;
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: 800;
+    -moz-appearance: textfield;
   }
 
-  .producto__rango {
-    font-family: var(--display);
-    font-size: var(--t-2);
-    color: var(--oro-claro);
+  .cantidad__mandos input::-webkit-inner-spin-button,
+  .cantidad__mandos input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
   }
 
-  .producto__resumen {
-    color: var(--texto-tenue);
-    padding-bottom: var(--e-1);
-    border-bottom: 1px solid var(--filete);
+  .compra__total {
+    display: grid;
+    justify-items: end;
+    gap: 2px;
+  }
+
+  .compra__total output {
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+
+  .compra__boton:disabled {
+    opacity: 0.45;
   }
 
   .garantias {
-    list-style: none;
-    margin: var(--e-1) 0 0;
-    padding: 0;
     display: grid;
-    gap: 0.55rem;
-    font-size: var(--t--2);
-    font-family: var(--sello);
-    letter-spacing: 0.06em;
-    color: var(--texto-tenue);
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
   }
 
   .garantias li {
-    padding-left: 1.4em;
-    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  .garantias li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.55em;
-    width: 0.7em;
-    height: 1px;
-    background: var(--oro);
+  .garantias :global(svg) {
+    color: var(--albero-osc);
   }
 
-  /* ---------------------------------------------------------- la cata */
-
-  .cata-larga__interior {
+  /* --- cata --- */
+  .cata__rejilla {
     display: grid;
-    gap: var(--e-4);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 40px;
   }
 
-  @media (width >= 56rem) {
-    .cata-larga__interior {
-      grid-template-columns: 18rem 1fr;
-      gap: var(--e-5);
-    }
-  }
-
-  .cata-larga__titulo {
-    font-size: var(--t-3);
-    margin-top: 0.3em;
-  }
-
-  .cata-larga__lista {
-    margin: 0;
+  .cata__bloque {
     display: grid;
-    gap: 0;
-  }
-
-  .cata-larga__lista > div {
-    display: grid;
-    gap: 0.6rem;
-    padding-block: var(--e-3);
-    border-top: 1px solid var(--filete);
-  }
-
-  @media (width >= 40rem) {
-    .cata-larga__lista > div {
-      grid-template-columns: 8rem 1fr;
-      gap: var(--e-2);
-    }
-  }
-
-  .cata-larga__lista dt {
-    color: var(--caoba);
-  }
-
-  .cata-larga__lista dd {
-    margin: 0;
-    font-size: var(--t-1);
+    align-content: start;
+    gap: 14px;
+    padding: 28px;
+    border-radius: var(--radio);
+    background: var(--blanco);
+    font-size: 1.0625rem;
     line-height: 1.6;
   }
 
-  /* ----------------------------------------------------------- banda */
+  .cata__bloque--color {
+    background: var(--caoba);
+    color: var(--cal);
+  }
 
-  .banda {
-    position: relative;
+  .cata__bloque--color .antetitulo {
+    color: var(--albero);
+  }
+
+  .cata__bloque--crianza {
+    grid-column: 1 / -1;
+    background: var(--albero);
+  }
+
+  .cata__bloque--crianza .antetitulo {
+    color: var(--hierro);
+  }
+
+  .incluye {
     display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 40px;
+    list-style: none;
+    padding: 0;
   }
 
-  .banda__foto,
-  .banda__panel {
-    grid-area: 1 / 1;
+  .incluye__vino {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    padding: 24px;
+    border-radius: var(--radio);
+    color: var(--blanco);
+    text-decoration: none;
+    transition: transform 0.3s var(--curva);
   }
 
-  .banda__foto :global(img) {
+  .incluye__vino:hover {
+    transform: translateY(-4px);
+  }
+
+  .incluye__mono {
+    font-family: var(--fraunces);
+    font-style: italic;
+    font-size: 4.5rem;
+    line-height: 0.8;
+  }
+
+  .incluye__nombre {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .incluye__gancho {
+    font-size: 0.9375rem;
+  }
+
+  /* --- soleras --- */
+  .soleras {
+    padding-block: clamp(64px, 8vw, 104px);
+  }
+
+  .soleras__rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+  }
+
+  .soleras__foto {
+    aspect-ratio: 360 / 460;
+  }
+
+  .soleras__foto :global(img) {
     width: 100%;
     height: 100%;
-    min-height: 24rem;
     object-fit: cover;
   }
 
-  .banda__panel {
-    position: relative;
+  .soleras__texto {
     display: grid;
-    align-items: center;
-    background: linear-gradient(
-      90deg,
-      var(--azabache) 0%,
-      color-mix(in srgb, var(--azabache) 86%, transparent) 48%,
-      transparent 100%
-    );
+    justify-items: start;
+    gap: 24px;
   }
 
-  @media (width < 48rem) {
-    .banda__panel {
-      background: color-mix(in srgb, var(--azabache) 84%, transparent);
-    }
-  }
-
-  .banda__texto {
-    width: min(100% - 2.5rem, var(--ancho));
-    margin-inline: auto;
-    padding-block: var(--e-5);
-  }
-
-  @media (width >= 48rem) {
-    .banda__texto {
-      width: min(100% - 5rem, var(--ancho));
-      padding-inline-end: 48%;
-    }
-  }
-
-  .banda__titulo {
-    font-size: var(--t-3);
-    margin-block: 0.3em 0.5em;
-  }
-
-  .banda__texto .boton {
-    margin-top: var(--e-3);
-  }
-
-  /* ------------------------------------------------------------ otros */
-
+  /* --- otros --- */
   .otros__titulo {
-    font-size: var(--t-2);
-    margin-bottom: var(--e-3);
+    margin-top: 16px;
   }
 
   .otros {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 24px);
+    margin-top: 40px;
     list-style: none;
-    margin: 0;
     padding: 0;
-    display: grid;
-    gap: var(--e-2);
-    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   }
 
-  .mini {
-    text-decoration: none;
-    display: grid;
-    gap: 0.4rem;
-    padding-bottom: var(--e-1);
+  .otros > li {
+    display: flex;
   }
 
-  .mini__foto {
-    margin: 0 0 0.6rem;
-    overflow: hidden;
-    background: color-mix(in srgb, var(--azabache) 88%, var(--caoba));
-    border: 1px solid var(--filete);
-    transition: border-color 0.4s var(--salida);
+  .otros > li > :global(.tarjeta) {
+    flex: 1;
   }
 
-  .mini:hover .mini__foto {
-    border-color: color-mix(in srgb, var(--oro) 60%, transparent);
+  @media (max-width: 1100px) {
+    .otros {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .incluye {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .cata__rejilla {
+      grid-template-columns: 1fr;
+    }
   }
 
-  .mini__foto :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: contain;
-    padding: var(--e-2);
-    transition: scale 0.6s var(--salida);
+  @media (max-width: 900px) {
+    .ficha__rejilla {
+      grid-template-columns: 1fr;
+    }
+    .ficha__visual {
+      position: relative;
+      top: 0;
+      width: min(100%, 420px);
+      margin-inline: auto;
+    }
+    .ficha__mono {
+      left: 0;
+      font-size: 2.2rem;
+    }
+    .ficha__joya {
+      right: 0;
+    }
+    .soleras__rejilla {
+      grid-template-columns: 1fr;
+    }
+    .soleras__foto {
+      width: min(70%, 300px);
+    }
   }
 
-  .mini:hover .mini__foto :global(img) {
-    scale: 1.07;
-  }
-
-  .mini__nombre {
-    font-family: var(--display);
-    font-size: var(--t-1);
-  }
-
-  .mini__precio {
-    font-size: var(--t--2);
-    font-family: var(--sello);
-    letter-spacing: 0.1em;
-    color: var(--texto-tenue);
+  @media (max-width: 420px) {
+    .compra__formatos {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -1,0 +1,12 @@
+<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #1c1511">
+  <h2 style="margin: 0 0 16px">Confirma tu correo</h2>
+  <p>Gracias por crear tu cuenta en <strong>Bodegas Galán Portero</strong>.</p>
+  <p>Pulsa el botón para confirmar tu correo y entrar:</p>
+  <p style="margin: 28px 0">
+    <a href="{{ .SiteURL }}/cuenta/confirmar?token_hash={{ .TokenHash }}&type=email"
+       style="background: #1c1511; color: #ffffff; padding: 14px 24px; border-radius: 999px; text-decoration: none; font-weight: bold">
+      Confirmar mi correo
+    </a>
+  </p>
+  <p style="color: #6b5e55; font-size: 14px">Si no has sido tú, ignora este mensaje: sin confirmar, la cuenta no se puede usar.</p>
+</div>

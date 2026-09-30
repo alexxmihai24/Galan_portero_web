@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import copas from '../assets/fotos/copas.jpg';
+/** Marco de las pantallas de entrar y registrarse: foto en arco + formulario. */
+interface Props {
+  antetitulo: string;
+}
+const { antetitulo } = Astro.props;
+---
+
+<section class="caja-cuenta contenedor">
+  <div class="caja-cuenta__foto arco--redondo" aria-hidden="true">
+    <Image src={copas} alt="" widths={[360, 540, 720]} sizes="(max-width: 900px) 0px, 440px" loading="eager" />
+  </div>
+  <div class="caja-cuenta__form">
+    <p class="antetitulo">{antetitulo}</p>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .caja-cuenta {
+    display: grid;
+    grid-template-columns: minmax(0, 440px) minmax(0, 520px);
+    justify-content: center;
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+    padding-block: clamp(32px, 6vw, 88px);
+  }
+
+  .caja-cuenta__foto {
+    aspect-ratio: 440 / 560;
+    border: 12px solid var(--albero);
+    border-bottom-width: 12px;
+  }
+
+  .caja-cuenta__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .caja-cuenta__form {
+    display: grid;
+    gap: 20px;
+  }
+
+  .caja-cuenta__form :global(form) {
+    display: grid;
+    gap: 18px;
+    padding: clamp(24px, 3.5vw, 36px);
+    border-radius: var(--radio-g);
+    background: var(--blanco);
+  }
+
+  @media (max-width: 900px) {
+    .caja-cuenta {
+      grid-template-columns: 1fr;
+    }
+    .caja-cuenta__foto {
+      display: none;
+    }
+  }
+</style>

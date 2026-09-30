@@ -19,6 +19,10 @@ const rutas = [
   '/produccion',
   '/personalizados',
   '/contacto',
+  '/cesta',
+  '/cuenta/entrar',
+  '/cuenta/registro',
+  '/vinos/pack-5-essences',
   '/404',
 ];
 

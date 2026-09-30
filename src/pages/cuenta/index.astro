@@ -1,0 +1,282 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icono from '../../components/Icono.astro';
+import Miniatura from '../../components/Miniatura.astro';
+import { articulos } from '../../lib/catalogo';
+import { euros } from '../../lib/pedido';
+import { ETIQUETA_ESTADO, fecha, pedidosDeUsuario, productosComprados } from '../../lib/pedidos';
+
+export const prerender = false;
+
+const usuario = Astro.locals.usuario!; // el middleware ya exige sesión
+// Con la sesión del cliente: RLS solo le deja leer sus pedidos.
+const [pedidos, catalogo] = await Promise.all([pedidosDeUsuario(Astro.locals.supabase!, usuario.id), articulos()]);
+const comprados = productosComprados(pedidos);
+const nombreCorto = usuario.nombre.split(' ')[0];
+const aviso = Astro.url.searchParams.has('bienvenida')
+  ? 'Correo confirmado. Ya tienes tu cuenta: si tenías vinos en la cesta, siguen ahí.'
+  : Astro.url.searchParams.get('aviso') === 'clave'
+    ? 'Contraseña cambiada. Hemos cerrado tu sesión en los demás dispositivos.'
+    : '';
+---
+
+<Base titulo="Mi cuenta" descripcion="Tus pedidos y tus vinos en Bodegas Galán Portero." privada>
+  <section class="cuenta contenedor">
+    {aviso && <p class="aviso aviso--ok cuenta__aviso" role="status">{aviso}</p>}
+    <header class="cuenta__cabeza">
+      <div>
+        <p class="antetitulo">Mi cuenta</p>
+        <h1 class="titular titular--1 cuenta__titulo">Hola, <span class="cursiva">{nombreCorto}.</span></h1>
+      </div>
+      <div class="cuenta__datos">
+        <p>{usuario.email}</p>
+        <div class="cuenta__acciones">
+          {usuario.rol === 'admin' && <a class="boton boton--albero boton--pequeno" href="/admin">Panel de la bodega</a>}
+          <form method="post" action="/cuenta/salir" data-astro-reload>
+            <button class="boton boton--pequeno" type="submit">Cerrar sesión</button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <div class="cuenta__rejilla">
+      <section aria-labelledby="pedidos-titulo">
+        <h2 id="pedidos-titulo" class="titular titular--3">Tus pedidos</h2>
+        {
+          pedidos.length === 0 ? (
+            <div class="vacio">
+              <p class="vacio__titulo">Todavía no has pedido <span class="cursiva">nada.</span></p>
+              <p class="lectura">Cuando compres, aquí verás cada pedido y en qué punto está: pagado, enviado o entregado.</p>
+              <a class="boton boton--primario" href="/vinos">Ver los vinos <Icono nombre="flecha" /></a>
+            </div>
+          ) : (
+            <ul class="pedidos" role="list">
+              {pedidos.map((p) => (
+                <li>
+                  <a class="pedido" href={`/cuenta/pedidos/${p.id}`}>
+                    <div class="pedido__cabeza">
+                      <span class="pedido__num">Pedido nº {p.id}</span>
+                      <span class={`estado estado--${p.estado}`}>{ETIQUETA_ESTADO[p.estado]}</span>
+                    </div>
+                    <div class="pedido__fotos" aria-hidden="true">
+                      {p.lineas.slice(0, 5).map((l) => <Miniatura articulo={catalogo.get(l.sku)} tam={44} />)}
+                    </div>
+                    <div class="pedido__pie">
+                      <span>{fecha(p.creado)} · {p.lineas.reduce((s, l) => s + l.unidades, 0)} botellas</span>
+                      <span class="precio">{euros(p.total_cent)}</span>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+
+      <aside class="comprados" aria-labelledby="comprados-titulo">
+        <h2 id="comprados-titulo" class="titular titular--3">Tus <span class="cursiva">vinos</span></h2>
+        {
+          comprados.length === 0 ? (
+            <p class="lectura">Aquí aparecerán los vinos que ya has probado, para repetir con un clic.</p>
+          ) : (
+            <ul class="comprados__lista" role="list">
+              {comprados.map((c) => {
+                const a = catalogo.get(c.sku);
+                const sigueALaVenta = a && a.activo && a.stock !== 0;
+                return (
+                  <li class="comprado" data-producto>
+                    <Miniatura articulo={a} tam={56} />
+                    <div class="comprado__info">
+                      {a ? <a class="comprado__nombre" href={`/vinos/${a.slug}`}>{c.nombre}</a> : <span class="comprado__nombre">{c.nombre}</span>}
+                      <span class="comprado__detalle">{c.formato} · {c.unidades} en total</span>
+                    </div>
+                    {sigueALaVenta && (
+                      <button class="boton-icono boton-icono--borde" type="button" data-anadir data-sku={c.sku} data-nombre={c.nombre} aria-label={`Volver a pedir ${c.nombre}`}>
+                        <Icono nombre="mas" />
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )
+        }
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .cuenta {
+    padding-block: clamp(32px, 5vw, 72px) clamp(64px, 8vw, 112px);
+  }
+
+  .cuenta__aviso {
+    margin-bottom: 28px;
+  }
+
+  .cuenta__cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+  }
+
+  .cuenta__titulo {
+    margin-top: 16px;
+  }
+
+  .cuenta__datos {
+    display: grid;
+    justify-items: end;
+    gap: 10px;
+    color: var(--texto-2);
+  }
+
+  .cuenta__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .cuenta__rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+    margin-top: clamp(40px, 5vw, 64px);
+  }
+
+  .vacio {
+    display: grid;
+    justify-items: start;
+    gap: 16px;
+    margin-top: 20px;
+    padding: clamp(24px, 4vw, 40px);
+    border-radius: var(--radio-g);
+    background: var(--blanco);
+  }
+
+  .vacio__titulo {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .pedidos {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+  }
+
+  .pedido {
+    display: grid;
+    gap: 14px;
+    padding: 22px 24px;
+    border-radius: var(--radio);
+    background: var(--blanco);
+    text-decoration: none;
+    transition:
+      transform 0.3s var(--curva),
+      box-shadow 0.3s var(--curva);
+  }
+
+  .pedido:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra);
+  }
+
+  .pedido__cabeza,
+  .pedido__pie {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px 16px;
+  }
+
+  .pedido__num {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .pedido__fotos {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pedido__pie {
+    color: var(--texto-2);
+    font-size: 0.9375rem;
+  }
+
+  .pedido__pie .precio {
+    color: var(--hierro);
+    font-size: 1.2rem;
+  }
+
+  .comprados {
+    position: sticky;
+    top: 112px;
+    padding: 28px;
+    border-radius: var(--radio-g);
+    background: var(--cal-2);
+  }
+
+  .comprados .lectura {
+    margin-top: 12px;
+  }
+
+  .comprados__lista {
+    display: grid;
+    gap: 4px;
+    margin-top: 16px;
+    list-style: none;
+    padding: 0;
+  }
+
+  .comprado {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 0;
+  }
+
+  .comprado__info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .comprado__nombre {
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .comprado__nombre:hover {
+    text-decoration: underline;
+  }
+
+  .comprado__detalle {
+    font-size: 0.875rem;
+    color: var(--texto-2);
+  }
+
+  @media (max-width: 900px) {
+    .cuenta__rejilla {
+      grid-template-columns: 1fr;
+    }
+    .cuenta__datos {
+      justify-items: start;
+    }
+    .comprados {
+      position: static;
+    }
+  }
+</style>

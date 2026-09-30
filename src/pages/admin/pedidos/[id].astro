@@ -1,0 +1,225 @@
+---
+import Base from '../../../layouts/Base.astro';
+import NavAdmin from '../../../components/NavAdmin.astro';
+import Miniatura from '../../../components/Miniatura.astro';
+import { articulos } from '../../../lib/catalogo';
+import { euros } from '../../../lib/pedido';
+import { cambiarEstado, ESTADOS, estadosSiguientes, ETIQUETA_ESTADO, fecha, pedidoAdmin, type Estado } from '../../../lib/pedidos';
+
+export const prerender = false;
+
+const id = Number(Astro.params.id);
+if (!Number.isSafeInteger(id) || id <= 0 || !(await pedidoAdmin(id))) return new Response(null, { status: 404 });
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  const nuevo = String((await Astro.request.formData()).get('estado'));
+  if (ESTADOS.includes(nuevo as Estado) && (await cambiarEstado(id, nuevo as Estado))) {
+    return Astro.redirect(`/admin/pedidos/${id}?cambiado=${nuevo}`);
+  }
+  error = 'Ese cambio de estado no es posible.';
+  Astro.response.status = 400;
+}
+
+const [pedido, catalogo] = await Promise.all([pedidoAdmin(id), articulos()]);
+if (!pedido) return new Response(null, { status: 404 });
+const cambiado = Astro.url.searchParams.get('cambiado') as Estado | null;
+const acciones: Record<Estado, string> = {
+  pendiente: '',
+  pagado: '',
+  enviado: 'Marcar como enviado',
+  entregado: 'Marcar como entregado',
+  cancelado: 'Cancelar pedido',
+};
+---
+
+<Base titulo={`Pedido nº ${pedido.id}`} descripcion="Detalle del pedido" privada>
+  <section class="admin contenedor">
+    <NavAdmin titulo="Pedido" cursiva={`nº ${pedido.id}`} />
+
+    {cambiado && ETIQUETA_ESTADO[cambiado] && <p class="aviso aviso--ok" role="status">Estado cambiado a «{ETIQUETA_ESTADO[cambiado]}».</p>}
+    {error && <p class="aviso aviso--error" role="alert">{error}</p>}
+
+    <div class="rejilla">
+      <div class="caja">
+        <div class="caja__cabeza">
+          <span class={`estado estado--${pedido.estado}`}>{ETIQUETA_ESTADO[pedido.estado]}</span>
+          <span>Hecho el {fecha(pedido.creado, true)}{pedido.pagado && ` · pagado el ${fecha(pedido.pagado, true)}`}</span>
+        </div>
+        <ul class="lineas" role="list">
+          {
+            pedido.lineas.map((l) => (
+              <li>
+                <Miniatura articulo={catalogo.get(l.sku)} tam={48} />
+                <span class="lineas__nombre">
+                  {l.nombre}
+                  <small>{l.formato} · SKU {l.sku}</small>
+                </span>
+                <strong class="lineas__uds">× {l.unidades}</strong>
+                <span class="precio">{euros(l.precio_cent * l.unidades)}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <dl class="totales">
+          <div><dt>Subtotal</dt><dd>{euros(pedido.subtotal_cent)}</dd></div>
+          <div><dt>Envío</dt><dd>{pedido.envio_cent ? euros(pedido.envio_cent) : 'Gratis'}</dd></div>
+          <div class="totales__total"><dt>Total cobrado</dt><dd>{euros(pedido.total_cent)}</dd></div>
+        </dl>
+      </div>
+
+      <aside class="lado">
+        <div>
+          <h2 class="antetitulo">Cliente</h2>
+          <p class="lado__texto"><strong>{pedido.cliente}</strong><br /><a class="enlace" href={`mailto:${pedido.email}`}>{pedido.email}</a></p>
+        </div>
+        <div>
+          <h2 class="antetitulo">Enviar a</h2>
+          <p class="lado__texto">
+            {pedido.envio_direccion ? (
+              <>
+                {pedido.envio_nombre && <strong>{pedido.envio_nombre}</strong>}
+                <br />
+                {pedido.envio_direccion}
+              </>
+            ) : (
+              'Sin dirección (el pago no se ha completado).'
+            )}
+          </p>
+        </div>
+        {
+          pedido.stripe_sesion && (
+            <div>
+              <h2 class="antetitulo">Pago en Stripe</h2>
+              <p class="lado__texto lado__codigo">{pedido.stripe_sesion}</p>
+            </div>
+          )
+        }
+        {
+          estadosSiguientes(pedido.estado).length > 0 && (
+            <form method="post" class="lado__acciones" data-astro-reload>
+              {estadosSiguientes(pedido.estado).map((e) => (
+                <button class:list={['boton boton--bloque', e === 'cancelado' ? '' : 'boton--primario']} type="submit" name="estado" value={e}>
+                  {acciones[e]}
+                </button>
+              ))}
+              {pedido.estado === 'pagado' && <p class="lado__nota">Cancelar aquí no devuelve el dinero: haz el reembolso desde el panel de Stripe.</p>}
+            </form>
+          )
+        }
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .admin {
+    display: grid;
+    gap: 28px;
+    padding-block: clamp(32px, 5vw, 64px) clamp(64px, 8vw, 112px);
+  }
+
+  .rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+    gap: clamp(24px, 4vw, 48px);
+    align-items: start;
+  }
+
+  .caja {
+    padding: clamp(20px, 3vw, 32px);
+    border-radius: var(--radio-g);
+    background: var(--blanco);
+  }
+
+  .caja__cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    color: var(--texto-2);
+  }
+
+  .lineas {
+    margin-top: 16px;
+    list-style: none;
+    padding: 0;
+  }
+
+  .lineas li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--linea);
+  }
+
+  .lineas__nombre {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    font-weight: 800;
+  }
+
+  .lineas__nombre small {
+    font-weight: 400;
+    color: var(--texto-2);
+  }
+
+  .lineas__uds {
+    font-size: 1.2rem;
+  }
+
+  .totales {
+    display: grid;
+    gap: 6px;
+    margin-top: 16px;
+  }
+
+  .totales div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .totales__total {
+    padding-top: 10px;
+    border-top: 1px solid var(--linea);
+    font-size: 1.3rem;
+    font-weight: 800;
+  }
+
+  .lado {
+    display: grid;
+    gap: 22px;
+    padding: 24px;
+    border-radius: var(--radio-g);
+    background: var(--cal-2);
+  }
+
+  .lado__texto {
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .lado__codigo {
+    font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+
+  .lado__acciones {
+    display: grid;
+    gap: 10px;
+  }
+
+  .lado__nota {
+    font-size: 0.875rem;
+    color: var(--texto-2);
+  }
+
+  @media (max-width: 900px) {
+    .rejilla {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

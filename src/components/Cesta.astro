@@ -1,0 +1,132 @@
+---
+import Icono from './Icono.astro';
+import LineasCesta from './LineasCesta.astro';
+---
+
+<dialog class="cesta" data-cesta aria-labelledby="cesta-titulo">
+  <div class="cesta__panel">
+    <header class="cesta__cabeza">
+      <h2 id="cesta-titulo" class="cesta__titulo">Tu <span class="cursiva">cesta</span></h2>
+      <button class="boton-icono boton-icono--borde" type="button" data-cerrar-cesta aria-label="Cerrar la cesta">
+        <Icono nombre="cerrar" tam={22} />
+      </button>
+    </header>
+    <LineasCesta modo="panel" />
+  </div>
+</dialog>
+
+<div class="aviso-cesta" data-aviso-cesta role="status" aria-live="polite" hidden>
+  <span class="aviso-cesta__texto"><span class="aviso-cesta__sub">Añadido a la cesta</span><strong data-aviso-nombre></strong></span>
+  <button class="boton boton--albero boton--pequeno" type="button" data-abrir-cesta>Ver cesta</button>
+</div>
+
+<script>
+  import '../scripts/cesta.ts';
+</script>
+
+<style>
+  .cesta {
+    width: min(460px, 100%);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0 0 0 auto;
+    padding: 0;
+    border: 0;
+    background: var(--cal);
+    color: var(--hierro);
+  }
+
+  .cesta::backdrop {
+    background: rgba(23, 20, 18, 0.45);
+    backdrop-filter: blur(3px);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cesta[open] {
+      animation: cesta-entra 0.45s var(--curva);
+    }
+    .cesta[open]::backdrop {
+      animation: velo 0.35s ease;
+    }
+  }
+
+  @keyframes cesta-entra {
+    from {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes velo {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .cesta__panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .cesta__cabeza {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 12px 24px;
+  }
+
+  .cesta__titulo {
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .aviso-cesta {
+    position: fixed;
+    z-index: 50;
+    left: 50%;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    translate: -50% 0;
+    width: min(460px, calc(100% - 24px));
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 10px 10px 22px;
+    border-radius: 999px;
+    background: var(--hierro);
+    color: var(--cal);
+    box-shadow: 0 14px 36px rgba(23, 20, 18, 0.3);
+  }
+
+  .aviso-cesta:not([hidden]) {
+    animation: aviso-entra 0.45s var(--curva);
+  }
+
+  @keyframes aviso-entra {
+    from {
+      opacity: 0;
+      translate: -50% 24px;
+    }
+  }
+
+  .aviso-cesta__texto {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  .aviso-cesta__texto strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .aviso-cesta__sub {
+    font-size: 0.8125rem;
+    color: var(--caoba-texto);
+  }
+</style>

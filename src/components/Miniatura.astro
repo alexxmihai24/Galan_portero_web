@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import type { Articulo } from '../lib/catalogo';
+/** Botella pequeña en su nicho, para listas de pedidos. */
+interface Props {
+  articulo: Articulo | undefined;
+  tam?: number;
+}
+const { articulo, tam = 64 } = Astro.props;
+const src = articulo?.recorte ?? articulo?.imagen;
+---
+
+<span class:list={['mini', articulo?.recorte ? 'mini--recorte' : 'mini--foto']} style={`--tam:${tam}px`}>
+  {src && <Image src={src} alt="" width={tam * 2} />}
+</span>
+
+<style>
+  .mini {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--tam);
+    height: calc(var(--tam) * 1.25);
+    overflow: hidden;
+    border-radius: 999px 999px 10px 10px;
+    background: var(--cal-2);
+  }
+
+  .mini--foto {
+    background: #1e1c1a;
+  }
+
+  .mini :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mini--recorte :global(img) {
+    width: auto;
+    height: 86%;
+    object-fit: contain;
+  }
+</style>

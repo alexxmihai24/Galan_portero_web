@@ -1,0 +1,149 @@
+---
+import Base from '../../layouts/Base.astro';
+import NavAdmin from '../../components/NavAdmin.astro';
+import Miniatura from '../../components/Miniatura.astro';
+import { actualizarProducto, articulos } from '../../lib/catalogo';
+
+export const prerender = false;
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  const d = await Astro.request.formData();
+  const sku = Number(d.get('sku'));
+  const stockTexto = String(d.get('stock') ?? '').trim();
+  try {
+    await actualizarProducto(sku, {
+      precio_cent: Math.round(Number(String(d.get('precio')).replace(',', '.')) * 100),
+      stock: stockTexto === '' ? null : Number(stockTexto),
+      activo: d.get('activo') === 'si',
+    });
+    return Astro.redirect(`/admin/productos?guardado=${sku}#fila-${sku}`);
+  } catch (e) {
+    error = (e as Error).message;
+    Astro.response.status = 400;
+  }
+}
+
+const guardado = Number(Astro.url.searchParams.get('guardado'));
+const lista = [...(await articulos(true)).values()]; // sin caché: el admin ve lo guardado
+---
+
+<Base titulo="Productos" descripcion="Precios y stock" privada>
+  <section class="admin contenedor">
+    <NavAdmin titulo="Productos" />
+    <p class="lectura">
+      Cambia precio, stock y si se vende. <strong>Stock vacío</strong> = sin control (nunca se agota). Los textos y las
+      fotos se editan en <code>src/data/vinos.ts</code>.
+    </p>
+    {error && <p class="aviso aviso--error" role="alert">{error}</p>}
+
+    <div class="tabla-caja">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio (€)</th>
+            <th>Stock</th>
+            <th>A la venta</th>
+            <th><span class="oculto-visual">Guardar</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            lista.map((a) => {
+              const f = `p-${a.sku}`;
+              return (
+                <tr id={`fila-${a.sku}`} class:list={[guardado === a.sku && 'recien']}>
+                  <td>
+                    <div class="producto">
+                      <Miniatura articulo={a} tam={40} />
+                      <span>
+                        <strong>{a.nombre}</strong>
+                        <br />
+                        <small>{a.formato} · SKU {a.sku}</small>
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <label class="oculto-visual" for={`${f}-precio`}>Precio de {a.nombre}, {a.formato}</label>
+                    <input class="dato" id={`${f}-precio`} form={f} name="precio" type="number" min="0" step="0.01" required value={(a.precio_cent / 100).toFixed(2)} />
+                  </td>
+                  <td>
+                    <label class="oculto-visual" for={`${f}-stock`}>Stock de {a.nombre}, {a.formato}</label>
+                    <input class="dato" id={`${f}-stock`} form={f} name="stock" type="number" min="0" step="1" placeholder="∞" value={a.stock ?? ''} />
+                  </td>
+                  <td>
+                    <label class="interruptor">
+                      <input form={f} type="checkbox" name="activo" value="si" checked={a.activo} />
+                      <span class="oculto-visual">{a.nombre}, {a.formato} a la venta</span>
+                    </label>
+                  </td>
+                  <td class="num">
+                    <form id={f} method="post" data-astro-reload>
+                      <input type="hidden" name="sku" value={a.sku} />
+                      <button class="boton boton--primario boton--pequeno" type="submit">
+                        {guardado === a.sku ? 'Guardado ✓' : 'Guardar'}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .admin {
+    display: grid;
+    gap: 24px;
+    padding-block: clamp(32px, 5vw, 64px) clamp(64px, 8vw, 112px);
+  }
+
+  .producto {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 220px;
+  }
+
+  small {
+    color: var(--texto-2);
+  }
+
+  .dato {
+    width: 7.5rem;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 2px solid rgba(23, 20, 18, 0.2);
+    border-radius: 12px;
+    background: var(--cal);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dato:focus {
+    outline: none;
+    border-color: var(--persiana);
+  }
+
+  .interruptor input {
+    width: 24px;
+    height: 24px;
+    accent-color: var(--persiana);
+  }
+
+  .recien {
+    background: #eef3ef;
+  }
+
+  code {
+    font-size: 0.9em;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--cal-2);
+  }
+</style>

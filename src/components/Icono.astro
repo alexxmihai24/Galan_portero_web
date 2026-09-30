@@ -1,0 +1,37 @@
+---
+/** Iconos de trazo (1.8) en línea. Decorativos: el texto o el aria-label lo pone quien los usa. */
+interface Props {
+  nombre: 'flecha' | 'flecha-izq' | 'bolsa' | 'usuario' | 'menu' | 'cerrar' | 'mas' | 'menos' | 'sol' | 'externo' | 'papelera';
+  tam?: number;
+  class?: string;
+}
+const { nombre, tam = 20, class: clase } = Astro.props;
+const trazos: Record<Props['nombre'], string> = {
+  flecha: '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
+  'flecha-izq': '<path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/>',
+  bolsa: '<path d="M5 8h14l-1 13H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  usuario: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  menu: '<path d="M4 8h16M4 16h11"/>',
+  cerrar: '<path d="M6 6l12 12M18 6L6 18"/>',
+  mas: '<path d="M12 5v14M5 12h14"/>',
+  menos: '<path d="M5 12h14"/>',
+  sol: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  externo: '<path d="M14 5h5v5"/><path d="M19 5l-9 9"/><path d="M18 14v5H5V6h5"/>',
+  papelera: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+};
+---
+
+<svg
+  class:list={[nombre === 'flecha' && 'flecha', clase]}
+  width={tam}
+  height={tam}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  set:html={trazos[nombre]}
+/>

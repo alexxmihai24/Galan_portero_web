@@ -1,113 +1,90 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import { pack } from '../data/vinos';
-
+import PortadaPagina from '../components/PortadaPagina.astro';
+import Icono from '../components/Icono.astro';
+import { ENVIO_GRATIS_DESDE, pack } from '../data/vinos';
 import brindis from '../assets/fotos/woman.jpg';
 import cata from '../assets/fotos/woman-wine.jpg';
 
-const ocasiones = ['Bodas', 'Comuniones', 'Bautizos', 'Empresa', 'Aniversarios', 'Ferias y congresos'];
+// Cada ocasión, una pegatina con su color y su giro.
+const ocasiones = [
+  { texto: 'Bodas', clase: 'pegatina--albero', giro: -6 },
+  { texto: 'Comuniones', clase: 'pegatina--persiana', giro: 4 },
+  { texto: 'Bautizos', clase: 'oc--am', giro: -3 },
+  { texto: 'Empresa', clase: '', giro: 7 },
+  { texto: 'Aniversarios', clase: 'oc--ol', giro: -8 },
+  { texto: 'Ferias y congresos', clase: 'oc--cr', giro: 3 },
+];
+const pasos = [
+  { titulo: 'Nos escribes', texto: 'Ocasión, número de botellas, fecha y qué vino te gusta. Si no lo tienes claro, te asesoramos.' },
+  { titulo: 'Diseñamos la etiqueta', texto: 'Con vuestros nombres, la fecha, un logo de empresa o lo que haga falta. Te la enseñamos antes de imprimir nada.' },
+  { titulo: 'Lo preparamos y te llega', texto: `Embotellado, etiquetado y enviado. Envío gratis a península a partir de ${ENVIO_GRATIS_DESDE} €.` },
+];
 ---
 
 <Base
   titulo="Productos personalizados"
   descripcion="Botellas de Bodegas Galán Portero con etiqueta personalizada para bodas, comuniones, empresas y celebraciones. Pide presupuesto sin compromiso."
 >
-  <section class="cabeza seccion">
-    <div class="contenedor cabeza__interior">
-      <div>
-        <p class="sello">Para tu evento especial</p>
-        <h1 class="cabeza__titulo display">Con vuestro<br />nombre en la etiqueta</h1>
-        <p class="cabeza__entrada lectura">
-          El mismo vino de siempre, con la etiqueta que vosotros queráis. Un detalle que se bebe y que la
-          gente recuerda.
-        </p>
-        <a class="boton boton--solido" href="/contacto">
-          Pedir presupuesto
-          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-        </a>
-      </div>
+  <PortadaPagina antetitulo="Para tu evento especial" imagen={pack.imagen} alt="Las cinco botellas de 5 Essences, con la etiqueta a la vista" pegatina="Sin compromiso">
+    <Fragment slot="titulo">Con vuestro nombre <span class="cursiva">en la etiqueta.</span></Fragment>
+    <p>El mismo vino de siempre, con la etiqueta que vosotros queráis. Un detalle que se bebe y que la gente recuerda.</p>
+    <Fragment slot="acciones">
+      <a class="boton boton--primario" href="/contacto">Pedir presupuesto <Icono nombre="flecha" /></a>
+      <a class="boton" href="tel:+34957664237">957 66 42 37</a>
+    </Fragment>
+  </PortadaPagina>
 
-      <figure class="cabeza__foto">
-        <Image
-          src={pack.imagen}
-          alt="Las cinco botellas de 5 Essences, con la etiqueta a la vista"
-          widths={[480, 800, 1200]}
-          sizes="(max-width: 56rem) 90vw, 28rem"
-          loading="eager"
-        />
-      </figure>
-    </div>
-  </section>
-
-  <!-- -------------------------------------------------------- ocasiones -->
-  <section class="papel seccion">
+  <section class="ocasiones fondo-cal-2 seccion" aria-labelledby="ocasiones-titulo">
     <div class="contenedor">
-      <h2 class="ocasiones__titulo display revelar">Para qué se suele pedir</h2>
-      <ul class="ocasiones">
+      <p class="antetitulo">Celebraciones y eventos</p>
+      <h2 id="ocasiones-titulo" class="titular titular--2 ocasiones__titulo">Para qué <span class="cursiva">se suele pedir.</span></h2>
+      <ul class="ocasiones__lista" role="list">
         {
-          ocasiones.map((o, i) => (
-            <li class="revelar" data-retardo={(i % 4) + 1}>
-              {o}
+          ocasiones.map((o) => (
+            <li class={`pegatina pegatina--viva ${o.clase}`} style={`--giro:${o.giro}deg`}>
+              {o.texto}
             </li>
           ))
         }
       </ul>
-
-      <p class="ocasiones__nota lectura revelar">
-        Cuéntanos cuántas botellas necesitas, para cuándo y qué quieres que ponga la etiqueta. Te decimos
-        precio y plazo sin compromiso.
+      <p class="lectura">
+        Cuéntanos cuántas botellas necesitas, para cuándo y qué quieres que ponga la etiqueta. Te decimos precio y plazo sin
+        compromiso.
       </p>
     </div>
   </section>
 
-  <!-- ------------------------------------------------------------ pasos -->
-  <section class="seccion">
-    <div class="contenedor">
-      <h2 class="pasos__titulo display revelar">Cómo funciona</h2>
-      <ol class="pasos">
-        <li class="paso revelar" data-retardo="1">
-          <p class="paso__num display">01</p>
-          <h3 class="paso__titulo">Nos escribes</h3>
-          <p class="paso__texto">
-            Ocasión, número de botellas, fecha y qué vino te gusta. Si no lo tienes claro, te asesoramos.
-          </p>
-        </li>
-        <li class="paso revelar" data-retardo="2">
-          <p class="paso__num display">02</p>
-          <h3 class="paso__titulo">Diseñamos la etiqueta</h3>
-          <p class="paso__texto">
-            Con vuestros nombres, la fecha, un logo de empresa o lo que haga falta. Te la enseñamos antes de
-            imprimir nada.
-          </p>
-        </li>
-        <li class="paso revelar" data-retardo="3">
-          <p class="paso__num display">03</p>
-          <h3 class="paso__titulo">Lo preparamos y te llega</h3>
-          <p class="paso__texto">
-            Embotellado, etiquetado y enviado. Envío gratis a península a partir de 100 &euro;.
-          </p>
-        </li>
-      </ol>
-    </div>
+  <section class="seccion contenedor" aria-labelledby="pasos-titulo">
+    <p class="antetitulo">Así de sencillo</p>
+    <h2 id="pasos-titulo" class="titular titular--2 pasos__titulo">Cómo <span class="cursiva">funciona.</span></h2>
+    <ol class="pasos" role="list">
+      {
+        pasos.map((p, i) => (
+          <li class="paso revela">
+            <span class="paso__num">0{i + 1}</span>
+            <h3 class="paso__titulo">{p.titulo}</h3>
+            <p class="paso__texto">{p.texto}</p>
+          </li>
+        ))
+      }
+    </ol>
   </section>
 
-  <!-- ----------------------------------------------------------- cierre -->
-  <section class="cierre">
-    <div class="cierre__fotos">
-      <figure><Image src={brindis} alt="Dos personas brindando con vino de la bodega" widths={[420, 760]} sizes="50vw" loading="lazy" /></figure>
-      <figure><Image src={cata} alt="Mujer catando una copa de vino generoso" widths={[420, 760]} sizes="50vw" loading="lazy" /></figure>
-    </div>
-    <div class="cierre__panel grano">
-      <div class="contenedor cierre__texto">
-        <p class="sello">Sin compromiso</p>
-        <h2 class="cierre__titulo display">Cuéntanos qué necesitas</h2>
+  <section class="cierre oscuro seccion" aria-labelledby="cierre-titulo">
+    <div class="contenedor cierre__rejilla">
+      <div class="cierre__fotos">
+        <div class="cierre__foto arco--redondo"><Image src={brindis} alt="Dos personas brindando con vino" widths={[360, 540]} sizes="(max-width: 900px) 45vw, 280px" /></div>
+        <div class="cierre__foto arco--redondo"><Image src={cata} alt="Mujer catando una copa de vino generoso" widths={[360, 540]} sizes="(max-width: 900px) 45vw, 280px" /></div>
+      </div>
+      <div class="cierre__texto">
+        <p class="antetitulo">Sin compromiso</p>
+        <h2 id="cierre-titulo" class="titular titular--2">Cuéntanos <span class="cursiva">qué necesitas.</span></h2>
+        <p class="lectura">Te preparamos un presupuesto adaptado al número de botellas y al diseño que queráis.</p>
         <div class="cierre__acciones">
-          <a class="boton boton--solido" href="/contacto">
-            Escribir a la bodega
-            <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="boton" href="tel:+34957664237">957 66 42 37</a>
+          <a class="boton boton--albero" href="/contacto">Escribir a la bodega <Icono nombre="flecha" /></a>
+          <a class="boton boton--contorno-claro" href="tel:+34957664237">957 66 42 37</a>
         </div>
       </div>
     </div>
@@ -115,173 +92,118 @@ const ocasiones = ['Bodas', 'Comuniones', 'Bautizos', 'Empresa', 'Aniversarios',
 </Base>
 
 <style>
-  .cabeza {
-    padding-top: calc(var(--e-6) + 2rem);
-  }
-
-  .cabeza__interior {
-    display: grid;
-    gap: var(--e-4);
-    align-items: center;
-  }
-
-  @media (width >= 56rem) {
-    .cabeza__interior {
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: var(--e-5);
-    }
-  }
-
-  .cabeza__titulo {
-    font-size: var(--t-5);
-    margin-block: 0.3em 0.4em;
-  }
-
-  .cabeza__entrada {
-    color: var(--texto-tenue);
-    margin-bottom: var(--e-3);
-  }
-
-  .cabeza__foto {
-    margin: 0;
-  }
-
-  .cabeza__foto :global(img) {
-    width: 100%;
-    height: auto;
-  }
-
-  /* -------------------------------------------------------- ocasiones */
-
   .ocasiones__titulo,
   .pasos__titulo {
-    font-size: var(--t-3);
-    margin-bottom: var(--e-3);
+    margin-top: 16px;
   }
 
-  .ocasiones {
-    list-style: none;
-    margin: 0 0 var(--e-3);
-    padding: 0;
+  .ocasiones__lista {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 16px 12px;
+    margin: 40px 0 32px;
+    list-style: none;
+    padding: 0;
   }
 
-  .ocasiones li {
-    font-family: var(--sello);
-    font-size: var(--t--2);
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    border: 1px solid color-mix(in srgb, var(--azabache) 24%, transparent);
-    padding: 0.75em 1.1em;
-    transition:
-      background-color 0.4s var(--salida),
-      color 0.4s var(--salida),
-      border-color 0.4s var(--salida);
+  .ocasiones__lista .pegatina {
+    border-color: var(--cal-2);
+    font-size: clamp(1.3rem, 2.4vw, 2.2rem);
+    padding: 10px 26px;
   }
 
-  .ocasiones li:hover {
-    background: var(--caoba);
-    border-color: var(--caoba);
-    color: var(--albariza);
+  .oc--am {
+    background: var(--am);
   }
-
-  .ocasiones__nota {
-    color: var(--texto-tenue);
+  .oc--ol {
+    background: var(--ol);
   }
-
-  /* ------------------------------------------------------------ pasos */
+  .oc--cr {
+    background: var(--cr);
+    color: var(--hierro);
+  }
 
   .pasos {
-    list-style: none;
-    margin: 0;
-    padding: 0;
     display: grid;
-    gap: var(--e-3);
-    counter-reset: paso;
-  }
-
-  @media (width >= 56rem) {
-    .pasos {
-      grid-template-columns: repeat(3, 1fr);
-    }
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+    list-style: none;
+    padding: 0;
   }
 
   .paso {
-    border-top: 1px solid var(--filete);
-    padding-top: var(--e-2);
     display: grid;
-    gap: 0.6rem;
     align-content: start;
+    gap: 12px;
+    padding: 32px;
+    border-radius: var(--radio-g);
+    background: var(--blanco);
   }
 
   .paso__num {
-    font-size: var(--t-3);
-    color: color-mix(in srgb, var(--oro) 70%, transparent);
-    line-height: 1;
+    font-family: var(--fraunces);
+    font-style: italic;
+    font-weight: 320;
+    font-size: 4.5rem;
+    line-height: 0.8;
+    color: var(--albero-osc);
   }
 
   .paso__titulo {
-    font-family: var(--display);
-    font-size: var(--t-1);
-    font-weight: 400;
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
   }
 
   .paso__texto {
-    color: var(--texto-tenue);
+    color: var(--texto-2);
+    line-height: 1.55;
   }
 
-  /* ----------------------------------------------------------- cierre */
-
-  .cierre {
-    position: relative;
+  .cierre__rejilla {
     display: grid;
-  }
-
-  .cierre__fotos,
-  .cierre__panel {
-    grid-area: 1 / 1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
   }
 
   .cierre__fotos {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
   }
 
-  .cierre__fotos figure {
-    margin: 0;
-    overflow: hidden;
+  .cierre__foto {
+    aspect-ratio: 3 / 4;
   }
 
-  .cierre__fotos :global(img) {
+  .cierre__foto:nth-child(2) {
+    margin-top: 48px;
+  }
+
+  .cierre__foto :global(img) {
     width: 100%;
     height: 100%;
-    min-height: 24rem;
     object-fit: cover;
   }
 
-  .cierre__panel {
-    position: relative;
-    display: grid;
-    align-items: center;
-    background: color-mix(in srgb, var(--azabache) 82%, transparent);
-  }
-
   .cierre__texto {
-    padding-block: var(--e-5);
-    max-width: 42rem;
-  }
-
-  .cierre__titulo {
-    font-size: var(--t-4);
-    margin-block: 0.3em 0.5em;
+    display: grid;
+    justify-items: start;
+    gap: 22px;
   }
 
   .cierre__acciones {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--e-2);
-    margin-top: var(--e-3);
+    gap: 12px;
+  }
+
+  @media (max-width: 900px) {
+    .pasos,
+    .cierre__rejilla {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

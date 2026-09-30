@@ -8,15 +8,18 @@ import amontillado from '../assets/botellas/5e-amontillado.jpg';
 import packImg from '../assets/botellas/pack-px.jpg';
 import soleraFundador from '../assets/botellas/mv-solera-fundador.jpg';
 import cosecha from '../assets/botellas/mv-cosecha.jpg';
+import soleraFundadorRecorte from '../assets/botellas/recortes/mv-solera-fundador-recorte.webp';
+import cosechaRecorte from '../assets/botellas/recortes/mv-cosecha-recorte.webp';
 
 /**
  * Datos extraidos del WooCommerce de bodegasgalanportero.com (Store API + paginas
  * de producto, agosto 2026). Los textos de cata son literales de la bodega: no
- * inventar, no reescribir. Los `variaciones[].id` son los variation_id reales de
- * WooCommerce y alimentan el enlace de compra, asi que si cambian alli hay que
- * actualizarlos aqui.
+ * inventar, no reescribir. Los `variaciones[].id` (variation_id de WooCommerce)
+ * se usan como SKU de la tienda propia: son la clave de la tabla `productos`, donde
+ * el admin cambia precio y stock. Los precios de aqui son solo el valor inicial.
  */
 
+/** Web antigua: solo se enlaza para los textos legales, que siguen alli. */
 export const TIENDA = 'https://bodegasgalanportero.com';
 export const ENVIO_GRATIS_DESDE = 100;
 
@@ -40,6 +43,10 @@ export type Vino = {
   gama: '5 Essences' | 'Marqués de la Vega';
   estilo: 'Vino seco' | 'Vino dulce' | 'Vino dulce natural';
   imagen: ImageMetadata;
+  /** botella sin fondo (solo Marques de la Vega, cuya foto tiene fondo blanco) */
+  recorte?: ImageMetadata;
+  /** 5 Essences: monograma de la etiqueta y su color */
+  monograma?: 'am' | 'pc' | 'ol' | 'cr' | 'px';
   /** frase de una linea, para la vitrina */
   gancho: string;
   resumen: string;
@@ -60,6 +67,7 @@ export const vinos: Vino[] = [
     gama: 'Marqués de la Vega',
     estilo: 'Vino dulce natural',
     imagen: soleraFundador,
+    recorte: soleraFundadorRecorte,
     gancho: 'La joya de la casa. Solera de más de 30 años.',
     resumen:
       'Uvas de variedad 100% Pedro Ximénez seleccionadas se solean entre 8 y 16 días, una vez alcanzado su nivel óptimo se molturan. Este vino se somete a crianza mediante el proceso de criaderas y soleras, en botas de roble americano. Nuestra solera tiene ya más de 30 años, es la joya de nuestros vinos.',
@@ -83,6 +91,7 @@ export const vinos: Vino[] = [
     gama: 'Marqués de la Vega',
     estilo: 'Vino dulce natural',
     imagen: cosecha,
+    recorte: cosechaRecorte,
     gancho: 'El PX del año, sin crianza. Directo de la pasera.',
     resumen:
       'Uvas de variedad 100% Pedro Ximénez seleccionadas se solean entre 8 y 16 días, una vez alcanzado su nivel óptimo se molturan. Una vez obtenido el mosto, se alcoholiza a 15º, se estabiliza y se almacena en depósitos de acero inoxidable donde alcanza sus características especiales.',
@@ -106,6 +115,7 @@ export const vinos: Vino[] = [
     gama: '5 Essences',
     estilo: 'Vino seco',
     imagen: amontillado,
+    monograma: 'am',
     gancho: 'Cinco años bajo velo de flor. Luego, tres más al aire.',
     resumen:
       'Crianza en barricas de roble americano mediante el sistema de criaderas y soleras. Este vino comienza siendo un fino. Debe serlo durante al menos 5 años de crianza biológica bajo velo de flor en botas de roble. Una vez que la flor desaparece llega la fase oxidativa durante otros 3 años como mínimo.',
@@ -130,6 +140,7 @@ export const vinos: Vino[] = [
     gama: '5 Essences',
     estilo: 'Vino seco',
     imagen: paloCortado,
+    monograma: 'pc',
     gancho: 'Nace fino, la flor no cuaja, y se convierte en una rareza.',
     resumen:
       'Parte de un vino cuyo destino inicial era el de criarse como vino fino pero la flor no llega a formarse correctamente, por lo que pasa directamente a crianza oxidativa. Este es un vino tremendamente particular y único. Es una joya de nuestros vinos generosos.',
@@ -152,6 +163,7 @@ export const vinos: Vino[] = [
     gama: '5 Essences',
     estilo: 'Vino seco',
     imagen: oloroso,
+    monograma: 'ol',
     gancho: 'Doce años de solera. Mucho cuerpo, nada de timidez.',
     resumen:
       'Parte de un vino blanco sin envejecimiento sometido al sistema de criaderas y soleras en barricas de roble americano. Solera de más de 12 años.',
@@ -175,6 +187,7 @@ export const vinos: Vino[] = [
     gama: '5 Essences',
     estilo: 'Vino dulce',
     imagen: cream,
+    monograma: 'cr',
     gancho: 'El cabeceo de nuestro Oloroso con nuestro PX.',
     resumen:
       'El Cream es un vino generoso de licor elaborado mediante la mezcla o «cabeceo» de vinos generosos de crianza oxidativa (fundamentalmente olorosos) con un importante aporte de vino dulce natural. La mezcla entre nuestro Oloroso y PX produce unas características organolépticas únicas en este Cream.',
@@ -198,6 +211,7 @@ export const vinos: Vino[] = [
     gama: '5 Essences',
     estilo: 'Vino dulce natural',
     imagen: pedroXimenez,
+    monograma: 'px',
     gancho: 'Reposado en botas viejas de Oloroso. Se mastica la pasa.',
     resumen:
       'Uvas de variedad 100% Pedro Ximénez seleccionadas se solean entre 8 y 16 días, una vez alcanzado su nivel óptimo se molturan. Éste PX es una selección que ha reposado en antiguas botas de Oloroso. Esto le aporta unos aromas inconfundibles de este tipo de vino que redondea y potencia este Pedro Ximénez tan especial.',
@@ -234,25 +248,6 @@ export const marquesDeLaVega = vinos.filter((v) => v.gama === 'Marqués de la Ve
 
 export function porSlug(slug: string): Vino | undefined {
   return vinos.find((v) => v.slug === slug);
-}
-
-/**
- * Enlace directo al carrito del WooCommerce existente. Verificado contra
- * bodegasgalanportero.com: `cantidad` es un atributo local (no taxonomia), asi
- * que el parametro lleva el nombre del termino, no un slug.
- */
-export function enlaceCompra(vino: Vino, variacion: Variacion, unidades = 1): string {
-  const p = new URLSearchParams({
-    'add-to-cart': String(vino.id),
-    variation_id: String(variacion.id),
-    attribute_cantidad: variacion.cantidad,
-    quantity: String(unidades),
-  });
-  return `${TIENDA}/?${p}`;
-}
-
-export function enlaceCompraPack(unidades = 1): string {
-  return `${TIENDA}/?add-to-cart=${pack.id}&quantity=${unidades}`;
 }
 
 export function euros(n: number): string {

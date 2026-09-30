@@ -1,0 +1,333 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Icono from '../../../components/Icono.astro';
+import Miniatura from '../../../components/Miniatura.astro';
+import { articulos } from '../../../lib/catalogo';
+import { euros } from '../../../lib/pedido';
+import { ETIQUETA_ESTADO, fecha, pedidoDeUsuario, type Estado } from '../../../lib/pedidos';
+import { registrarSiPagada, stripe } from '../../../lib/stripe';
+
+export const prerender = false;
+
+const usuario = Astro.locals.usuario!;
+const supabase = Astro.locals.supabase!;
+const id = Number(Astro.params.id);
+// Con la sesión del cliente: un pedido ajeno no existe para él (RLS), y además se filtra por su id.
+let pedido = Number.isSafeInteger(id) && id > 0 ? await pedidoDeUsuario(supabase, id, usuario.id) : null;
+if (!pedido) return new Response(null, { status: 404 });
+
+// Vuelta de Stripe: si el webhook aún no ha llegado, se confirma aquí mismo (es idempotente).
+// Solo se pregunta a Stripe por la sesión guardada en ESTE pedido, nunca por una de la URL a secas.
+const sesionId = Astro.url.searchParams.get('session_id');
+const vieneDePagar = Astro.url.searchParams.get('pagado') === '1';
+if (vieneDePagar && sesionId && sesionId === pedido.stripe_sesion && pedido.estado === 'pendiente' && stripe) {
+  try {
+    if (await registrarSiPagada(await stripe.checkout.sessions.retrieve(sesionId))) {
+      pedido = (await pedidoDeUsuario(supabase, id, usuario.id)) ?? pedido;
+    }
+  } catch (e) {
+    console.error('No se ha podido confirmar el pago al volver de Stripe (lo hará el webhook):', (e as Error).message);
+  }
+}
+
+const catalogo = await articulos();
+const pasos: Estado[] = ['pagado', 'enviado', 'entregado'];
+const indice = pasos.indexOf(pedido.estado);
+const repetir = JSON.stringify(
+  pedido.lineas.filter((l) => catalogo.get(l.sku)?.activo).map((l) => ({ sku: l.sku, unidades: l.unidades })),
+);
+---
+
+<Base titulo={`Pedido nº ${pedido.id}`} descripcion="Detalle de tu pedido." privada>
+  <section class="detalle contenedor">
+    <nav class="migas" aria-label="Estás en">
+      <a href="/cuenta">Mi cuenta</a> <span aria-hidden="true">/</span> <span aria-current="page">Pedido nº {pedido.id}</span>
+    </nav>
+
+    {
+      vieneDePagar && pedido.estado === 'pagado' && (
+        <div class="gracias">
+          <p class="gracias__titulo">¡Gracias! <span class="cursiva">Ya está pagado.</span></p>
+          <p>Lo preparamos en la bodega y te avisamos cuando salga. Puedes seguirlo desde esta página.</p>
+        </div>
+      )
+    }
+    {
+      vieneDePagar && pedido.estado === 'pendiente' && (
+        <p class="aviso aviso--info">Estamos confirmando el pago con el banco. Recarga la página en unos segundos.</p>
+      )
+    }
+
+    <header class="detalle__cabeza">
+      <div>
+        <p class="antetitulo">Hecho el {fecha(pedido.creado, true)}</p>
+        <h1 class="titular titular--2 detalle__titulo">Pedido <span class="cursiva">nº {pedido.id}</span></h1>
+      </div>
+      <span class={`estado estado--${pedido.estado}`}>{ETIQUETA_ESTADO[pedido.estado]}</span>
+    </header>
+
+    {
+      indice >= 0 && (
+        <ol class="progreso" role="list" aria-label="Estado del envío">
+          {pasos.map((p, i) => (
+            <li class:list={['progreso__paso', i <= indice && 'hecho']} aria-current={i === indice ? 'step' : undefined}>
+              <span class="progreso__punto" aria-hidden="true" />
+              {ETIQUETA_ESTADO[p]}
+            </li>
+          ))}
+        </ol>
+      )
+    }
+
+    <div class="detalle__rejilla">
+      <div class="detalle__lineas">
+        <ul class="lineas-pedido" role="list">
+          {
+            pedido.lineas.map((l) => {
+              const a = catalogo.get(l.sku);
+              return (
+                <li class="linea-pedido">
+                  <Miniatura articulo={a} tam={64} />
+                  <div class="linea-pedido__info">
+                    {a ? <a href={`/vinos/${a.slug}`}>{l.nombre}</a> : <span>{l.nombre}</span>}
+                    <span class="linea-pedido__detalle">{l.formato} · {l.unidades} × {euros(l.precio_cent)}</span>
+                  </div>
+                  <span class="precio">{euros(l.precio_cent * l.unidades)}</span>
+                </li>
+              );
+            })
+          }
+        </ul>
+        <dl class="totales">
+          <div><dt>Subtotal</dt><dd>{euros(pedido.subtotal_cent)}</dd></div>
+          <div><dt>Envío</dt><dd>{pedido.envio_cent === 0 ? 'Gratis' : euros(pedido.envio_cent)}</dd></div>
+          <div class="totales__total"><dt>Total</dt><dd>{euros(pedido.total_cent)}</dd></div>
+        </dl>
+      </div>
+
+      <aside class="detalle__lado">
+        {
+          pedido.envio_direccion && (
+            <div>
+              <h2 class="antetitulo">Se envía a</h2>
+              <p class="detalle__dir">
+                {pedido.envio_nombre && <strong>{pedido.envio_nombre}</strong>}
+                <br />
+                {pedido.envio_direccion}
+              </p>
+            </div>
+          )
+        }
+        <button class="boton boton--comprar boton--bloque" type="button" data-anadir data-anadir-varios={repetir} data-nombre={`Pedido nº ${pedido.id}`}>
+          <Icono nombre="mas" /> Volver a pedir
+        </button>
+        <p class="detalle__ayuda">¿Algún problema con el pedido? Llámanos al <a class="enlace" href="tel:+34957664237">957 66 42 37</a>.</p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .detalle {
+    display: grid;
+    gap: 28px;
+    padding-block: 24px clamp(64px, 8vw, 112px);
+  }
+
+  .migas {
+    display: flex;
+    gap: 10px;
+    font-size: 0.9375rem;
+    color: var(--texto-2);
+  }
+
+  .migas a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    font-weight: 700;
+    color: var(--hierro);
+  }
+
+  .gracias {
+    display: grid;
+    gap: 8px;
+    padding: clamp(24px, 4vw, 36px);
+    border-radius: var(--radio-g);
+    background: var(--persiana);
+    color: var(--cal);
+  }
+
+  .gracias__titulo {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .detalle__cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+  }
+
+  .detalle__titulo {
+    margin-top: 12px;
+  }
+
+  .progreso {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    list-style: none;
+    padding: 0;
+    counter-reset: paso;
+  }
+
+  .progreso__paso {
+    position: relative;
+    display: grid;
+    gap: 10px;
+    padding-top: 0;
+    font-weight: 700;
+    color: var(--texto-3);
+  }
+
+  .progreso__paso::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--cal-2);
+  }
+
+  .progreso__paso.hecho {
+    color: var(--hierro);
+  }
+
+  .progreso__paso.hecho::before {
+    background: var(--albero);
+  }
+
+  .progreso__punto {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--cal-2);
+    border: 4px solid var(--cal);
+  }
+
+  .hecho .progreso__punto {
+    background: var(--albero);
+  }
+
+  .detalle__rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+    gap: clamp(24px, 4vw, 48px);
+    align-items: start;
+  }
+
+  .detalle__lineas {
+    padding: clamp(20px, 3vw, 32px);
+    border-radius: var(--radio-g);
+    background: var(--blanco);
+  }
+
+  .lineas-pedido {
+    list-style: none;
+    padding: 0;
+  }
+
+  .linea-pedido {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--linea);
+  }
+
+  .linea-pedido__info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .linea-pedido__info a,
+  .linea-pedido__info > span:first-child {
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .linea-pedido__detalle {
+    font-size: 0.875rem;
+    color: var(--texto-2);
+  }
+
+  .totales {
+    display: grid;
+    gap: 6px;
+    margin-top: 18px;
+  }
+
+  .totales div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .totales dt {
+    color: var(--texto-2);
+  }
+
+  .totales dd {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .totales__total {
+    padding-top: 10px;
+    border-top: 1px solid var(--linea);
+    font-size: 1.35rem;
+  }
+
+  .totales__total dt,
+  .totales__total dd {
+    color: var(--hierro) !important;
+    font-weight: 800 !important;
+  }
+
+  .detalle__lado {
+    display: grid;
+    gap: 20px;
+    padding: 28px;
+    border-radius: var(--radio-g);
+    background: var(--cal-2);
+  }
+
+  .detalle__dir {
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  .detalle__ayuda {
+    font-size: 0.9375rem;
+    color: var(--texto-2);
+  }
+
+  @media (max-width: 900px) {
+    .detalle__rejilla {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .progreso {
+      font-size: 0.8125rem;
+    }
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import Base from '../../layouts/Base.astro';
+import CajaCuenta from '../../components/CajaCuenta.astro';
+import { ErrorAuth, mensajeAuth, recuperacionReciente, validarClave } from '../../lib/auth';
+
+export const prerender = false;
+
+// El middleware ya exige sesión. Además tiene que venir de un enlace de recuperación reciente:
+// con una sesión normal (o robada) no se puede cambiar la contraseña sin saber la actual.
+const supabase = Astro.locals.supabase!;
+const { data: claims } = await supabase.auth.getClaims(); // verifica el token (firma y caducidad)
+if (!recuperacionReciente(claims?.claims.amr)) return Astro.redirect('/cuenta/recuperar?aviso=caducado');
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  const d = await Astro.request.formData();
+  const password = String(d.get('password') ?? '');
+  try {
+    validarClave(password);
+    if (password !== String(d.get('repetir') ?? '')) throw new ErrorAuth('Las dos contraseñas no coinciden.');
+    const { error: e } = await supabase.auth.updateUser({ password });
+    if (e) throw new ErrorAuth(mensajeAuth(e));
+    // Quien tuviera abierta la cuenta en otro sitio (quizá con la contraseña antigua) queda fuera.
+    await supabase.auth.signOut({ scope: 'others' });
+    return Astro.redirect('/cuenta?aviso=clave');
+  } catch (e) {
+    if (!(e instanceof ErrorAuth)) throw e;
+    error = e.message;
+    Astro.response.status = 400;
+  }
+}
+---
+
+<Base titulo="Contraseña nueva" descripcion="Elige una contraseña nueva." privada>
+  <CajaCuenta antetitulo="Contraseña nueva">
+    <h1 class="titular titular--2">Elige otra <span class="cursiva">contraseña.</span></h1>
+    <form method="post" data-astro-reload>
+      {error && <p class="aviso aviso--error" role="alert">{error}</p>}
+      <div class="campo">
+        <label for="password">Contraseña nueva</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="72" aria-describedby="password-ayuda" />
+        <span class="campo__ayuda" id="password-ayuda">Mínimo 8 caracteres.</span>
+      </div>
+      <div class="campo">
+        <label for="repetir">Repítela</label>
+        <input id="repetir" name="repetir" type="password" autocomplete="new-password" required minlength="8" maxlength="72" />
+      </div>
+      <button class="boton boton--primario boton--bloque" type="submit">Guardar la contraseña</button>
+    </form>
+  </CajaCuenta>
+</Base>

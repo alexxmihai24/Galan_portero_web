@@ -1,730 +1,1340 @@
 ---
 import { Image, Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import Vitrina from '../components/Vitrina.astro';
-import { marquesDeLaVega, pack, euros, enlaceCompraPack, ENVIO_GRATIS_DESDE } from '../data/vinos';
+import Icono from '../components/Icono.astro';
+import TarjetaVino from '../components/TarjetaVino.astro';
+import { catalogo, principal } from '../lib/catalogo';
+import { euros } from '../data/vinos';
 
-import lagarPuntal from '../assets/fotos/lagar.jpg';
+import pasera from '../assets/fotos/pasera-montilla.jpg';
 import barrica from '../assets/fotos/barrica.jpg';
-import copaBlanca from '../assets/fotos/copa-blanca.jpg';
-import bodegaEdificio from '../assets/fotos/lagar-montilla.jpg';
-import brindis from '../assets/fotos/woman.jpg';
+import vides from '../assets/fotos/vides.jpg';
+import terreno from '../assets/fotos/terreno.jpg';
+import lagar from '../assets/fotos/lagar-montilla.jpg';
+import solera from '../assets/fotos/solera.jpg';
+import copas from '../assets/fotos/copas.jpg';
+import solera2 from '../assets/fotos/solera-2.jpg';
+import patio from '../assets/fotos/patio.jpg';
+import escudo from '../assets/marca/escudo-tinta.png';
 
-const rasgos = [
-  { cifra: '1950', pie: 'Desde mediados del siglo XX' },
-  { cifra: '+30', pie: 'Años la solera fundadora' },
-  { cifra: '100%', pie: 'Uva Pedro Ximénez' },
-  { cifra: '415', pie: 'g/L de azúcar en su esplendor' },
+export const prerender = false; // precios y stock salen de la base de datos
+
+const { vinos, pack } = await catalogo();
+const esencias = vinos.filter((v) => v.gama === '5 Essences');
+const marques = vinos.filter((v) => v.gama === 'Marqués de la Vega');
+const packALaVenta = pack.activo && pack.stock !== 0;
+
+const pasos = [
+  { foto: vides, titulo: 'La viña', texto: 'Pedro Ximénez de la campiña de Montilla, sobre tierra albariza.', alt: 'Viñedo de Pedro Ximénez en la campiña', pegatina: '01' },
+  { foto: terreno, titulo: 'La pasera', texto: 'La uva se solea entre 8 y 16 días, hasta casi ser pasa.', alt: 'Pasera con la uva extendida al sol y Montilla al fondo', pegatina: '02 · 8 a 16 días al sol' },
+  { foto: lagar, titulo: 'El lagar', texto: 'Una vez alcanzado su nivel óptimo, la pasa se moltura.', alt: 'Fachada encalada del lagar en Montilla', pegatina: '03' },
+  { foto: solera, titulo: 'La solera', texto: 'Criaderas y soleras en botas de roble americano.', alt: 'Botas de roble apiladas en la solera', pegatina: '04' },
 ];
 ---
 
 <Base
   titulo="inicio"
-  descripcion="Bodega familiar en Montilla desde mediados del siglo XX. Pedro Ximénez de pasas y vinos generosos con Denominación de Origen Protegida Montilla-Moriles."
+  descripcion="Pedro Ximénez de Montilla-Moriles hecho al sol desde 1950. Solera de más de 30 años, la gama 5 Essences y envío gratis a península desde 100 €."
 >
-  <!-- ------------------------------------------------------------- hero -->
-  <section class="hero grano">
-    <div class="hero__foto">
-      <Picture formats={['avif']} fallbackFormat="webp"
-        src={lagarPuntal}
-        alt="El Lagar El Puntal, cortijo blanco sobre el viñedo de Pedro Ximénez en la campiña de Montilla"
-        widths={[720, 1200, 1800, 2400]}
-        sizes="100vw"
-        loading="eager"
-        fetchpriority="high"
-      />
-    </div>
-
-    <div class="hero__texto contenedor">
-      <p class="sello hero__sello">Montilla &middot; Córdoba &middot; D.O.P. Montilla-Moriles</p>
-      <h1 class="hero__titulo display">
-        Se hace<br />
-        <span class="hero__enfasis italica">al sol</span>
+  <!-- ============================================================ HERO -->
+  <section class="hero contenedor" aria-labelledby="hero-titulo">
+    <div class="hero__texto">
+      <p class="antetitulo">Montilla · Córdoba · D.O.P. Montilla-Moriles</p>
+      <h1 id="hero-titulo" class="titular titular--hero hero__titulo">
+        <span class="hero__linea">Se hace</span>
+        <span class="hero__linea hero__linea--sol">
+          <span class="hero__sol" aria-hidden="true"></span>
+          <span class="cursiva">al sol.</span>
+        </span>
       </h1>
-      <p class="hero__entrada">
-        Vinos puros de pasas, naturales, dulces, de color rubí oscuro, obtenidos a partir del soleado previo
-        de la uva, casi hasta la pasificación.
+      <p class="lectura hero__entrada">
+        Vinos puros de pasas, naturales, dulces, de color rubí oscuro, obtenidos a partir del soleado previo de
+        la uva, casi hasta la pasificación.
       </p>
       <div class="hero__acciones">
-        <a class="boton boton--solido" href="/vinos">
-          Ver los vinos
-          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-        </a>
-        <a class="boton" href="/bodega">Nuestra historia</a>
+        <a class="boton boton--primario" href="/vinos">Comprar vinos <Icono nombre="flecha" /></a>
+        <a class="boton" href="/bodega">Conoce la bodega</a>
       </div>
     </div>
 
-    <p class="hero__desliza sello sello--tenue" aria-hidden="true">Desliza</p>
-  </section>
-
-  <!-- ------------------------------------------------------------ cifras -->
-  <section class="cifras">
-    <div class="contenedor cifras__rejilla">
-      {
-        rasgos.map((r, i) => (
-          <div class="cifra revelar" data-retardo={i + 1}>
-            <p class="cifra__valor display">{r.cifra}</p>
-            <p class="cifra__pie sello sello--tenue">{r.pie}</p>
-          </div>
-        ))
-      }
+    <div class="hero__visual">
+      <div class="hero__arco">
+        <Picture
+          src={pasera}
+          formats={['avif', 'webp']}
+          alt="Uva Pedro Ximénez soleándose en la pasera, con Montilla al fondo"
+          width={560}
+          height={744}
+          fit="cover"
+          quality={40}
+          widths={[380, 560, 760, 1120]}
+          sizes="(max-width: 900px) 92vw, 560px"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <span class="pegatina pegatina--mono hero__px">px</span>
+      <span class="pegatina pegatina--persiana hero__cien">100% Pedro Ximénez</span>
+      <div class="sello hero__sello" aria-hidden="true">
+        <svg class="sello__aro" viewBox="0 0 156 156">
+          <defs><path id="aro-hero" d="M78,78 m-58,0 a58,58 0 1,1 116,0 a58,58 0 1,1 -116,0"></path></defs>
+          <text><textPath href="#aro-hero">DESDE 1950 · MONTILLA · SE HACE AL SOL · </textPath></text>
+        </svg>
+        <Image src={escudo} alt="" height={96} />
+      </div>
     </div>
   </section>
 
-  <!-- ---------------------------------------------------------- el vino -->
-  <section class="papel seccion" id="pedro-ximenez">
-    <div class="contenedor px">
-      <div class="px__texto revelar">
-        <p class="sello">Vino dulce Pedro Ximénez 100% de pasas</p>
-        <h2 class="px__titulo display">Auténtica<br />miel de uva</h2>
-        <div class="lectura">
-          <p>
-            Fruto de una historia marcada por la constancia en el trabajo, de una variedad de uva y un terreno
-            hechos el uno para el otro, y gracias a la pasión por un trabajo artesanal transmitida de padres a
-            hijos, elaboramos unos vinos dulces de una calidad excelsa.
-          </p>
-          <p>
-            Sometidos a crianza para aumentar lentamente su color en las botas. Color que pasa de ambarino a
-            tonalidades casi azabache, con contenidos mínimos en azúcares superiores a los 272 gramos por
-            litro, llegando a alcanzar los 415 gramos por litro una vez envejecido, en su estado de mayor
-            esplendor.
-          </p>
-          <p>
-            Se trata de vinos densos, cargados de agradables aromas varietales, con matices que recuerdan al
-            higo pasificado, el chocolate, el cacao, el café, el dátil y por supuesto el olor característico
-            de la uva pasificada que le da nombre.
-          </p>
-          <p class="italica px__remate">
-            Una verdadera delicia para los sentidos, fragante y frutoso, suave en la boca y en absoluto
-            empalagoso.
-          </p>
+  <!-- ============================================================ ZÓCALO -->
+  <div class="zocalo cinta hero-cinta" aria-hidden="true" data-scroll-x>
+    {
+      [0, 1].map(() => (
+        <div class="cinta__pista" aria-hidden="true">
+          <span class="cinta__grande">Montilla-Moriles</span>
+          <Icono nombre="sol" tam={52} />
+          <span class="cinta__cursiva">desde 1950</span>
+          <Icono nombre="sol" tam={52} />
+          <span class="cinta__grande">Pedro Ximénez</span>
+          <Icono nombre="sol" tam={52} />
+          <span class="cinta__cursiva">se hace al sol</span>
+          <Icono nombre="sol" tam={52} />
         </div>
-        <a class="boton px__boton" href="/produccion">
-          Cómo se hace
-          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-        </a>
-      </div>
+      ))
+    }
+  </div>
 
-      <div class="px__fotos">
-        <figure class="px__foto px__foto--alta revelar" data-retardo="1">
-          <Image
-            src={barrica}
-            alt="Botas de roble numeradas, apiladas en la bodega"
-            widths={[420, 720, 1000]}
-            sizes="(max-width: 62rem) 45vw, 22rem"
-            loading="lazy"
-          />
-        </figure>
-        <figure class="px__foto px__foto--recorte revelar" data-retardo="2">
-          <Image
-            src={copaBlanca}
-            alt="Copa con el Pedro Ximénez: caoba oscuro, casi azabache"
-            widths={[420, 720, 1000]}
-            sizes="(max-width: 62rem) 45vw, 20rem"
-            loading="lazy"
-          />
-        </figure>
+  <!-- ============================================================ MANIFIESTO + CIFRAS -->
+  <section class="seccion contenedor manifiesto" aria-labelledby="manifiesto-titulo">
+    <p class="antetitulo revela">Nuestra casa · desde 1950</p>
+    <h2 id="manifiesto-titulo" class="manifiesto__frase revela">
+      Fruto de una historia marcada por la constancia en el trabajo, de una variedad de uva y un terreno
+      <span class="cursiva">hechos el uno para el otro.</span>
+    </h2>
+    <ul class="cifras" role="list">
+      <li class="cifra cifra--albero revela">
+        <span class="cifra__pie">Fundación en Montilla</span>
+        <span class="cifra__num">1950</span>
+      </li>
+      <li class="cifra cifra--caoba revela">
+        <span class="cifra__pie cifra__pie--cursiva">años de solera madre</span>
+        <span class="cifra__num" data-cuenta="30" data-prefijo="+">+30</span>
+      </li>
+      <li class="cifra cifra--foto revela">
+        <Image src={barrica} alt="Botas de roble numeradas en la bodega" widths={[360, 540, 720]} sizes="(max-width: 700px) 92vw, 25vw" />
+        <span class="pegatina cifra__pegatina">Criaderas y soleras</span>
+      </li>
+      <li class="cifra cifra--persiana revela">
+        <span class="cifra__pie">g/l de azúcar natural</span>
+        <span class="cifra__num" data-cuenta="415">415</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============================================================ PROCESO -->
+  <section class="proceso fondo-cal-2" aria-labelledby="proceso-titulo">
+    <div class="proceso__fijo">
+      <div class="contenedor proceso__cabeza">
+        <h2 id="proceso-titulo" class="titular titular--2">Del sol <span class="cursiva">a la solera</span></h2>
+        <div class="proceso__flechas">
+          <button class="boton-icono boton-icono--borde proceso__flecha" type="button" data-anterior aria-label="Paso anterior" aria-controls="proceso-pista">
+            <Icono nombre="flecha-izq" />
+          </button>
+          <button class="boton-icono proceso__flecha proceso__flecha--llena" type="button" data-siguiente aria-label="Paso siguiente" aria-controls="proceso-pista">
+            <Icono nombre="flecha" />
+          </button>
+        </div>
+        <div class="proceso__progreso" aria-hidden="true"><span></span></div>
+      </div>
+      <div class="proceso__marco" data-carrusel data-scroll-x>
+        <ol class="proceso__pista" id="proceso-pista" data-pista role="list" tabindex="0" aria-label="Los cuatro pasos del Pedro Ximénez">
+          {
+            pasos.map((p, i) => (
+              <li class="paso">
+                <div class="paso__visual">
+                  <div class="paso__foto arco--redondo">
+                    <Image src={p.foto} alt={p.alt} widths={[320, 460, 640]} sizes="(max-width: 700px) 78vw, 420px" />
+                  </div>
+                  <span class:list={['pegatina pegatina--viva paso__pegatina', i === 1 && 'pegatina--albero']} style={`--giro:${[-6, 4, -4, 5][i]}deg`}>
+                    {p.pegatina}
+                  </span>
+                </div>
+                <h3 class="paso__titulo">{p.titulo}</h3>
+                <p class="paso__texto">{p.texto}</p>
+              </li>
+            ))
+          }
+        </ol>
       </div>
     </div>
   </section>
 
-  <!-- ---------------------------------------------------------- vitrina -->
-  <Vitrina />
-
-  <!-- ------------------------------------------------------------- pack -->
-  <section class="pack papel seccion">
-    <div class="contenedor pack__interior">
-      <figure class="pack__foto revelar">
-        <Image
-          src={pack.imagen}
-          alt="Las cinco botellas de la gama 5 Essences: Oloroso, Palo Cortado, Pedro Ximénez, Cream y Amontillado"
-          widths={[520, 860, 1200]}
-          sizes="(max-width: 56rem) 90vw, 34rem"
-          loading="lazy"
-        />
-      </figure>
-      <div class="pack__texto revelar" data-retardo="1">
-        <p class="sello">Las cinco, juntas</p>
-        <h2 class="pack__titulo display">{pack.nombre}</h2>
-        <p class="lectura">{pack.resumen}</p>
-        <ul class="pack__lista">
-          {pack.incluye.map((n) => <li>{n}</li>)}
-        </ul>
-        <p class="pack__precio">
-          <span class="sello sello--tenue">Precio</span>
-          <strong>{euros(pack.precio)}</strong>
+  <!-- ============================================================ BAJADA A LA BODEGA -->
+  <section class="bodega oscuro seccion diferido" aria-labelledby="bodega-titulo">
+    <div class="contenedor bodega__rejilla">
+      <div class="bodega__texto">
+        <p class="antetitulo revela">Criaderas y soleras</p>
+        <h2 id="bodega-titulo" class="titular titular--2 revela">
+          De ambarino <span class="cursiva bodega__cursiva">a azabache.</span>
+        </h2>
+        <p class="lectura revela">
+          Sometidos a crianza para aumentar lentamente su color en las botas. Color que pasa de ambarino a
+          tonalidades casi azabache, con contenidos mínimos en azúcares superiores a los 272 gramos por litro,
+          llegando a alcanzar los 415 gramos por litro una vez envejecido.
         </p>
-        <a class="boton boton--solido" href={enlaceCompraPack()} rel="noopener">
-          Comprar el pack
-          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-        </a>
+        <div class="crianza revela" aria-hidden="true" data-scroll-x>
+          <div class="crianza__barra">
+            <span class="crianza__carril"><span class="crianza__bola"></span></span>
+          </div>
+          <div class="crianza__etiquetas"><span>Ambarino</span><span>Caoba</span><span>Azabache</span></div>
+        </div>
+        <a class="boton boton--albero revela" href="/produccion">Ver el proceso completo <Icono nombre="flecha" /></a>
+      </div>
+      <div class="bodega__fotos">
+        <Picture
+          src={copas}
+          formats={['avif', 'webp']}
+          class="bodega__copas"
+          alt="Cuatro catavinos con vinos de ámbar a azabache sobre una bota"
+          widths={[480, 720, 1000, 1280]}
+          sizes="(max-width: 900px) 92vw, 640px"
+        />
+        <div class="bodega__pasillo arco--redondo">
+          <Image src={solera2} alt="Pasillo de botas en la bodega" widths={[240, 360, 480]} sizes="240px" />
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- -------------------------------------------------- marqués de la vega -->
-  <section class="mv seccion">
+  <!-- ============================================================ 5 ESSENCES -->
+  <section class="esencias seccion diferido" id="cinco-esencias" aria-labelledby="esencias-titulo">
     <div class="contenedor">
-      <header class="mv__cabecera revelar">
-        <p class="sello">Nuestra enseña</p>
-        <h2 class="mv__titulo display">Marqués de la Vega</h2>
-        <p class="mv__entrada lectura">
-          El Pedro Ximénez es un vino único en el mundo elaborado en las paseras de nuestra Denominación de
-          Origen. Estos dos son los nuestros.
-        </p>
-      </header>
+      <p class="antetitulo revela">Gama de autor · 5 Essences</p>
+      <h2 id="esencias-titulo" class="titular titular--1 esencias__titulo revela">Cinco <span class="cursiva">esencias.</span></h2>
+      <p class="lectura esencias__entrada revela">
+        Desde mediados del siglo pasado hemos ido evolucionando para lograr desarrollar una gama propia de los vinos
+        generosos de la Denominación de Origen Protegida Montilla-Moriles.
+      </p>
 
-      <div class="mv__rejilla">
-        {
-          marquesDeLaVega.map((v, i) => (
-            <a class="ficha revelar" href={`/vinos/${v.slug}`} data-retardo={i + 1}>
-              <figure class="ficha__foto">
-                <Image
-                  src={v.imagen}
-                  alt={v.nombre}
-                  widths={[360, 620, 900]}
-                  sizes="(max-width: 48rem) 80vw, 26rem"
-                  loading="lazy"
-                />
-              </figure>
-              <div class="ficha__cuerpo">
-                <p class="sello sello--tenue">{v.estilo}</p>
-                <h3 class="ficha__nombre display">{v.corto}</h3>
-                <p class="ficha__gancho italica">{v.gancho}</p>
-                <p class="ficha__precio">
-                  Desde <strong>{euros(Math.min(...v.variaciones.map((x) => x.precio)))}</strong>
-                </p>
-                <span class="ficha__mas sello">
-                  Ver ficha <span aria-hidden="true">&rarr;</span>
-                </span>
-              </div>
-            </a>
-          ))
-        }
+      <div class="bento" data-carrusel>
+        <ul class="bento__rejilla" data-pista role="list" data-scroll-x>
+          {
+            esencias.map((v) => {
+              const venta = principal(v);
+              return (
+                <li class:list={['bloque', `bloque--${v.monograma}`]} data-producto>
+                  <div class="bloque__interior">
+                  <span class="bloque__mono" aria-hidden="true">{v.monograma}</span>
+                  <h3 class="bloque__nombre">
+                    <a href={`/vinos/${v.slug}`}>{v.corto}</a>
+                  </h3>
+                  <p class="bloque__gancho">{v.gancho}</p>
+                  <div class="bloque__botella arco--redondo">
+                    <Image
+                      src={v.imagen}
+                      alt=""
+                      widths={[160, 240, 360, 480]}
+                      sizes="(max-width: 700px) 120px, 220px"
+                      transition:name={`botella-${v.slug}`}
+                    />
+                  </div>
+                  <div class="bloque__pie">
+                    <span class="precio bloque__precio">{euros((venta ?? v.variaciones[0]!).precio)}</span>
+                    {venta ? (
+                      <button class="bloque__anadir" type="button" data-anadir data-sku={venta.id} data-nombre={v.corto} aria-label={`Añadir ${v.corto} a la cesta`}>
+                        Añadir
+                      </button>
+                    ) : (
+                      <span class="agotado">Agotado</span>
+                    )}
+                  </div>
+                  </div>
+                </li>
+              );
+            })
+          }
+          <li class="bloque bloque--pack" data-producto>
+            <Image src={pack.imagen} alt="Estuche con las cinco botellas 5 Essences" widths={[360, 540, 720]} sizes="(max-width: 700px) 80vw, 25vw" class="bloque__foto" />
+            <span class="pegatina pegatina--albero pegatina--viva bloque__pegatina">Pack · {euros(pack.precio)}</span>
+            {
+              packALaVenta ? (
+                <button class="boton boton--claro bloque__comprar-pack" type="button" data-anadir data-sku={pack.sku} data-nombre={pack.nombre}>
+                  Comprar las cinco
+                </button>
+              ) : (
+                <a class="boton boton--claro bloque__comprar-pack" href={`/vinos/${pack.slug}`}>Ver el pack</a>
+              )
+            }
+          </li>
+        </ul>
+        <div class="bento__flechas">
+          <button class="boton-icono boton-icono--borde" type="button" data-anterior aria-label="Vino anterior"><Icono nombre="flecha-izq" /></button>
+          <button class="boton-icono boton-icono--borde" type="button" data-siguiente aria-label="Vino siguiente"><Icono nombre="flecha" /></button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ---------------------------------------------------------- historia -->
-  <section class="historia">
-    <div class="historia__foto">
-      <Image
-        src={bodegaEdificio}
-        alt="Fachada encalada de la bodega de Galán Portero en Montilla"
-        widths={[720, 1200, 1800]}
-        sizes="100vw"
-        loading="lazy"
-      />
-    </div>
-    <div class="historia__panel grano">
-      <div class="historia__texto">
-        <p class="sello">Desde mediados del siglo XX</p>
-        <h2 class="historia__titulo display">Pasión por lo nuestro</h2>
-        <p class="lectura">
-          Los fundadores, Don Antonio Galán López y Doña Soledad Portero Urbano, eran un matrimonio montillano
-          dedicado a la labor en el campo. Con unos hijos ya dispuestos para ayudar, decidieron fundar una
-          pequeña bodega familiar a raíz de los estupendos viñedos de la comarca.
+  <!-- ============================================================ MARQUÉS DE LA VEGA -->
+  <section class="marques fondo-cal-2 seccion diferido" aria-labelledby="marques-titulo">
+    <div class="contenedor marques__rejilla">
+      <div class="marques__texto">
+        <p class="antetitulo revela">Nuestra enseña · Marqués de la Vega</p>
+        <h2 id="marques-titulo" class="titular titular--2 revela">
+          <span class="cursiva marques__cursiva">Y el Pedro Ximénez</span> de siempre.
+        </h2>
+        <p class="lectura revela">
+          El Pedro Ximénez es un vino único en el mundo elaborado en las paseras de nuestra Denominación de Origen.
+          Estos dos son los nuestros.
         </p>
-        <a class="boton" href="/bodega">
-          Conócenos
-          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-        </a>
+        <a class="boton revela" href="/vinos">Ver los {vinos.length + 1} vinos</a>
       </div>
+      {marques.map((v, i) => <TarjetaVino producto={v} pegatina={i === 0 ? 'La joya de la casa' : undefined} />)}
     </div>
   </section>
 
-  <!-- --------------------------------------------------------- eventos -->
-  <section class="eventos papel seccion">
-    <div class="contenedor eventos__interior">
-      <div class="revelar">
-        <p class="sello">Para tu evento especial</p>
-        <h2 class="eventos__titulo display">Productos personalizados</h2>
-        <p class="lectura">
-          Botellas con etiqueta propia para bodas, comuniones, empresas y celebraciones. Nos dices qué
-          necesitas y lo preparamos.
-        </p>
-        <a class="boton" href="/personalizados">
-          Pedir presupuesto
-          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-        </a>
+  <!-- ============================================================ VISITA -->
+  <section class="visita diferido" aria-labelledby="visita-titulo">
+    <Picture
+      src={patio}
+      formats={['avif', 'webp']}
+      class="visita__foto"
+      alt="Patio del cortijo con las paredes encaladas, el zócalo albero y la torre"
+      widths={[640, 1024, 1440, 2000]}
+      sizes="100vw"
+    />
+    <div class="contenedor visita__caja">
+      <div class="visita__tarjeta revela">
+        <p class="antetitulo">Visítanos</p>
+        <h2 id="visita-titulo" class="titular titular--3">La casa, <span class="cursiva">en Montilla.</span></h2>
+        <p class="lectura">Av. del Marqués de la Vega de Armijo, 76<br />14550 Montilla, Córdoba</p>
+        <div class="visita__acciones">
+          <a class="boton boton--primario boton--pequeno" href="/contacto">Contacto</a>
+          <a
+            class="boton boton--pequeno"
+            href="https://www.google.com/maps/search/?api=1&query=Av.%20del%20Marqu%C3%A9s%20de%20la%20Vega%20de%20Armijo%2076%2C%2014550%20Montilla"
+            rel="noopener">Cómo llegar <Icono nombre="externo" tam={18} /></a
+          >
+        </div>
       </div>
-      <figure class="eventos__foto revelar" data-retardo="1">
-        <Image
-          src={brindis}
-          alt="Brindis con una copa de vino de la bodega"
-          widths={[480, 800, 1200]}
-          sizes="(max-width: 56rem) 90vw, 28rem"
-          loading="lazy"
-        />
-      </figure>
     </div>
   </section>
-
-  <p class="envio sello">
-    Envíos gratis a península desde sólo {ENVIO_GRATIS_DESDE} &euro;
-  </p>
 </Base>
 
 <style>
-  /* ------------------------------------------------------------- hero */
-
+  /* ---------------------------------------------------------------- hero */
   .hero {
-    position: relative;
-    min-height: 100svh;
     display: grid;
-    align-items: end;
-    padding-block: var(--e-6) var(--e-5);
-    isolation: isolate;
-    overflow: hidden;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 560px);
+    gap: clamp(32px, 4vw, 56px);
+    padding-top: clamp(24px, 4vw, 56px);
   }
 
-  .hero__foto {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-  }
-
-  .hero__foto :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    /* El cortijo del Puntal está sobre el 52%/32% de la foto: se ancla ahí para
-       que no se pierda al recortar en vertical, y el zoom va hacia él. */
-    object-position: 52% 34%;
-    transform-origin: 52% 34%;
-    animation: ken-burns 26s ease-in-out infinite alternate;
-  }
-
-  @keyframes ken-burns {
-    from {
-      scale: 1;
-    }
-    to {
-      scale: 1.11;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero__foto :global(img) {
-      animation: none;
-    }
-  }
-
-  /* Velo para que el texto se lea sin apagar la foto */
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--azabache) 72%, transparent) 0%, transparent 32%),
-      linear-gradient(
-        0deg,
-        var(--azabache) 4%,
-        color-mix(in srgb, var(--azabache) 78%, transparent) 34%,
-        color-mix(in srgb, var(--azabache) 45%, transparent) 58%,
-        transparent 88%
-      );
-  }
-
-  .hero__sello {
-    margin-bottom: var(--e-3);
+  .hero__texto {
+    padding-top: clamp(8px, 2vw, 24px);
+    display: flex;
+    flex-direction: column;
   }
 
   .hero__titulo {
-    font-size: var(--t-6);
-    margin-bottom: var(--e-3);
+    margin-top: 24px;
   }
 
-  .hero__enfasis {
-    color: var(--oro-claro);
-    display: inline-block;
-    padding-left: 0.14em;
+  .hero__linea {
+    display: block;
+  }
+
+  .hero__linea--sol {
+    position: relative;
+    margin-top: 0.04em;
+  }
+
+  .hero__linea--sol .cursiva {
+    position: relative;
+    font-size: 1.14em;
+    line-height: 0.92;
+  }
+
+  /* El sol: disco albero detrás de "sol" */
+  .hero__sol {
+    position: absolute;
+    left: 1.42em;
+    top: 0.06em;
+    width: 1.03em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--albero);
   }
 
   .hero__entrada {
-    max-width: 34rem;
-    font-size: var(--t-1);
-    color: color-mix(in srgb, var(--albariza) 86%, transparent);
-    margin-bottom: var(--e-3);
+    margin-top: 36px;
+    max-width: 30rem;
   }
 
   .hero__acciones {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--e-2);
+    gap: 12px;
+    margin-top: 36px;
   }
 
-  .hero__desliza {
+  .hero__visual {
+    position: relative;
+  }
+
+  .hero__arco {
+    aspect-ratio: 560 / 744;
+    border: 14px solid var(--albero);
+    border-bottom: 0;
+    border-radius: 999px 999px 0 0;
+    overflow: hidden;
+    transform-origin: 50% 100%;
+  }
+
+  .hero__arco :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 62%;
+  }
+
+  .hero__px {
     position: absolute;
-    right: 2.5rem;
-    bottom: var(--e-3);
-    writing-mode: vertical-rl;
-    letter-spacing: 0.3em;
+    left: -44px;
+    top: 20%;
+    --giro: -9deg;
+    font-size: 3rem;
   }
 
-  @media (width < 48rem) {
-    .hero__desliza {
-      display: none;
+  .hero__cien {
+    position: absolute;
+    left: -76px;
+    bottom: 13%;
+    --giro: 5deg;
+  }
+
+  .hero__sello {
+    position: absolute;
+    right: -28px;
+    top: 5%;
+    rotate: 12deg;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__sello :global(.sello__aro) {
+      animation: gira 26s linear infinite;
+    }
+
+    @supports (animation-timeline: scroll()) {
+      .hero__sol {
+        animation: sol-sube linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 70vh;
+      }
+      .hero__arco {
+        animation: arco-abre linear both;
+        animation-timeline: view();
+        animation-range: exit 0% exit 90%;
+      }
     }
   }
 
-  /* ----------------------------------------------------------- cifras */
+  @keyframes gira {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  @keyframes sol-sube {
+    to {
+      translate: 0.12em -0.28em;
+      scale: 1.12;
+      background-color: #e7b54c;
+    }
+  }
+
+  @keyframes arco-abre {
+    to {
+      border-radius: 48px 48px 0 0;
+      scale: 1.06;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .hero__sello {
+      right: -6px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+    }
+    .hero__visual {
+      width: min(100%, 520px);
+      margin-inline: auto;
+    }
+    .hero__px {
+      left: 4px;
+      font-size: 2.2rem;
+    }
+    .hero__cien {
+      left: 4px;
+      font-size: 0.95rem;
+    }
+    .hero__sello {
+      right: -6px;
+      width: 104px;
+    }
+    .hero__arco {
+      border-width: 10px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero__acciones .boton {
+      flex: 1 1 100%;
+    }
+  }
+
+  /* ---------------------------------------------------------------- cinta */
+  .hero-cinta {
+    padding-block: clamp(10px, 1.6vw, 24px);
+  }
+
+  .cinta__grande {
+    font-size: clamp(2.4rem, 5.6vw, 5.25rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+  }
+
+  .cinta__cursiva {
+    font-family: var(--fraunces);
+    font-style: italic;
+    font-weight: 340;
+    font-size: clamp(2.6rem, 6vw, 5.6rem);
+  }
+
+  /* ---------------------------------------------------------------- manifiesto */
+  .manifiesto__frase {
+    margin-top: 24px;
+    max-width: 74rem;
+    font-size: clamp(1.9rem, 3.2vw + 0.6rem, 3.25rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+  }
 
   .cifras {
-    background: var(--azabache-90);
-    border-block: 1px solid color-mix(in srgb, var(--oro) 20%, transparent);
-    padding-block: var(--e-3);
-  }
-
-  .cifras__rejilla {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--e-3) var(--e-2);
-  }
-
-  @media (width >= 56rem) {
-    .cifras__rejilla {
-      grid-template-columns: repeat(4, 1fr);
-    }
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: clamp(40px, 5vw, 72px);
+    list-style: none;
+    padding: 0;
   }
 
   .cifra {
-    text-align: center;
-    display: grid;
-    gap: 0.5rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+    min-height: 300px;
+    padding: 32px;
+    border-radius: var(--radio);
+    overflow: hidden;
   }
 
-  .cifra__valor {
-    font-size: var(--t-3);
-    color: var(--oro-claro);
+  .cifra--albero {
+    background: var(--albero);
   }
 
-  /* --------------------------------------------------------------- px */
-
-  .px {
-    display: grid;
-    gap: var(--e-4);
-    align-items: center;
+  .cifra--caoba {
+    background: var(--caoba);
+    color: var(--cal);
   }
 
-  @media (width >= 62rem) {
-    .px {
-      grid-template-columns: 1fr 1fr;
-      gap: var(--e-5);
+  .cifra--persiana {
+    background: var(--persiana);
+    color: var(--cal);
+  }
+
+  .cifra--foto {
+    padding: 0;
+  }
+
+  .cifra--foto :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cifra__pegatina {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    --giro: -4deg;
+    border-color: var(--cal);
+  }
+
+  .cifra__pie {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .cifra__pie--cursiva {
+    font-family: var(--fraunces);
+    font-style: italic;
+    font-size: 1.6rem;
+    font-weight: 320;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--caoba-texto);
+  }
+
+  .cifra__num {
+    font-size: clamp(4.4rem, 7vw, 7.5rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    line-height: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 1100px) {
+    .cifras {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .px__titulo {
-    font-size: var(--t-4);
-    margin-block: 0.3em 0.55em;
+  @media (max-width: 520px) {
+    .cifras {
+      gap: 10px;
+    }
+    .cifra {
+      min-height: 200px;
+      gap: 24px;
+      padding: 20px;
+    }
+    .cifra__num {
+      font-size: 12.5vw;
+    }
+    .cifra__pie {
+      font-size: 0.75rem;
+    }
+    .cifra__pie--cursiva {
+      font-size: 1.2rem;
+    }
+    .cifra__pegatina {
+      left: 10px;
+      bottom: 10px;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+    }
   }
 
-  .px__remate {
-    font-size: var(--t-1);
-    color: var(--caoba);
+  /* ---------------------------------------------------------------- proceso
+     Por defecto: carrusel con scroll-snap y flechas. En escritorio con soporte:
+     la sección se queda fija y el scroll vertical desliza las tarjetas. */
+  .proceso__fijo {
+    padding-block: clamp(72px, 8vw, 104px);
   }
 
-  .px__boton {
-    margin-top: var(--e-3);
+  .proceso__cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
   }
 
-  .px__fotos {
+  .proceso__flechas {
+    display: flex;
+    gap: 10px;
+  }
+
+  .proceso__flecha {
+    width: 52px;
+    height: 52px;
+  }
+
+  .proceso__flecha--llena {
+    background: var(--hierro);
+    color: var(--cal);
+  }
+
+  .proceso__flecha--llena:hover {
+    background: var(--persiana);
+  }
+
+  .proceso__progreso {
+    display: none;
+  }
+
+  .proceso__marco {
+    margin-top: 48px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .proceso__marco::-webkit-scrollbar {
+    display: none;
+  }
+
+  .proceso__pista {
+    display: flex;
+    gap: 28px;
+    width: max-content;
+    padding-inline: var(--margen);
+    list-style: none;
+    margin: 0;
+  }
+
+  .proceso__pista:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .paso {
+    position: relative;
+    width: clamp(260px, 72vw, 420px);
+    scroll-snap-align: start;
+    scroll-margin-left: var(--margen);
+  }
+
+  .paso__foto {
+    aspect-ratio: 420 / 460;
+  }
+
+  .paso__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .paso__visual {
+    position: relative;
+  }
+
+  .paso__pegatina {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    border-color: var(--cal-2);
+  }
+
+  .paso__titulo {
+    margin-top: 22px;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .paso__texto {
+    margin-top: 6px;
+    max-width: 22rem;
+    color: var(--texto-2);
+  }
+
+  @media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .proceso {
+        height: 220vh;
+        view-timeline-name: --proceso;
+      }
+      .proceso__fijo {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-block: 88px 24px;
+        overflow: hidden;
+      }
+      .proceso__marco {
+        overflow: visible;
+      }
+      .proceso__flechas {
+        display: none;
+      }
+      .proceso__progreso {
+        display: block;
+        width: 240px;
+        height: 3px;
+        margin-bottom: 18px;
+        background: rgba(23, 20, 18, 0.15);
+      }
+      .proceso__progreso span {
+        display: block;
+        height: 100%;
+        background: var(--hierro);
+        transform-origin: left;
+        animation: progreso linear both;
+        animation-timeline: --proceso;
+        animation-range: contain 0% contain 100%;
+      }
+      .proceso__pista {
+        animation: desliza linear both;
+        animation-timeline: --proceso;
+        animation-range: contain 0% contain 100%;
+      }
+      .paso {
+        width: min(420px, 30vw);
+      }
+      .paso__foto {
+        height: min(460px, 46vh);
+        aspect-ratio: auto;
+      }
+    }
+  }
+
+  @keyframes desliza {
+    to {
+      translate: calc(-100% + 100vw - 16px) 0;
+    }
+  }
+
+  @keyframes progreso {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  /* ---------------------------------------------------------------- bodega oscura */
+  .bodega__rejilla {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--e-2);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 640px);
+    gap: clamp(48px, 7vw, 96px);
     align-items: start;
   }
 
-  .px__foto {
-    margin: 0;
-    overflow: hidden;
+  .bodega__texto {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
   }
 
-  .px__foto :global(img) {
+  .bodega__cursiva {
+    display: block;
+  }
+
+  .crianza {
+    width: min(100% + 28px, 568px);
+    /* la bola viaja por un carril tan ancho como la barra: se recorta lo que sobra */
+    overflow-x: clip;
+    padding: 8px 14px 0;
+    margin: -8px -14px 0;
+  }
+
+  .crianza__barra {
+    position: relative;
+    height: 16px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #d59a3a, #a8551f, #6a2413, #2e0e08, #0e0503);
+    box-shadow: inset 0 0 0 1px rgba(246, 242, 234, 0.15);
+  }
+
+  .crianza__carril {
+    position: absolute;
+    inset: 0;
+    translate: 68% 0;
+  }
+
+  .crianza__bola {
+    position: absolute;
+    left: -14px;
+    top: -6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--cal);
+    border: 4px solid var(--caoba);
+  }
+
+  .crianza__etiquetas {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--caoba-texto);
+  }
+
+  .bodega__fotos {
+    position: relative;
+  }
+
+  .bodega__fotos :global(.bodega__copas) {
     width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 640 / 560;
     object-fit: cover;
-    transition: scale 0.9s var(--salida);
+    border-radius: var(--radio-g);
   }
 
-  .px__foto:hover :global(img) {
-    scale: 1.05;
+  .bodega__pasillo {
+    position: absolute;
+    left: -64px;
+    top: 62%;
+    width: 220px;
+    aspect-ratio: 240 / 330;
+    border: 10px solid var(--caoba);
   }
 
-  .px__foto--alta {
-    margin-top: var(--e-4);
+  .bodega__pasillo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  /* La foto de la copa viene recortada sobre blanco y ese blanco canta sobre el
-     papel albariza. `multiply` lo funde con el fondo y deja sólo la copa. */
-  .px__foto--recorte :global(img) {
-    mix-blend-mode: multiply;
-    object-fit: contain;
-    background: transparent;
-  }
-
-  /* ------------------------------------------------------------- pack */
-
-  .pack {
-    --fondo: var(--albariza-hueso);
-    background: var(--fondo);
-  }
-
-  .pack__interior {
-    display: grid;
-    gap: var(--e-4);
-    align-items: center;
-  }
-
-  @media (width >= 56rem) {
-    .pack__interior {
-      grid-template-columns: 1.05fr 1fr;
-      gap: var(--e-5);
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .bodega {
+        animation: se-abre linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 80%;
+      }
+      .crianza__carril {
+        animation: envejece linear both;
+        animation-timeline: view();
+        animation-range: cover 25% cover 65%;
+      }
     }
   }
 
-  .pack__foto {
-    margin: 0;
+  @keyframes se-abre {
+    from {
+      clip-path: inset(5% 2% 0 2% round 48px);
+    }
+    to {
+      clip-path: inset(0 0 0 0 round 0);
+    }
   }
 
-  .pack__titulo {
-    font-size: var(--t-3);
-    margin-block: 0.3em 0.5em;
+  @keyframes envejece {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 100% 0;
+    }
   }
 
-  .pack__lista {
+  @media (max-width: 1000px) {
+    .bodega__rejilla {
+      grid-template-columns: 1fr;
+    }
+    .bodega__fotos {
+      padding-bottom: 180px;
+    }
+    .bodega__pasillo {
+      left: auto;
+      right: 24px;
+      top: auto;
+      bottom: 0;
+      width: 180px;
+    }
+  }
+
+  /* ---------------------------------------------------------------- 5 essences */
+  .esencias {
+    transition: background-color 0.6s var(--curva);
+  }
+
+  /* El color del vino inunda la sección al pasar por su bloque */
+  .esencias:has(.bloque--am:hover) {
+    background: color-mix(in srgb, var(--am) 9%, var(--cal));
+  }
+  .esencias:has(.bloque--pc:hover) {
+    background: color-mix(in srgb, var(--pc) 9%, var(--cal));
+  }
+  .esencias:has(.bloque--ol:hover) {
+    background: color-mix(in srgb, var(--ol) 9%, var(--cal));
+  }
+  .esencias:has(.bloque--cr:hover) {
+    background: color-mix(in srgb, var(--cr) 16%, var(--cal));
+  }
+  .esencias:has(.bloque--px:hover) {
+    background: color-mix(in srgb, var(--px) 8%, var(--cal));
+  }
+
+  .esencias__titulo {
+    margin-top: 16px;
+  }
+
+  .esencias__entrada {
+    margin-top: 20px;
+  }
+
+  .bento {
+    margin-top: 48px;
+  }
+
+  .bento__rejilla {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: minmax(420px, auto);
+    grid-template-areas:
+      'pc pc pc pc pc pc pc cr cr cr cr cr'
+      'am am am am am ol ol ol ol ol ol ol'
+      'px px px px px px px pk pk pk pk pk';
+    gap: 16px;
     list-style: none;
     padding: 0;
-    margin: var(--e-3) 0;
+    margin: 0;
+  }
+
+  .bento__flechas {
+    display: none;
+  }
+
+  .bloque {
+    --fondo: var(--hierro);
+    --tinta: var(--blanco);
+    position: relative;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-direction: column;
+    padding: 36px;
+    border-radius: var(--radio-g);
+    background: var(--fondo);
+    color: var(--tinta);
+    overflow: hidden;
+    container-type: inline-size;
+    transition: transform 0.45s var(--curva);
   }
 
-  .pack__lista li {
-    font-family: var(--sello);
-    font-size: var(--t--2);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    border: 1px solid color-mix(in srgb, var(--azabache) 22%, transparent);
-    padding: 0.5em 0.85em;
-  }
-
-  .pack__precio {
-    display: flex;
-    align-items: baseline;
-    gap: 0.8rem;
-    margin-bottom: var(--e-2);
-  }
-
-  .pack__precio strong {
-    font-family: var(--display);
-    font-weight: 400;
-    font-size: var(--t-2);
-  }
-
-  /* --------------------------------------------------------------- mv */
-
-  .mv__cabecera {
-    max-width: 42rem;
-    margin-bottom: var(--e-4);
-  }
-
-  .mv__titulo {
-    font-size: var(--t-4);
-    margin-block: 0.3em 0.45em;
-  }
-
-  .mv__entrada {
-    color: var(--texto-tenue);
-  }
-
-  .mv__rejilla {
+  /* Estrecho: la botella junto al monograma y el texto debajo, a todo el ancho. */
+  .bloque__interior {
     display: grid;
-    gap: var(--e-3);
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-areas:
+      'mono foto'
+      'nombre nombre'
+      'gancho gancho'
+      '. .'
+      'pie pie';
+    column-gap: 16px;
+    flex: 1;
   }
 
-  @media (width >= 48rem) {
-    .mv__rejilla {
-      grid-template-columns: 1fr 1fr;
+  /* Ancho: texto a la izquierda y la botella en su columna, de arriba abajo. Nunca se tapan. */
+  @container (min-width: 440px) {
+    .bloque__interior {
+      grid-template-areas:
+        'mono foto'
+        'nombre foto'
+        'gancho foto'
+        '. foto'
+        'pie foto';
+      column-gap: 28px;
     }
   }
 
-  .ficha {
-    text-decoration: none;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    background: var(--azabache-90);
-    border: 1px solid var(--filete);
-    transition:
-      border-color 0.5s var(--salida),
-      transform 0.5s var(--salida);
-  }
-
-  .ficha:hover,
-  .ficha:focus-visible {
-    border-color: color-mix(in srgb, var(--oro) 65%, transparent);
+  .bloque:hover {
     transform: translateY(-4px);
   }
 
-  .ficha__foto {
-    margin: 0;
-    overflow: hidden;
-    background: color-mix(in srgb, var(--azabache) 88%, var(--caoba));
+  .bloque--pc {
+    grid-area: pc;
+    --fondo: var(--pc);
+  }
+  .bloque--cr {
+    grid-area: cr;
+    --fondo: var(--cr);
+    --tinta: var(--hierro);
+  }
+  .bloque--am {
+    grid-area: am;
+    --fondo: var(--am);
+  }
+  .bloque--ol {
+    grid-area: ol;
+    --fondo: var(--ol);
+  }
+  .bloque--px {
+    grid-area: px;
+    --fondo: var(--px);
+  }
+  .bloque--pack {
+    grid-area: pk;
+    padding: 0;
+    background: #1e1c1a;
   }
 
-  .ficha__foto :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: contain;
-    padding: var(--e-3);
-    transition: scale 0.7s var(--salida);
+  .bloque__mono {
+    grid-area: mono;
+    align-self: start;
+    font-family: var(--fraunces);
+    font-style: italic;
+    font-weight: 320;
+    font-size: clamp(5rem, 30cqi, 8.5rem);
+    line-height: 0.75;
   }
 
-  .ficha:hover .ficha__foto :global(img) {
-    scale: 1.06;
-  }
-
-  .ficha__cuerpo {
-    padding: var(--e-3);
-    display: grid;
-    gap: 0.55rem;
-    align-content: start;
-  }
-
-  .ficha__nombre {
-    font-size: var(--t-2);
-  }
-
-  .ficha__gancho {
-    color: var(--texto-tenue);
-  }
-
-  .ficha__precio {
-    font-size: var(--t--1);
-    color: var(--texto-tenue);
-  }
-
-  .ficha__precio strong {
-    font-family: var(--display);
-    font-weight: 400;
-    font-size: var(--t-1);
-    color: var(--albariza);
-  }
-
-  .ficha__mas {
-    margin-top: 0.4rem;
-  }
-
-  /* ---------------------------------------------------------- historia */
-
-  .historia {
+  .bloque__nombre {
+    grid-area: nombre;
     position: relative;
-    display: grid;
+    z-index: 1;
+    margin-top: 24px;
+    font-size: clamp(1.75rem, 8cqi, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
   }
 
-  .historia__foto {
-    grid-area: 1 / 1;
+  .bloque__nombre a {
+    text-decoration: none;
   }
 
-  .historia__foto :global(img) {
+  .bloque__nombre a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  .bloque__gancho {
+    grid-area: gancho;
+    position: relative;
+    z-index: 1;
+    margin-top: 10px;
+    max-width: 19rem;
+    font-size: 1.125rem;
+    line-height: 1.45;
+  }
+
+  .bloque__pie {
+    grid-area: pie;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding-top: 20px;
+  }
+
+  .bloque__precio {
+    font-size: 1.75rem;
+  }
+
+  .bloque__anadir {
+    min-height: 50px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--blanco);
+    color: var(--fondo);
+    font-weight: 800;
+    font-size: 1rem;
+    transition: transform 0.25s var(--curva);
+  }
+
+  .bloque__anadir:hover {
+    transform: scale(1.05);
+  }
+
+  .bloque--cr .bloque__anadir {
+    background: var(--hierro);
+    color: var(--blanco);
+  }
+
+  .bloque--px .bloque__anadir {
+    background: var(--albero);
+    color: var(--hierro);
+  }
+
+  .bloque .agotado {
+    color: inherit;
+  }
+
+  .bloque__botella {
+    grid-area: foto;
+    justify-self: end;
+    align-self: start;
+    width: clamp(96px, 34cqi, 124px);
+    aspect-ratio: 11 / 16;
+    border: 4px solid var(--blanco);
+    rotate: 4deg;
+    transition: rotate 0.45s var(--curva);
+  }
+
+  @container (min-width: 440px) {
+    .bloque__botella {
+      align-self: end;
+      width: clamp(150px, 34cqi, 220px);
+      border-width: 5px;
+    }
+  }
+
+  .bloque--cr .bloque__botella,
+  .bloque--ol .bloque__botella {
+    rotate: -4deg;
+  }
+
+  .bloque:hover .bloque__botella {
+    rotate: 0deg;
+  }
+
+  .bloque__botella :global(img) {
     width: 100%;
     height: 100%;
-    min-height: 26rem;
     object-fit: cover;
   }
 
-  .historia__panel {
-    grid-area: 1 / 1;
-    position: relative;
-    display: grid;
-    align-items: center;
-    background: linear-gradient(
-      90deg,
-      var(--azabache) 0%,
-      color-mix(in srgb, var(--azabache) 88%, transparent) 45%,
-      transparent 100%
-    );
-  }
-
-  @media (width < 48rem) {
-    .historia__panel {
-      background: color-mix(in srgb, var(--azabache) 84%, transparent);
-    }
-  }
-
-  .historia__texto {
-    width: min(100% - 2.5rem, var(--ancho));
-    margin-inline: auto;
-    max-width: 34rem;
-    padding-block: var(--e-5);
-  }
-
-  @media (width >= 48rem) {
-    .historia__texto {
-      width: min(100% - 5rem, var(--ancho));
-      padding-inline-end: 50%;
-      max-width: none;
-    }
-    .historia__texto .lectura {
-      max-width: 30rem;
-    }
-  }
-
-  .historia__titulo {
-    font-size: var(--t-4);
-    margin-block: 0.3em 0.5em;
-  }
-
-  .historia__texto .boton {
-    margin-top: var(--e-3);
-  }
-
-  /* ---------------------------------------------------------- eventos */
-
-  .eventos__interior {
-    display: grid;
-    gap: var(--e-4);
-    align-items: center;
-  }
-
-  @media (width >= 56rem) {
-    .eventos__interior {
-      grid-template-columns: 1fr 0.85fr;
-      gap: var(--e-5);
-    }
-  }
-
-  .eventos__titulo {
-    font-size: var(--t-3);
-    margin-block: 0.3em 0.5em;
-  }
-
-  .eventos__interior .boton {
-    margin-top: var(--e-3);
-  }
-
-  .eventos__foto {
-    margin: 0;
-  }
-
-  .eventos__foto :global(img) {
+  .bloque--pack :global(.bloque__foto) {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 5;
+    height: 100%;
     object-fit: cover;
   }
 
-  /* ------------------------------------------------------------ envío */
+  .bloque__pegatina {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    --giro: 8deg;
+    font-size: 1.2rem;
+  }
 
-  .envio {
-    text-align: center;
-    padding-block: var(--e-3);
-    background: var(--caoba);
-    color: var(--albariza);
-    margin: 0;
+  .bloque__comprar-pack {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+  }
+
+  @media (max-width: 1100px) {
+    .bento__rejilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: minmax(400px, auto);
+      grid-template-areas: 'pc cr' 'am ol' 'px pk';
+    }
+  }
+
+  /* Móvil: carrusel horizontal con scroll-snap */
+  @media (max-width: 700px) {
+    .bento {
+      margin-right: calc(var(--margen) * -1);
+    }
+    .bento__rejilla {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      padding-right: var(--margen);
+    }
+    .bento__rejilla::-webkit-scrollbar {
+      display: none;
+    }
+    .bloque {
+      flex: 0 0 min(300px, 80vw);
+      min-height: 400px;
+      padding: 26px;
+      scroll-snap-align: start;
+    }
+    .bento__flechas {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+  }
+
+  /* ---------------------------------------------------------------- marqués */
+  .marques__rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(2, minmax(0, 380px));
+    gap: 24px;
+    align-items: start;
+  }
+
+  .marques__texto {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding-right: clamp(0px, 3vw, 40px);
+  }
+
+  .marques__cursiva {
+    display: block;
+    font-size: 0.95em;
+  }
+
+  @media (max-width: 1100px) {
+    .marques__rejilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .marques__texto {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .marques__rejilla {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ---------------------------------------------------------------- visita */
+  .visita {
+    position: relative;
+    min-height: 640px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .visita :global(.visita__foto) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 55%;
+  }
+
+  .visita__caja {
+    position: relative;
+    padding-block: 64px;
+  }
+
+  .visita__tarjeta {
+    display: grid;
+    gap: 18px;
+    width: min(100%, 520px);
+    padding: clamp(28px, 4vw, 44px);
+    border-radius: var(--radio-g);
+    background: var(--cal);
+  }
+
+  .visita__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 640px) {
+    .visita {
+      min-height: 0;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .visita :global(.visita__foto) {
+      position: static;
+      height: 300px;
+    }
+    .visita__caja {
+      margin-top: -64px;
+      padding-block: 0 48px;
+    }
   }
 </style>

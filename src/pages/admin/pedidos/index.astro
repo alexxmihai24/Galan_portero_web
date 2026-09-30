@@ -1,0 +1,110 @@
+---
+import Base from '../../../layouts/Base.astro';
+import NavAdmin from '../../../components/NavAdmin.astro';
+import { euros } from '../../../lib/pedido';
+import { ESTADOS, ETIQUETA_ESTADO, fecha, listarPedidos, type Estado } from '../../../lib/pedidos';
+
+export const prerender = false;
+
+const pedido = Astro.url.searchParams.get('estado');
+const estado = ESTADOS.includes(pedido as Estado) ? (pedido as Estado) : undefined;
+const pedidos = await listarPedidos(estado);
+const filtros: { valor?: Estado; texto: string }[] = [
+  { texto: 'Todos' },
+  { valor: 'pagado', texto: 'Por enviar' },
+  { valor: 'enviado', texto: 'Enviados' },
+  { valor: 'entregado', texto: 'Entregados' },
+  { valor: 'cancelado', texto: 'Cancelados' },
+  { valor: 'pendiente', texto: 'Sin pagar' },
+];
+---
+
+<Base titulo="Pedidos" descripcion="Pedidos de la tienda" privada>
+  <section class="admin contenedor">
+    <NavAdmin titulo="Pedidos" />
+
+    <nav class="filtros" aria-label="Filtrar por estado">
+      {
+        filtros.map((f) => (
+          <a class="filtro" href={f.valor ? `?estado=${f.valor}` : '/admin/pedidos'} aria-current={f.valor === estado ? 'page' : undefined}>
+            {f.texto}
+          </a>
+        ))
+      }
+    </nav>
+
+    {
+      pedidos.length === 0 ? (
+        <p class="aviso aviso--info">No hay pedidos {estado ? `en «${ETIQUETA_ESTADO[estado]}»` : 'todavía'}.</p>
+      ) : (
+        <div class="tabla-caja">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Pedido</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th class="num">Botellas</th>
+                <th class="num">Total</th>
+                <th>Estado</th>
+                <th><span class="oculto-visual">Ver</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {pedidos.map((p) => (
+                <tr>
+                  <td><strong>nº {p.id}</strong></td>
+                  <td>{fecha(p.creado)}</td>
+                  <td>
+                    {p.cliente}
+                    <br />
+                    <small>{p.email}</small>
+                  </td>
+                  <td class="num">{p.unidades}</td>
+                  <td class="num">{euros(p.total_cent)}</td>
+                  <td><span class={`estado estado--${p.estado}`}>{ETIQUETA_ESTADO[p.estado]}</span></td>
+                  <td class="num"><a class="enlace" href={`/admin/pedidos/${p.id}`}>Ver</a></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+  </section>
+</Base>
+
+<style>
+  .admin {
+    display: grid;
+    gap: 28px;
+    padding-block: clamp(32px, 5vw, 64px) clamp(64px, 8vw, 112px);
+  }
+
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filtro {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 2px solid rgba(23, 20, 18, 0.2);
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .filtro[aria-current='page'] {
+    background: var(--hierro);
+    border-color: var(--hierro);
+    color: var(--cal);
+  }
+
+  small {
+    color: var(--texto-2);
+  }
+</style>

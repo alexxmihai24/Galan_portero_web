@@ -7,24 +7,37 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "start": "node --env-file-if-exists=.env ./dist/server/entry.mjs",
+    "check": "astro check",
+    "test": "node --test \"tests/*.test.ts\"",
+    "crear-admin": "node --env-file=.env scripts/crear-admin.ts",
+    "probar": "node --env-file=.env scripts/probar-tienda.mjs",
+    "probar:supabase": "node --env-file=.env scripts/probar-supabase.mjs",
+    "probar:webhook": "node --env-file=.env scripts/probar-webhook.mjs"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/react": "^4.4.0",
-    "@fontsource-variable/archivo": "^5.2.5",
-    "@fontsource-variable/bodoni-moda": "^5.2.5",
-    "@fontsource-variable/newsreader": "^5.2.5",
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
-    "astro": "^5.14.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "sharp": "^0.34.4",
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/node": "^11.1.6",
+    "@astrojs/vercel": "^11.0.11",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
+    "astro": "^7.3.5",
+    "sharp": "^0.35.5",
+    "stripe": "^22.6.2",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
     "lighthouse": "^13.4.1",
     "playwright": "^1.61.0"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "overrides": {
+    "@vercel/routing-utils": {
+      "path-to-regexp": "6.3.0"
+    }
   }
 }

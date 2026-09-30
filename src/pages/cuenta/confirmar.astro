@@ -1,0 +1,79 @@
+---
+import type { EmailOtpType } from '@supabase/supabase-js';
+import Base from '../../layouts/Base.astro';
+import CajaCuenta from '../../components/CajaCuenta.astro';
+
+export const prerender = false;
+
+// Destino del enlace de los correos de Supabase (plantillas en supabase/plantillas):
+//   ?token_hash=…&type=email     confirmar la cuenta
+//   ?token_hash=…&type=recovery  he olvidado mi contraseña
+//   ?code=…[&tipo=recuperacion]  plantillas por defecto de Supabase (mismo navegador)
+// Los destinos son fijos: aquí no se acepta ningún `volver`, así un enlace manipulado
+// no puede llevar a nadie fuera de la web.
+
+const TIPOS: EmailOtpType[] = ['email', 'signup', 'recovery'];
+const destino = (recuperacion: boolean) => (recuperacion ? '/cuenta/clave' : '/cuenta?bienvenida=1');
+
+const supabase = Astro.locals.supabase;
+const q = Astro.url.searchParams;
+let tokenHash = q.get('token_hash') ?? '';
+let tipo = q.get('type') ?? '';
+let fallo = false;
+
+if (supabase && Astro.request.method === 'POST') {
+  // Se confirma con POST, no al abrir el enlace: los antivirus del correo abren los enlaces
+  // (GET) para analizarlos y gastarían el token de un solo uso antes que la persona.
+  const d = await Astro.request.formData();
+  tokenHash = String(d.get('token_hash') ?? '');
+  tipo = String(d.get('type') ?? '');
+  if (tokenHash && TIPOS.includes(tipo as EmailOtpType)) {
+    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: tipo as EmailOtpType });
+    if (!error) return Astro.redirect(destino(tipo === 'recovery'));
+  }
+  fallo = true;
+  Astro.response.status = 400;
+} else if (supabase && q.get('code')) {
+  // Solo funciona en el navegador donde se pidió (la cookie del PKCE está ahí).
+  // `tipo` solo elige la página de destino; quién puede cambiar la contraseña lo decide /cuenta/clave.
+  const { error } = await supabase.auth.exchangeCodeForSession(q.get('code')!);
+  if (!error) return Astro.redirect(destino(q.get('tipo') === 'recuperacion'));
+  fallo = true;
+}
+
+const pendiente = !fallo && tokenHash !== '' && TIPOS.includes(tipo as EmailOtpType);
+const esRecuperacion = tipo === 'recovery';
+---
+
+<Base titulo="Confirmar" descripcion="Confirma tu correo en Bodegas Galán Portero." privada>
+  <CajaCuenta antetitulo={esRecuperacion ? 'Contraseña nueva' : 'Tu cuenta'}>
+    {
+      pendiente ? (
+        <>
+          <h1 class="titular titular--2">
+            Un último <span class="cursiva">paso.</span>
+          </h1>
+          <form method="post" data-astro-reload>
+            <input type="hidden" name="token_hash" value={tokenHash} />
+            <input type="hidden" name="type" value={tipo} />
+            <button class="boton boton--primario boton--bloque" type="submit">
+              {esRecuperacion ? 'Elegir contraseña nueva' : 'Confirmar mi correo y entrar'}
+            </button>
+          </form>
+        </>
+      ) : (
+        <>
+          <h1 class="titular titular--2">
+            Este enlace <span class="cursiva">ya no vale.</span>
+          </h1>
+          <p class="aviso aviso--info" role="status">
+            Ha caducado o ya se ha usado. Si acabas de confirmar tu correo, ya puedes entrar con tu contraseña.
+          </p>
+          <p>
+            <a class="enlace" href="/cuenta/entrar">Entrar</a> · <a class="enlace" href="/cuenta/recuperar">Pedir otro enlace para cambiar la contraseña</a>
+          </p>
+        </>
+      )
+    }
+  </CajaCuenta>
+</Base>

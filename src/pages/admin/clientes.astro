@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import NavAdmin from '../../components/NavAdmin.astro';
+import { euros } from '../../lib/pedido';
+import { fecha, listarClientes } from '../../lib/pedidos';
+
+export const prerender = false;
+
+const clientes = await listarClientes();
+---
+
+<Base titulo="Clientes" descripcion="Clientes de la tienda" privada>
+  <section class="admin contenedor">
+    <NavAdmin titulo="Clientes" />
+    <div class="tabla-caja">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Alta</th>
+            <th class="num">Pedidos</th>
+            <th class="num">Gastado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            clientes.map((c) => (
+              <tr>
+                <td>
+                  <strong>{c.nombre}</strong> {c.admin && <span class="estado estado--enviado">Admin</span>}
+                </td>
+                <td><a class="enlace" href={`mailto:${c.email}`}>{c.email}</a></td>
+                <td>{fecha(c.creado)}</td>
+                <td class="num">{c.pedidos}</td>
+                <td class="num">{euros(c.gastado_cent)}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .admin {
+    display: grid;
+    gap: 28px;
+    padding-block: clamp(32px, 5vw, 64px) clamp(64px, 8vw, 112px);
+  }
+</style>

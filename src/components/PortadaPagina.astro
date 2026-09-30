@@ -1,0 +1,107 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+/**
+ * Cabecera de las páginas interiores: titular a la izquierda y foto en arco
+ * con marco albero a la derecha (el mismo gesto que la portada).
+ * Slots: `titulo` (el h1), por defecto (entrada) y `acciones`.
+ */
+interface Props {
+  antetitulo: string;
+  imagen: ImageMetadata;
+  alt: string;
+  pegatina?: string;
+}
+const { antetitulo, imagen, alt, pegatina } = Astro.props;
+---
+
+<section class="portada contenedor">
+  <div class="portada__texto">
+    <p class="antetitulo">{antetitulo}</p>
+    <h1 class="titular titular--1 portada__titulo"><slot name="titulo" /></h1>
+    <div class="lectura portada__entrada"><slot /></div>
+    {Astro.slots.has('acciones') && <div class="portada__acciones"><slot name="acciones" /></div>}
+  </div>
+  <div class="portada__visual">
+    <div class="portada__arco">
+      <Picture
+        src={imagen}
+        formats={['avif', 'webp']}
+        alt={alt}
+        width={480}
+        height={600}
+        fit="cover"
+        quality={40}
+        widths={[380, 480, 760, 960]}
+        sizes="(max-width: 900px) 90vw, 480px"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+    {pegatina && <span class="pegatina pegatina--albero pegatina--viva portada__pegatina">{pegatina}</span>}
+  </div>
+</section>
+
+<style>
+  .portada {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+    padding-block: clamp(24px, 4vw, 56px) clamp(56px, 7vw, 96px);
+  }
+
+  .portada__texto {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+  }
+
+  .portada__titulo {
+    font-size: clamp(3.2rem, 7.5vw, 7.6rem);
+  }
+
+  .portada__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .portada__visual {
+    position: relative;
+  }
+
+  .portada__arco {
+    aspect-ratio: 480 / 600;
+    border: 12px solid var(--albero);
+    border-bottom: 0;
+    border-radius: 999px 999px 0 0;
+    overflow: hidden;
+  }
+
+  .portada__arco :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .portada__pegatina {
+    position: absolute;
+    left: -32px;
+    bottom: 14%;
+    --giro: -6deg;
+  }
+
+  @media (max-width: 900px) {
+    .portada {
+      grid-template-columns: 1fr;
+    }
+    .portada__visual {
+      width: min(100%, 440px);
+      margin-inline: auto;
+    }
+    .portada__pegatina {
+      left: -4px;
+    }
+  }
+</style>

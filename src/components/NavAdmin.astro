@@ -1,0 +1,76 @@
+---
+/** Cabecera común del panel de la bodega. */
+interface Props {
+  titulo: string;
+  cursiva?: string;
+}
+const { titulo, cursiva } = Astro.props;
+const ruta = Astro.url.pathname.replace(/\/$/, '');
+const enlaces = [
+  { href: '/admin', texto: 'Resumen' },
+  { href: '/admin/pedidos', texto: 'Pedidos' },
+  { href: '/admin/productos', texto: 'Productos' },
+  { href: '/admin/clientes', texto: 'Clientes' },
+];
+const actual = (href: string) => (href === '/admin' ? ruta === '/admin' : ruta.startsWith(href));
+---
+
+<header class="admin-cabeza">
+  <div>
+    <p class="antetitulo">Panel de la bodega</p>
+    <h1 class="titular titular--2 admin-cabeza__titulo">{titulo} {cursiva && <span class="cursiva">{cursiva}</span>}</h1>
+  </div>
+  <nav aria-label="Panel">
+    <ul class="admin-nav" role="list">
+      {
+        enlaces.map((e) => (
+          <li>
+            <a href={e.href} aria-current={actual(e.href) ? 'page' : undefined}>
+              {e.texto}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .admin-cabeza {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+  }
+
+  .admin-cabeza__titulo {
+    margin-top: 12px;
+  }
+
+  .admin-nav {
+    display: flex;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 999px;
+    background: var(--cal-2);
+    list-style: none;
+    overflow-x: auto;
+  }
+
+  .admin-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .admin-nav a[aria-current='page'] {
+    background: var(--hierro);
+    color: var(--cal);
+  }
+</style>

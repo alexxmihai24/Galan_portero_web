@@ -1,0 +1,296 @@
+---
+import Icono from './Icono.astro';
+/** Contenido de la cesta. Lo pinta src/scripts/cesta.ts; se usa en el panel lateral y en /cesta. */
+interface Props {
+  modo: 'panel' | 'pagina';
+}
+const { modo } = Astro.props;
+---
+
+<div class:list={['lc', `lc--${modo}`]}>
+  <div class="lc__envio" data-cesta-llena hidden>
+    <p class="lc__envio-texto" data-cesta-falta></p>
+    <div class="lc__barra" aria-hidden="true"><span data-cesta-progreso></span></div>
+  </div>
+
+  <div class="lc__vacia" data-cesta-vacia>
+    <p class="lc__vacia-titulo">Tu cesta está <span class="cursiva">vacía.</span></p>
+    <p class="lc__vacia-texto">Los vinos se hacen al sol; la cesta, con un clic.</p>
+    <a class="boton boton--primario" href="/vinos">Ver los vinos <Icono nombre="flecha" /></a>
+  </div>
+
+  <ul class="lc__lineas" role="list" data-cesta-lineas aria-label="Productos en la cesta"></ul>
+
+  <div class="lc__pie" data-cesta-llena hidden>
+    <dl class="lc__totales">
+      <div><dt>Subtotal</dt><dd data-cesta-subtotal></dd></div>
+      <div><dt>Envío a península</dt><dd data-cesta-envio-coste></dd></div>
+      <div class="lc__total"><dt>Total</dt><dd data-cesta-total></dd></div>
+    </dl>
+    <p class="aviso aviso--error" data-cesta-error role="alert" hidden></p>
+    <button class="boton boton--comprar boton--bloque" type="button" data-pagar>
+      Pagar con tarjeta <Icono nombre="flecha" />
+    </button>
+    <p class="lc__nota">Pago seguro con Stripe. Venta solo a mayores de 18 años.</p>
+    {modo === 'panel' && <a class="lc__ver enlace" href="/cesta">Ver la cesta completa</a>}
+  </div>
+</div>
+
+<template data-plantilla-linea>
+  <li class="linea" data-linea>
+    <a class="linea__foto" data-href tabindex="-1"><img data-img alt="" width="80" height="100" loading="lazy" /></a>
+    <div class="linea__info">
+      <a class="linea__nombre" data-href data-nombre></a>
+      <span class="linea__formato" data-formato></span>
+      <span class="linea__precio precio" data-importe></span>
+    </div>
+    <div class="linea__mandos">
+      <div class="linea__contador">
+        <button type="button" class="boton-icono" data-menos><Icono nombre="menos" tam={18} /></button>
+        <output data-unidades></output>
+        <button type="button" class="boton-icono" data-mas><Icono nombre="mas" tam={18} /></button>
+      </div>
+      <button type="button" class="linea__quitar" data-quitar>Quitar</button>
+    </div>
+  </li>
+</template>
+
+<style>
+  .lc {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .lc--panel {
+    padding: 0 24px 20px;
+    overflow-y: auto;
+  }
+
+  .lc__envio {
+    padding: 14px 18px;
+    border-radius: 20px;
+    background: var(--cal-2);
+  }
+
+  .lc__envio-texto {
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  .lc__barra {
+    height: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    background: rgba(23, 20, 18, 0.12);
+    overflow: hidden;
+  }
+
+  .lc__barra span {
+    display: block;
+    height: 100%;
+    width: 100%;
+    border-radius: inherit;
+    background: var(--albero);
+    transform-origin: left;
+    transform: scaleX(var(--progreso, 0));
+    transition: transform 0.6s var(--curva);
+  }
+
+  .lc__vacia {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 40px 0;
+  }
+
+  .lc__vacia-titulo {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .lc__vacia-texto {
+    color: var(--texto-2);
+  }
+
+  .lc__lineas {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+  }
+
+  .lc__pie {
+    margin-top: auto;
+    padding-top: 16px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .lc__totales {
+    display: grid;
+    gap: 6px;
+    padding-top: 16px;
+    border-top: 1px solid var(--linea);
+  }
+
+  .lc__totales div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .lc__totales dt {
+    color: var(--texto-2);
+  }
+
+  .lc__totales dd {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lc__total {
+    font-size: 1.35rem;
+  }
+
+  .lc__total dt {
+    color: var(--hierro) !important;
+    font-weight: 800;
+  }
+
+  .lc__total dd {
+    font-weight: 800 !important;
+  }
+
+  .lc__nota {
+    font-size: 0.8125rem;
+    color: var(--texto-3);
+    text-align: center;
+  }
+
+  .lc__ver {
+    justify-self: center;
+    font-size: 0.9375rem;
+  }
+
+  /* líneas (se clonan desde la plantilla; :global porque las crea el script) */
+  :global(.linea) {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--linea);
+  }
+
+  :global(.linea__foto) {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 72px;
+    height: 90px;
+    overflow: hidden;
+    border-radius: 36px 36px 12px 12px;
+    background: var(--cal-2);
+  }
+
+  :global(.linea__foto img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  :global(.linea__foto.es-recorte img) {
+    width: auto;
+    height: 86%;
+    object-fit: contain;
+  }
+
+  :global(.linea__info) {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  :global(.linea__nombre) {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    line-height: 1.2;
+  }
+
+  :global(.linea__nombre:hover) {
+    text-decoration: underline;
+  }
+
+  :global(.linea__formato) {
+    font-size: 0.875rem;
+    color: var(--texto-2);
+  }
+
+  :global(.linea__precio) {
+    margin-top: 2px;
+  }
+
+  :global(.linea__mandos) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  :global(.linea__contador) {
+    display: flex;
+    align-items: center;
+    border: 2px solid rgba(23, 20, 18, 0.18);
+    border-radius: 999px;
+  }
+
+  :global(.linea__contador .boton-icono) {
+    width: 40px;
+    height: 40px;
+  }
+
+  :global(.linea__contador output) {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  :global(.linea__quitar) {
+    min-height: 32px;
+    padding: 0 6px;
+    border: 0;
+    background: none;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--texto-2);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  :global(.linea__quitar:hover) {
+    color: var(--error);
+  }
+
+  /* en la página /cesta las líneas respiran más */
+  .lc--pagina :global(.linea) {
+    grid-template-columns: 96px minmax(0, 1fr) auto;
+    gap: 20px;
+    padding: 20px 0;
+  }
+
+  .lc--pagina :global(.linea__foto) {
+    width: 96px;
+    height: 120px;
+    border-radius: 48px 48px 14px 14px;
+  }
+
+  .lc--pagina :global(.linea__nombre) {
+    font-size: 1.25rem;
+  }
+</style>

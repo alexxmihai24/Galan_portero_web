@@ -3,7 +3,23 @@ dist/
 .astro/
 capturas/
 .vercel/
-.env
-.env.production
 .DS_Store
 npm-debug.log*
+
+# Secretos: nunca a git. Solo se sube la plantilla sin valores.
+.env
+.env.*
+!.env.example
+
+# Documentación interna: no se sube.
+*.md
+
+# Base de datos SQLite de la versión anterior (datos de prueba).
+datos/
+
+# Supabase CLI (solo si alguien lo usa en local)
+supabase/.temp/
+supabase/.branches/
+
+# Material interno de diseño (maquetas, histórico): no se sube.
+docs/

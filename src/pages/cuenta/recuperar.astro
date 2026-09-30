@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import CajaCuenta from '../../components/CajaCuenta.astro';
+import { emailValido, mensajeAuth, normalizarEmail } from '../../lib/auth';
+
+export const prerender = false;
+
+const supabase = Astro.locals.supabase;
+let email = '';
+let enviado = false;
+let error = '';
+if (Astro.request.method === 'POST' && supabase) {
+  email = normalizarEmail(String((await Astro.request.formData()).get('email') ?? ''));
+  if (!emailValido(email)) {
+    error = 'Escribe un correo válido.';
+    Astro.response.status = 400;
+  } else {
+    const { error: e } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${Astro.url.origin}/cuenta/confirmar?tipo=recuperacion` });
+    // Mismo mensaje exista o no la cuenta: esta página no debe servir para averiguar quién es cliente.
+    if (e?.status === 429) {
+      error = mensajeAuth(e);
+      Astro.response.status = 429;
+    } else {
+      if (e) console.error('resetPasswordForEmail:', e.message);
+      enviado = true;
+    }
+  }
+}
+const caducado = Astro.url.searchParams.get('aviso') === 'caducado';
+---
+
+<Base titulo="Recuperar contraseña" descripcion="Cambia la contraseña de tu cuenta en Bodegas Galán Portero." privada>
+  <CajaCuenta antetitulo="Contraseña">
+    <h1 class="titular titular--2">¿Se te ha <span class="cursiva">olvidado?</span></h1>
+    {
+      enviado ? (
+        <p class="aviso aviso--ok" role="status">
+          Si hay una cuenta con <strong>{email}</strong>, te llegará un correo con un enlace para elegir una contraseña nueva.
+          Caduca en una hora.
+        </p>
+      ) : (
+        <>
+          {caducado && <p class="aviso aviso--info">Para cambiar la contraseña, pide un enlace nuevo: el anterior ya no vale.</p>}
+          <p class="lectura">Escribe el correo de tu cuenta y te mandamos un enlace para elegir otra.</p>
+          <form method="post" data-astro-reload>
+            {error && <p class="aviso aviso--error" role="alert">{error}</p>}
+            <div class="campo">
+              <label for="email">Correo electrónico</label>
+              <input id="email" name="email" type="email" autocomplete="email" required value={email} />
+            </div>
+            <button class="boton boton--primario boton--bloque" type="submit" disabled={!supabase}>
+              Enviarme el enlace
+            </button>
+          </form>
+        </>
+      )
+    }
+    <p><a class="enlace" href="/cuenta/entrar">Volver a entrar</a></p>
+  </CajaCuenta>
+</Base>

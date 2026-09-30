@@ -1,47 +1,56 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icono from '../components/Icono.astro';
+
+// Servida al momento: así también responde bien si alguien visita /404 a mano.
+export const prerender = false;
+Astro.response.status = 404;
 ---
 
 <Base titulo="Página no encontrada" descripcion="Esta página no existe en bodegasgalanportero.com.">
-  <section class="perdido">
-    <div class="contenedor perdido__interior">
-      <p class="sello">Error 404</p>
-      <h1 class="perdido__titulo display">Aquí no<br />hay nada</h1>
-      <p class="perdido__texto lectura">
-        La página que buscas no existe o ha cambiado de sitio. Vuelve a la bodega y sigue por donde quieras.
-      </p>
-      <div class="perdido__acciones">
-        <a class="boton boton--solido" href="/">
-          Volver al inicio
-          <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-        </a>
-        <a class="boton" href="/vinos">Ver los vinos</a>
-      </div>
+  <section class="perdido contenedor">
+    <p class="antetitulo">Error 404</p>
+    <h1 class="titular titular--1 perdido__titulo">
+      Aquí no <span class="perdido__sol" aria-hidden="true"></span><span class="cursiva">hay nada.</span>
+    </h1>
+    <p class="lectura">La página que buscas no existe o ha cambiado de sitio. Vuelve a la bodega y sigue por donde quieras.</p>
+    <div class="perdido__acciones">
+      <a class="boton boton--primario" href="/">Volver al inicio <Icono nombre="flecha" /></a>
+      <a class="boton" href="/vinos">Ver los vinos</a>
     </div>
   </section>
 </Base>
 
 <style>
   .perdido {
-    min-height: 78svh;
     display: grid;
-    align-items: center;
-    padding-block: var(--e-6);
+    justify-items: start;
+    gap: 24px;
+    padding-block: clamp(48px, 10vw, 140px);
   }
 
   .perdido__titulo {
-    font-size: var(--t-5);
-    margin-block: 0.3em 0.5em;
+    position: relative;
   }
 
-  .perdido__texto {
-    color: var(--texto-tenue);
+  .perdido__titulo .cursiva {
+    position: relative;
+    display: block;
+  }
+
+  .perdido__sol {
+    position: absolute;
+    left: 1.6em;
+    bottom: 0.02em;
+    width: 0.9em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--albero);
   }
 
   .perdido__acciones {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--e-2);
-    margin-top: var(--e-3);
+    gap: 12px;
   }
 </style>

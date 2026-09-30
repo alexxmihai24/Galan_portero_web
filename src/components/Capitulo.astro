@@ -1,0 +1,97 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+/** Bloque foto + texto que alterna de lado. Slots: `titulo` y por defecto (párrafos). */
+interface Props {
+  antetitulo: string;
+  imagen: ImageMetadata;
+  alt: string;
+  numero?: string;
+  invertido?: boolean;
+  /** Ilustración o retrato: se ve entera, sin recortar */
+  entera?: boolean;
+}
+const { antetitulo, imagen, alt, numero, invertido = false, entera = false } = Astro.props;
+---
+
+<article class:list={['capitulo contenedor', invertido && 'capitulo--invertido']}>
+  <div class="capitulo__visual revela">
+    <div class:list={['capitulo__foto arco--redondo', entera && 'capitulo__foto--entera']}>
+      <Image src={imagen} alt={alt} widths={[420, 640, 900]} sizes="(max-width: 900px) 90vw, 520px" />
+    </div>
+    {numero && <span class="pegatina pegatina--viva capitulo__num">{numero}</span>}
+  </div>
+  <div class="capitulo__texto">
+    <p class="antetitulo revela">{antetitulo}</p>
+    <h2 class="titular titular--2 revela"><slot name="titulo" /></h2>
+    <div class="lectura revela"><slot /></div>
+  </div>
+</article>
+
+<style>
+  .capitulo {
+    display: grid;
+    grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+    padding-block: clamp(40px, 5vw, 72px);
+  }
+
+  .capitulo--invertido {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+  }
+
+  .capitulo--invertido .capitulo__visual {
+    order: 2;
+  }
+
+  .capitulo__visual {
+    position: relative;
+  }
+
+  .capitulo__foto {
+    aspect-ratio: 520 / 620;
+  }
+
+  .capitulo__foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .capitulo__foto--entera {
+    background: var(--cal-2);
+  }
+
+  .capitulo__foto--entera :global(img) {
+    object-fit: contain;
+    padding-top: 12%;
+  }
+
+  .capitulo__num {
+    position: absolute;
+    right: 18px;
+    bottom: 22px;
+    --giro: 6deg;
+    font-size: 1.6rem;
+    border-color: var(--cal);
+  }
+
+  .capitulo__texto {
+    display: grid;
+    gap: 22px;
+  }
+
+  @media (max-width: 900px) {
+    .capitulo,
+    .capitulo--invertido {
+      grid-template-columns: 1fr;
+    }
+    .capitulo--invertido .capitulo__visual {
+      order: 0;
+    }
+    .capitulo__visual {
+      width: min(100%, 440px);
+    }
+  }
+</style>

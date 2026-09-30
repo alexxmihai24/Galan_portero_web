@@ -33,7 +33,6 @@ const opciones = {
       : { rttMs: 40, throughputKbps: 10240, cpuSlowdownMultiplier: 1 },
 };
 
-const cat = ['performance', 'accessibility', 'best-practices', 'seo'];
 const nota = (r, c) => Math.round((r.categories[c]?.score ?? 0) * 100);
 const filas = [];
 

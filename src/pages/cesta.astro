@@ -1,0 +1,129 @@
+---
+import Base from '../layouts/Base.astro';
+import Icono from '../components/Icono.astro';
+import LineasCesta from '../components/LineasCesta.astro';
+import { ENVIO_GRATIS_DESDE } from '../data/vinos';
+import { ENVIO_CENT, euros } from '../lib/pedido';
+---
+
+<Base titulo="Tu cesta" descripcion="Revisa los vinos de tu cesta y paga de forma segura con tarjeta." privada>
+  <section class="cesta-pagina contenedor" aria-labelledby="cesta-pagina-titulo">
+    <p class="antetitulo">Tienda online</p>
+    <h1 id="cesta-pagina-titulo" class="titular titular--1 cesta-pagina__titulo">Tu <span class="cursiva">cesta.</span></h1>
+
+    <p class="aviso aviso--info cesta-pagina__cancelado" data-cancelado hidden>
+      Has vuelto sin pagar. Tus vinos siguen aquí cuando quieras terminar.
+    </p>
+
+    <div class="cesta-pagina__rejilla">
+      <div class="cesta-pagina__lista">
+        <LineasCesta modo="pagina" />
+      </div>
+      <aside class="cesta-pagina__ayuda" aria-label="Cómo compramos">
+        <ul class="ayuda" role="list">
+          <li>
+            <Icono nombre="sol" tam={24} />
+            <span><strong>Envío gratis a península</strong> desde {ENVIO_GRATIS_DESDE}&nbsp;€. Por debajo, {euros(ENVIO_CENT)}.</span>
+          </li>
+          <li>
+            <Icono nombre="bolsa" tam={24} />
+            <span><strong>Pago seguro con Stripe.</strong> Tu tarjeta nunca pasa por nuestra web.</span>
+          </li>
+          <li>
+            <Icono nombre="usuario" tam={24} />
+            <span><strong>Con tu cuenta</strong> ves tus pedidos y en qué estado están.</span>
+          </li>
+        </ul>
+        <p class="ayuda__tel">
+          ¿Un pedido grande o para un evento? <a class="enlace" href="tel:+34957664237">957 66 42 37</a>
+        </p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const aviso = document.querySelector<HTMLElement>('[data-cancelado]');
+    if (aviso) aviso.hidden = new URLSearchParams(location.search).get('cancelado') !== '1';
+  });
+</script>
+
+<style>
+  .cesta-pagina {
+    padding-block: clamp(32px, 5vw, 72px) clamp(64px, 8vw, 112px);
+  }
+
+  .cesta-pagina__titulo {
+    margin-top: 16px;
+  }
+
+  .cesta-pagina__cancelado {
+    margin-top: 24px;
+    max-width: 760px;
+  }
+
+  .cesta-pagina__rejilla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: start;
+    margin-top: 32px;
+  }
+
+  .cesta-pagina__lista {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(20px, 3vw, 36px);
+    border-radius: var(--radio-g);
+    background: var(--blanco);
+  }
+
+  .cesta-pagina__ayuda {
+    position: sticky;
+    top: 112px;
+    display: grid;
+    gap: 24px;
+    padding: 28px;
+    border-radius: var(--radio-g);
+    background: var(--cal-2);
+  }
+
+  .ayuda {
+    display: grid;
+    gap: 18px;
+    list-style: none;
+    padding: 0;
+  }
+
+  .ayuda li {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 14px;
+    line-height: 1.45;
+    color: var(--texto-2);
+  }
+
+  .ayuda strong {
+    color: var(--hierro);
+  }
+
+  .ayuda :global(svg) {
+    color: var(--albero-osc);
+  }
+
+  .ayuda__tel {
+    padding-top: 18px;
+    border-top: 1px solid var(--linea);
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 900px) {
+    .cesta-pagina__rejilla {
+      grid-template-columns: 1fr;
+    }
+    .cesta-pagina__ayuda {
+      position: static;
+    }
+  }
+</style>

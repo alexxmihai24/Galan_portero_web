@@ -1,0 +1,110 @@
+---
+import Base from '../../layouts/Base.astro';
+import CajaCuenta from '../../components/CajaCuenta.astro';
+import { ErrorAuth, mensajeAuth, rutaSegura, validarRegistro } from '../../lib/auth';
+import { TIENDA } from '../../data/vinos';
+
+export const prerender = false;
+
+const volver = rutaSegura(Astro.url.searchParams.get('volver'));
+if (Astro.locals.usuario) return Astro.redirect(volver);
+
+const supabase = Astro.locals.supabase;
+let error = '';
+let revisaCorreo = false;
+const valores = { nombre: '', email: '' };
+if (Astro.request.method === 'POST' && supabase) {
+  const datos = await Astro.request.formData();
+  valores.nombre = String(datos.get('nombre') ?? '');
+  valores.email = String(datos.get('email') ?? '');
+  try {
+    // Venta de alcohol: solo a mayores de edad.
+    if (datos.get('mayor') !== 'si') throw new ErrorAuth('Para comprar vino tienes que ser mayor de 18 años.');
+    if (datos.get('privacidad') !== 'si') throw new ErrorAuth('Tienes que aceptar la política de privacidad.');
+    const { email, nombre, password } = validarRegistro({ ...valores, password: String(datos.get('password') ?? '') });
+
+    const { data, error: e } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        // Consentimientos guardados con fecha, por si hay que demostrarlos (RGPD).
+        data: { nombre, mayor_de_edad: true, acepta_privacidad: new Date().toISOString() },
+        // Solo se usa con las plantillas de correo por defecto de Supabase (flujo con ?code=).
+        emailRedirectTo: `${Astro.url.origin}/cuenta/confirmar`,
+      },
+    });
+    if (e) throw new ErrorAuth(mensajeAuth(e));
+    // Con la confirmación de correo activada no hay sesión hasta pulsar el enlace. Supabase
+    // responde igual si el correo ya existía, para no revelar quién tiene cuenta.
+    if (data.session) return Astro.redirect(volver);
+    revisaCorreo = true;
+  } catch (e) {
+    if (!(e instanceof ErrorAuth)) throw e;
+    error = e.message;
+    Astro.response.status = 400;
+  }
+}
+const entrar = `/cuenta/entrar${volver !== '/cuenta' ? `?volver=${encodeURIComponent(volver)}` : ''}`;
+---
+
+<Base titulo="Crear cuenta" descripcion="Crea tu cuenta en Bodegas Galán Portero para comprar y seguir tus pedidos." privada>
+  <CajaCuenta antetitulo="Nueva cuenta">
+    {
+      revisaCorreo ? (
+        <>
+          <h1 class="titular titular--2">
+            Mira tu <span class="cursiva">correo.</span>
+          </h1>
+          <p class="aviso aviso--ok" role="status">
+            Te hemos enviado un enlace a <strong>{valores.email.trim().toLowerCase()}</strong>. Púlsalo para activar tu cuenta y
+            entrar. Si no llega en unos minutos, mira en la carpeta de spam.
+          </p>
+          <p>
+            ¿Ya lo has confirmado? <a class="enlace" href={entrar}>Entra aquí</a>.
+          </p>
+        </>
+      ) : (
+        <>
+          <h1 class="titular titular--2">
+            Pasa, <span class="cursiva">estás en casa.</span>
+          </h1>
+          {!supabase && <p class="aviso aviso--error">Las cuentas de cliente todavía no están configuradas en esta tienda.</p>}
+          <form method="post" data-astro-reload>
+            {error && <p class="aviso aviso--error" role="alert">{error}</p>}
+            <div class="campo">
+              <label for="nombre">Nombre</label>
+              <input id="nombre" name="nombre" type="text" autocomplete="name" required minlength="2" maxlength="100" value={valores.nombre} />
+            </div>
+            <div class="campo">
+              <label for="email">Correo electrónico</label>
+              <input id="email" name="email" type="email" autocomplete="email" required value={valores.email} />
+            </div>
+            <div class="campo">
+              <label for="password">Contraseña</label>
+              <input id="password" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="72" aria-describedby="password-ayuda" />
+              <span class="campo__ayuda" id="password-ayuda">
+                Mínimo 8 caracteres.
+              </span>
+            </div>
+            <label class="casilla">
+              <input type="checkbox" name="mayor" value="si" required />
+              <span>Soy mayor de 18 años.</span>
+            </label>
+            <label class="casilla">
+              <input type="checkbox" name="privacidad" value="si" required />
+              <span>
+                He leído y acepto la <a class="enlace" href={`${TIENDA}/politica-de-privacidad`} target="_blank" rel="noopener">política de privacidad</a>.
+              </span>
+            </label>
+            <button class="boton boton--primario boton--bloque" type="submit" disabled={!supabase}>
+              Crear mi cuenta
+            </button>
+          </form>
+          <p>
+            ¿Ya tienes cuenta? <a class="enlace" href={entrar}>Entra aquí</a>.
+          </p>
+        </>
+      )
+    }
+  </CajaCuenta>
+</Base>

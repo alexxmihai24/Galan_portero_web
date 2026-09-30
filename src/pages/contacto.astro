@@ -1,11 +1,12 @@
 ---
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import PortadaPagina from '../components/PortadaPagina.astro';
+import Icono from '../components/Icono.astro';
 import fachada from '../assets/fotos/lagar-montilla.jpg';
 
 const sedes = [
   {
-    nombre: 'Bodega',
+    nombre: 'Bodega principal',
     direccion: ['Av. del Marqués de la Vega de Armijo, 76', '14550 Montilla, Córdoba'],
     consulta: 'Av. del Marqués de la Vega de Armijo 76, 14550 Montilla, Córdoba',
   },
@@ -15,7 +16,6 @@ const sedes = [
     consulta: 'Carretera A-3130 km 24, 14550 Montilla, Córdoba',
   },
 ];
-
 const mapa = (consulta: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(consulta)}`;
 ---
 
@@ -23,57 +23,31 @@ const mapa = (consulta: string) => `https://www.google.com/maps/search/?api=1&qu
   titulo="Contacto"
   descripcion="Bodegas Galán Portero en Montilla (Córdoba). Teléfono 957 66 42 37, info@bodegasgalanportero.com. Bodega en Av. Marqués de la Vega de Armijo 76 y Lagar El Puntal en la A-3130."
 >
-  <section class="cabeza seccion">
-    <div class="contenedor cabeza__interior">
-      <div>
-        <p class="sello">Estamos en Montilla</p>
-        <h1 class="cabeza__titulo display">Escríbenos</h1>
-        <p class="cabeza__entrada lectura">
-          Cualquier duda sobre los vinos, los envíos o un pedido para un evento: encantados de atenderte.
-        </p>
+  <PortadaPagina antetitulo="Estamos en Montilla" imagen={fachada} alt="Fachada de la bodega en Montilla, con el portón y el zócalo amarillo">
+    <Fragment slot="titulo">Escríbe<span class="cursiva">nos.</span></Fragment>
+    <p>Cualquier duda sobre los vinos, los envíos o un pedido para un evento: encantados de atenderte.</p>
+    <Fragment slot="acciones">
+      <a class="directo" href="tel:+34957664237"><span class="antetitulo">Teléfono</span>957 66 42 37</a>
+      <a class="directo" href="mailto:info@bodegasgalanportero.com"><span class="antetitulo">Correo</span>info@bodegasgalanportero.com</a>
+    </Fragment>
+  </PortadaPagina>
 
-        <ul class="directos">
-          <li>
-            <span class="sello sello--tenue">Teléfono</span>
-            <a class="directos__valor" href="tel:+34957664237">957 66 42 37</a>
-          </li>
-          <li>
-            <span class="sello sello--tenue">Correo</span>
-            <a class="directos__valor" href="mailto:info@bodegasgalanportero.com"
-              >info@bodegasgalanportero.com</a
-            >
-          </li>
-        </ul>
-      </div>
-
-      <figure class="cabeza__foto">
-        <Image
-          src={fachada}
-          alt="Fachada de la bodega en Montilla, con el portón y el zócalo amarillo"
-          widths={[480, 800, 1200]}
-          sizes="(max-width: 56rem) 90vw, 26rem"
-          loading="eager"
-        />
-      </figure>
-    </div>
-  </section>
-
-  <!-- ------------------------------------------------------------ sedes -->
-  <section class="papel seccion">
+  <section class="fondo-cal-2 seccion" aria-labelledby="sedes-titulo">
     <div class="contenedor">
-      <h2 class="sedes__titulo display revelar">Dónde encontrarnos</h2>
-      <ul class="sedes">
+      <p class="antetitulo">Instalaciones</p>
+      <h2 id="sedes-titulo" class="titular titular--2 sedes__titulo">Dónde <span class="cursiva">encontrarnos.</span></h2>
+      <ul class="sedes" role="list">
         {
-          sedes.map((s, i) => (
-            <li class="sede revelar" data-retardo={i + 1}>
-              <p class="sello">{s.nombre}</p>
+          sedes.map((s) => (
+            <li class="sede revela">
+              <h3 class="sede__nombre">{s.nombre}</h3>
               <address class="sede__dir">
                 {s.direccion.map((l) => (
                   <span>{l}</span>
                 ))}
               </address>
-              <a class="enlace sede__mapa" href={mapa(s.consulta)} target="_blank" rel="noopener noreferrer">
-                Abrir en el mapa <span aria-hidden="true">&nearr;</span>
+              <a class="boton boton--primario boton--pequeno" href={mapa(s.consulta)} target="_blank" rel="noopener noreferrer">
+                Abrir en Google Maps <Icono nombre="externo" tam={18} />
               </a>
             </li>
           ))
@@ -82,318 +56,163 @@ const mapa = (consulta: string) => `https://www.google.com/maps/search/?api=1&qu
     </div>
   </section>
 
-  <!-- ---------------------------------------------------------- formulario -->
-  <section class="seccion">
-    <div class="contenedor formulario__interior">
-      <header class="revelar">
-        <p class="sello">Cuéntanos</p>
-        <h2 class="formulario__titulo display">Formulario</h2>
-        <p class="lectura">
-          Rellena los campos y se abrirá tu programa de correo con el mensaje ya escrito, listo para enviar a
-          info@bodegasgalanportero.com.
-        </p>
-      </header>
-
-      <form class="formulario revelar" data-formulario data-retardo="1">
-        <div class="campo">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" name="nombre" type="text" required autocomplete="name" />
-        </div>
-
-        <div class="campo">
-          <label for="correo">Correo electrónico</label>
-          <input id="correo" name="correo" type="email" required autocomplete="email" />
-        </div>
-
-        <div class="campo">
-          <label for="telefono">Teléfono <span class="campo__opcional">(opcional)</span></label>
-          <input id="telefono" name="telefono" type="tel" autocomplete="tel" />
-        </div>
-
-        <div class="campo">
-          <label for="asunto">Asunto</label>
-          <select id="asunto" name="asunto">
-            <option>Consulta sobre un vino</option>
-            <option>Pedido y envíos</option>
-            <option>Productos personalizados para un evento</option>
-            <option>Visita a la bodega</option>
-            <option>Otra cosa</option>
-          </select>
-        </div>
-
-        <div class="campo campo--ancho">
-          <label for="mensaje">Mensaje</label>
-          <textarea id="mensaje" name="mensaje" rows="6" required></textarea>
-        </div>
-
-        <div class="campo campo--ancho formulario__pie">
-          <button class="boton boton--solido" type="submit">
-            Preparar el correo
-            <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-          </button>
-          <p class="formulario__aviso">
-            Al escribirnos, tus datos se usan sólo para responderte. También puedes llamarnos al
-            <a class="enlace" href="tel:+34957664237">957 66 42 37</a>.
-          </p>
-        </div>
-      </form>
+  <section class="seccion contenedor formulario-seccion" aria-labelledby="form-titulo">
+    <div class="formulario__texto">
+      <p class="antetitulo">Atención al cliente</p>
+      <h2 id="form-titulo" class="titular titular--2">Envíanos <span class="cursiva">un mensaje.</span></h2>
+      <p class="lectura">
+        Rellena los campos y se abrirá tu programa de correo con el mensaje ya preparado, listo para enviar a
+        info@bodegasgalanportero.com.
+      </p>
     </div>
+    <form class="formulario" data-formulario>
+      <div class="campo">
+        <label for="nombre">Nombre completo</label>
+        <input id="nombre" name="nombre" type="text" required autocomplete="name" />
+      </div>
+      <div class="campo">
+        <label for="correo">Correo electrónico</label>
+        <input id="correo" name="correo" type="email" required autocomplete="email" />
+      </div>
+      <div class="campo">
+        <label for="telefono">Teléfono <span class="campo__ayuda">(opcional)</span></label>
+        <input id="telefono" name="telefono" type="tel" autocomplete="tel" />
+      </div>
+      <div class="campo">
+        <label for="asunto">Motivo</label>
+        <select id="asunto" name="asunto">
+          <option>Consulta sobre un vino</option>
+          <option>Pedido y envíos</option>
+          <option>Productos personalizados para un evento</option>
+          <option>Visita a la bodega</option>
+          <option>Otra cosa</option>
+        </select>
+      </div>
+      <div class="campo campo--ancho">
+        <label for="mensaje">Mensaje</label>
+        <textarea id="mensaje" name="mensaje" rows="6" required></textarea>
+      </div>
+      <div class="campo--ancho formulario__pie">
+        <button class="boton boton--primario" type="submit">Preparar el correo <Icono nombre="flecha" /></button>
+        <p class="campo__ayuda">Tus datos solo se usan para responderte. También puedes llamarnos al 957 66 42 37.</p>
+      </div>
+    </form>
   </section>
 </Base>
 
+<script>
+  function montarFormulario() {
+    const form = document.querySelector<HTMLFormElement>('[data-formulario]');
+    if (!form) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const d = new FormData(form);
+      const val = (k: string) => String(d.get(k) ?? '').trim();
+      const lineas = [`Nombre: ${val('nombre')}`, `Correo: ${val('correo')}`];
+      if (val('telefono')) lineas.push(`Teléfono: ${val('telefono')}`);
+      const cuerpo = [...lineas, '', val('mensaje')].join('\n');
+      location.href = `mailto:info@bodegasgalanportero.com?subject=${encodeURIComponent(val('asunto'))}&body=${encodeURIComponent(cuerpo)}`;
+    });
+  }
+  document.addEventListener('astro:page-load', montarFormulario);
+</script>
+
 <style>
-  .cabeza {
-    padding-top: calc(var(--e-6) + 2rem);
-  }
-
-  .cabeza__interior {
+  .directo {
     display: grid;
-    gap: var(--e-4);
-    align-items: center;
-  }
-
-  @media (width >= 56rem) {
-    .cabeza__interior {
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: var(--e-5);
-    }
-  }
-
-  .cabeza__titulo {
-    font-size: var(--t-5);
-    margin-block: 0.3em 0.4em;
-  }
-
-  .cabeza__entrada {
-    color: var(--texto-tenue);
-  }
-
-  .directos {
-    list-style: none;
-    margin: var(--e-4) 0 0;
-    padding: 0;
-    display: grid;
-    gap: var(--e-2);
-  }
-
-  .directos li {
-    display: grid;
-    gap: 0.5rem;
-    border-top: 1px solid var(--filete);
-    padding-top: var(--e-2);
-  }
-
-  .directos__valor {
-    font-family: var(--display);
-    font-size: var(--t-2);
+    gap: 4px;
+    padding: 16px 22px;
+    border-radius: 20px;
+    background: var(--blanco);
+    font-size: clamp(1.1rem, 1.4vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
     text-decoration: none;
-    transition: color 0.35s var(--salida);
-    word-break: break-word;
+    transition: transform 0.25s var(--curva);
   }
 
-  .directos__valor:hover,
-  .directos__valor:focus-visible {
-    color: var(--oro-claro);
+  .directo:hover {
+    transform: translateY(-2px);
   }
-
-  .cabeza__foto {
-    margin: 0;
-  }
-
-  .cabeza__foto :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-  }
-
-  /* ------------------------------------------------------------ sedes */
 
   .sedes__titulo {
-    font-size: var(--t-3);
-    margin-bottom: var(--e-3);
+    margin-top: 16px;
   }
 
   .sedes {
-    list-style: none;
-    margin: 0;
-    padding: 0;
     display: grid;
-    gap: var(--e-3);
-  }
-
-  @media (width >= 48rem) {
-    .sedes {
-      grid-template-columns: 1fr 1fr;
-    }
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+    list-style: none;
+    padding: 0;
   }
 
   .sede {
-    border: 1px solid var(--filete);
-    padding: var(--e-3);
     display: grid;
-    gap: var(--e-1);
-    align-content: start;
+    justify-items: start;
+    gap: 16px;
+    padding: clamp(24px, 3vw, 36px);
+    border-radius: var(--radio-g);
+    background: var(--blanco);
+  }
+
+  .sede__nombre {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
   }
 
   .sede__dir {
+    display: grid;
     font-style: normal;
-    font-family: var(--display);
-    font-size: var(--t-1);
-    line-height: 1.45;
+    color: var(--texto-2);
+    line-height: 1.6;
+  }
+
+  .formulario-seccion {
     display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: start;
   }
 
-  .sede__mapa {
-    justify-self: start;
-    margin-top: var(--e-1);
-    font-family: var(--sello);
-    font-size: var(--t--2);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    display: inline-block;
-    padding-block: 0.34rem;
-  }
-
-  /* ------------------------------------------------------- formulario */
-
-  .formulario__interior {
+  .formulario__texto {
     display: grid;
-    gap: var(--e-4);
-  }
-
-  @media (width >= 62rem) {
-    .formulario__interior {
-      grid-template-columns: 20rem 1fr;
-      gap: var(--e-5);
-      align-items: start;
-    }
-  }
-
-  .formulario__titulo {
-    font-size: var(--t-3);
-    margin-block: 0.3em 0.5em;
+    gap: 20px;
   }
 
   .formulario {
     display: grid;
-    gap: var(--e-2);
-  }
-
-  @media (width >= 40rem) {
-    .formulario {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .campo {
-    display: grid;
-    gap: 0.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    padding: clamp(24px, 3vw, 36px);
+    border-radius: var(--radio-g);
+    background: var(--blanco);
   }
 
   .campo--ancho {
     grid-column: 1 / -1;
   }
 
-  .campo label {
-    font-family: var(--sello);
-    font-size: var(--t--2);
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--texto-tenue);
-  }
-
-  .campo__opcional {
-    text-transform: none;
-    letter-spacing: 0.04em;
-    /* El color de la etiqueta ya viene atenuado; un 0.7 encima lo dejaba en 3.8:1. */
-  }
-
-  .campo input,
-  .campo select,
-  .campo textarea {
-    font-family: var(--texto-fuente);
-    font-size: var(--t-0);
-    color: var(--texto);
-    background: color-mix(in srgb, var(--albariza) 5%, transparent);
-    border: 1px solid var(--filete);
-    padding: 0.85rem 1rem;
-    border-radius: 0;
-    transition: border-color 0.3s var(--salida);
-  }
-
-  .campo textarea {
-    resize: vertical;
-  }
-
-  .campo input:hover,
-  .campo select:hover,
-  .campo textarea:hover {
-    border-color: color-mix(in srgb, var(--oro) 45%, transparent);
-  }
-
-  .campo input:focus-visible,
-  .campo select:focus-visible,
-  .campo textarea:focus-visible {
-    border-color: var(--oro);
-  }
-
   .formulario__pie {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--e-2);
-    margin-top: var(--e-1);
+    gap: 16px;
   }
 
-  .formulario__aviso {
-    flex: 1 1 16rem;
-    font-size: var(--t--2);
-    color: var(--texto-tenue);
-    line-height: 1.55;
+  .formulario__pie .campo__ayuda {
+    flex: 1;
+    min-width: 14rem;
   }
 
-  /* El teléfono va dentro de una frase, así que WCAG lo exime del 24x24, pero
-     en móvil se toca igual: se le ensancha el área sin mover la línea. */
-  .formulario__aviso a {
-    padding-block: 0.4rem;
+  @media (max-width: 900px) {
+    .sedes,
+    .formulario-seccion,
+    .formulario {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
-
-<script>
-  // ponytail: sin backend. El formulario compone un `mailto:` con lo escrito, que
-  // funciona hoy y sin depender de nadie. Si algun dia quieren recibirlo en un
-  // panel, se cambia el `submit` por un POST a Formspree/Resend y ya.
-  function montarFormulario() {
-    const form = document.querySelector<HTMLFormElement>('[data-formulario]');
-    if (!form) return;
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!form.reportValidity()) return;
-
-      const d = new FormData(form);
-      const val = (k: string) => String(d.get(k) ?? '').trim();
-
-      const cuerpo = [
-        `Nombre: ${val('nombre')}`,
-        `Correo: ${val('correo')}`,
-        val('telefono') && `Teléfono: ${val('telefono')}`,
-        '',
-        val('mensaje'),
-      ]
-        .filter(Boolean)
-        .join('\n');
-
-      const url =
-        'mailto:info@bodegasgalanportero.com' +
-        `?subject=${encodeURIComponent(val('asunto'))}` +
-        `&body=${encodeURIComponent(cuerpo)}`;
-
-      window.location.href = url;
-    });
-  }
-
-  montarFormulario();
-  document.addEventListener('astro:page-load', montarFormulario);
-</script>

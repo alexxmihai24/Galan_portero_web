@@ -1,36 +1,44 @@
 ---
 import { Image } from 'astro:assets';
-import { TIENDA } from '../data/vinos';
-import logo from '../assets/marca/logo-blanco.png';
+import Icono from './Icono.astro';
+import escudo from '../assets/marca/escudo-tinta.png';
 
-const rutas = [
+const enlaces = [
   { href: '/vinos', texto: 'Vinos' },
+  { href: '/vinos#5-essences', texto: '5 Essences' },
   { href: '/bodega', texto: 'La bodega' },
-  { href: '/produccion', texto: 'Producción' },
   { href: '/personalizados', texto: 'Personalizados' },
   { href: '/contacto', texto: 'Contacto' },
 ];
-
-const actual = Astro.url.pathname;
+// En el menú del móvil cabe también el proceso.
+const enlacesMovil = [
+  { href: '/vinos', texto: 'Vinos' },
+  { href: '/bodega', texto: 'La bodega' },
+  { href: '/produccion', texto: 'El proceso' },
+  { href: '/personalizados', texto: 'Personalizados' },
+  { href: '/contacto', texto: 'Contacto' },
+];
+const ruta = Astro.url.pathname;
+const actual = (href: string) => !href.includes('#') && (ruta === href || ruta.startsWith(href + '/'));
 ---
 
-<header class="cabecera" data-cabecera>
-  <div class="cabecera__barra contenedor">
-    <a class="marca" href="/" aria-label="Bodegas Galán Portero, inicio">
-      <Image src={logo} alt="Bodegas Galán Portero, desde 1950" widths={[190, 380]} sizes="190px" loading="eager" />
+<header class="cabecera">
+  <div class="cabecera__interior contenedor">
+    <a class="marca" href="/">
+      <Image src={escudo} alt="" height={92} class="marca__escudo" loading="eager" />
+      <span class="marca__texto">
+        <span class="marca__nombre">Bodegas Galán</span>
+        <span class="marca__sub">Portero</span>
+      </span>
     </a>
 
-    <nav class="nav" aria-label="Principal">
-      <ul class="nav__lista">
+    <nav class="menu" aria-label="Principal">
+      <ul class="menu__lista" role="list">
         {
-          rutas.map((r) => (
+          enlaces.map((e) => (
             <li>
-              <a
-                href={r.href}
-                class="nav__enlace"
-                aria-current={actual === r.href || actual.startsWith(r.href + '/') ? 'page' : undefined}
-              >
-                {r.texto}
+              <a class="menu__enlace" href={e.href} aria-current={actual(e.href) ? 'page' : undefined}>
+                {e.texto}
               </a>
             </li>
           ))
@@ -39,286 +47,359 @@ const actual = Astro.url.pathname;
     </nav>
 
     <div class="cabecera__acciones">
-      <a class="carrito" href={`${TIENDA}/carrito`} rel="noopener">
-        <span>Carrito</span>
+      <a class="boton-icono cabecera__cuenta" href="/cuenta" aria-label="Mi cuenta">
+        <Icono nombre="usuario" tam={22} />
       </a>
-      <button class="hamburguesa" type="button" aria-expanded="false" aria-controls="menu-movil" data-abrir>
-        <span class="oculto-visual">Abrir menú</span>
-        <span class="hamburguesa__linea"></span>
-        <span class="hamburguesa__linea"></span>
+      <button class="boton-cesta" type="button" data-abrir-cesta aria-haspopup="dialog" transition:persist="boton-cesta">
+        <Icono nombre="bolsa" tam={18} class="boton-cesta__icono" />
+        <span class="boton-cesta__texto">Cesta</span>
+        <span class="boton-cesta__n" data-cesta-contador>0</span>
+        <span class="oculto-visual" data-cesta-contador-texto>, vacía</span>
+      </button>
+      <button class="boton-icono boton-icono--borde cabecera__menu" type="button" data-abrir-menu aria-label="Abrir menú" aria-haspopup="dialog">
+        <Icono nombre="menu" tam={22} />
       </button>
     </div>
   </div>
 
-  <div class="menu" id="menu-movil" hidden data-menu>
-    <ul class="menu__lista">
-      {
-        rutas.map((r, i) => (
-          <li style={`--i:${i}`}>
-            <a href={r.href}>{r.texto}</a>
-          </li>
-        ))
-      }
-      <li style={`--i:${rutas.length}`}>
-        <a href={`${TIENDA}/carrito`} rel="noopener">
-          Carrito
-        </a>
-      </li>
-    </ul>
-  </div>
+  <dialog class="menu-movil" data-menu-movil aria-label="Menú">
+    <div class="menu-movil__cabeza contenedor">
+      <a class="marca" href="/">
+        <Image src={escudo} alt="" height={92} class="marca__escudo" />
+        <span class="marca__texto">
+          <span class="marca__nombre">Bodegas Galán</span>
+          <span class="marca__sub">Portero</span>
+        </span>
+      </a>
+      <button class="boton-icono boton-icono--borde" type="button" data-cerrar-menu aria-label="Cerrar menú">
+        <Icono nombre="cerrar" tam={22} />
+      </button>
+    </div>
+    <nav class="menu-movil__nav contenedor" aria-label="Principal">
+      <ol class="menu-movil__lista" role="list">
+        {
+          enlacesMovil.map((e, i) => (
+            <li>
+              <a href={e.href} aria-current={actual(e.href) ? 'page' : undefined}>
+                <span class="menu-movil__num">0{i + 1}</span>
+                {e.texto}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="menu-movil__acciones">
+        <a class="boton boton--primario" href="/cuenta"><Icono nombre="usuario" /> Mi cuenta</a>
+        <button class="boton" type="button" data-abrir-cesta><Icono nombre="bolsa" /> Ver la cesta</button>
+      </div>
+    </nav>
+    <p class="menu-movil__zocalo zocalo">
+      <span class="fraunces">Se hace al sol</span> · desde 1950
+    </p>
+  </dialog>
 </header>
 
 <style>
   .cabecera {
-    position: fixed;
-    inset: 0 0 auto;
-    z-index: 100;
-    transition:
-      background-color 0.5s var(--salida),
-      backdrop-filter 0.5s var(--salida),
-      border-color 0.5s var(--salida);
-    border-bottom: 1px solid transparent;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--cal);
   }
 
-  /* Solo se vuelve sólida al bajar; sobre el hero flota. */
-  .cabecera[data-fija] {
-    background: color-mix(in srgb, var(--azabache) 88%, transparent);
-    backdrop-filter: blur(14px) saturate(1.2);
-    border-bottom-color: color-mix(in srgb, var(--oro) 22%, transparent);
+  @supports (animation-timeline: scroll()) {
+    .cabecera {
+      animation: cabecera-sombra linear both;
+      animation-timeline: scroll();
+      animation-range: 0 140px;
+    }
   }
 
-  .cabecera__barra {
-    display: flex;
+  @keyframes cabecera-sombra {
+    to {
+      box-shadow:
+        0 1px 0 var(--linea),
+        0 12px 30px rgba(23, 20, 18, 0.06);
+    }
+  }
+
+  .cabecera__interior {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--e-3);
-    padding-block: 1.15rem;
+    height: 88px;
   }
 
   .marca {
-    display: block;
-    line-height: 0;
-  }
-
-  .marca :global(img) {
-    width: 11.9rem;
-    height: auto;
-  }
-
-  @media (width < 34rem) {
-    .marca :global(img) {
-      width: 9.5rem;
-    }
-  }
-
-  .nav {
-    display: none;
-  }
-
-  @media (width >= 62rem) {
-    .nav {
-      display: block;
-    }
-  }
-
-  .nav__lista {
-    display: flex;
-    gap: var(--e-3);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .nav__enlace {
-    font-family: var(--sello);
-    font-size: var(--t--2);
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    text-decoration: none;
-    color: color-mix(in srgb, var(--albariza) 82%, transparent);
-    /* 0.62em deja el enlace en 24 px de alto: el mínimo de WCAG 2.5.8 */
-    padding-block: 0.62em;
-    position: relative;
-    transition: color 0.35s var(--salida);
-  }
-
-  .nav__enlace::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 1px;
-    width: 100%;
-    background: var(--oro);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s var(--salida);
-  }
-
-  .nav__enlace:hover,
-  .nav__enlace:focus-visible,
-  .nav__enlace[aria-current='page'] {
-    color: var(--albariza);
-  }
-
-  .nav__enlace:hover::after,
-  .nav__enlace:focus-visible::after,
-  .nav__enlace[aria-current='page']::after {
-    transform: scaleX(1);
-  }
-
-  .cabecera__acciones {
+    justify-self: start;
     display: flex;
     align-items: center;
-    gap: var(--e-2);
-  }
-
-  .carrito {
-    font-family: var(--sello);
-    font-size: var(--t--2);
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
+    gap: 14px;
     text-decoration: none;
-    color: var(--oro);
-    border: 1px solid color-mix(in srgb, var(--oro) 45%, transparent);
-    padding: 0.7em 1.1em;
-    transition:
-      background-color 0.35s var(--salida),
-      color 0.35s var(--salida);
+    color: var(--hierro);
   }
 
-  .carrito:hover,
-  .carrito:focus-visible {
-    background: var(--oro);
-    color: var(--azabache);
+  .marca :global(.marca__escudo) {
+    width: auto;
+    height: 46px;
   }
 
-  @media (width < 34rem) {
-    .carrito {
-      display: none;
-    }
+  .marca__texto {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    line-height: 1;
   }
 
-  .hamburguesa {
-    display: grid;
-    gap: 6px;
-    width: 2.75rem;
-    height: 2.75rem;
-    place-content: center;
-    background: none;
-    border: 1px solid color-mix(in srgb, var(--albariza) 25%, transparent);
-    cursor: pointer;
+  .marca__nombre {
+    text-transform: uppercase;
+    font-family: var(--fraunces);
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
   }
 
-  @media (width >= 62rem) {
-    .hamburguesa {
-      display: none;
-    }
-  }
-
-  .hamburguesa__linea {
-    display: block;
-    width: 1.15rem;
-    height: 1px;
-    background: var(--albariza);
-    transition: transform 0.35s var(--salida);
-  }
-
-  .hamburguesa[aria-expanded='true'] .hamburguesa__linea:first-child {
-    transform: translateY(3.5px) rotate(45deg);
-  }
-
-  .hamburguesa[aria-expanded='true'] .hamburguesa__linea:last-child {
-    transform: translateY(-3.5px) rotate(-45deg);
-  }
-
-  .menu {
-    position: fixed;
-    inset: 0;
-    background: var(--azabache);
-    display: grid;
-    place-content: center;
-    z-index: 99;
-  }
-
-  /* `display:grid` de arriba gana al `hidden` de la hoja del navegador. */
-  .menu[hidden] {
-    display: none;
+  .marca__sub {
+    text-transform: uppercase;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.72em;
   }
 
   .menu__lista {
-    list-style: none;
+    display: flex;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 999px;
+    background: var(--cal-2);
+  }
+
+  .menu__enlace {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+  }
+
+  .menu__enlace:hover {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .menu__enlace[aria-current='page'] {
+    background: var(--blanco);
+  }
+
+  .cabecera__acciones {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .boton-cesta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 7px 0 18px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--hierro);
+    color: var(--cal);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    transition: transform 0.25s var(--curva);
+  }
+
+  .boton-cesta:hover {
+    transform: translateY(-1px);
+  }
+
+  .boton-cesta__n {
+    display: grid;
+    place-items: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 6px;
+    border-radius: 15px;
+    background: var(--albero);
+    color: var(--hierro);
+    font-size: 0.8125rem;
+    font-weight: 800;
+  }
+
+  .boton-cesta__n.salta {
+    animation: salta 0.5s var(--curva);
+  }
+
+  @keyframes salta {
+    40% {
+      transform: scale(1.35);
+    }
+  }
+
+  .cabecera__menu {
+    display: none;
+  }
+
+  @media (max-width: 1099px) {
+    .cabecera__interior {
+      grid-template-columns: 1fr auto;
+    }
+    .menu {
+      display: none;
+    }
+    .cabecera__menu {
+      display: inline-grid;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cabecera__interior {
+      height: 64px;
+    }
+    .marca :global(.marca__escudo) {
+      height: 36px;
+    }
+    .marca__nombre {
+      font-size: 0.875rem;
+      letter-spacing: 0.12em;
+    }
+    .marca__sub {
+      font-size: 0.5rem;
+      letter-spacing: 0.62em;
+    }
+    .boton-cesta {
+      padding-left: 14px;
+    }
+    .boton-cesta__texto,
+    .cabecera__cuenta {
+      display: none;
+    }
+  }
+
+  @media (min-width: 641px) {
+    :global(.boton-cesta__icono) {
+      display: none;
+    }
+  }
+
+  /* --- menú del móvil (dialog a pantalla completa) --- */
+  .menu-movil {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: var(--e-2);
-    text-align: center;
+    border: 0;
+    background: var(--cal);
+    color: var(--hierro);
+    overflow-y: auto;
   }
 
-  .menu__lista a {
-    font-family: var(--display);
-    font-size: var(--t-3);
+  .menu-movil[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-movil::backdrop {
+    background: var(--cal);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu-movil[open] {
+      animation: menu-entra 0.45s var(--curva);
+    }
+    .menu-movil[open] .menu-movil__lista li {
+      animation: revela 0.6s var(--curva) both;
+    }
+    .menu-movil[open] .menu-movil__lista li:nth-child(2) {
+      animation-delay: 0.05s;
+    }
+    .menu-movil[open] .menu-movil__lista li:nth-child(3) {
+      animation-delay: 0.1s;
+    }
+    .menu-movil[open] .menu-movil__lista li:nth-child(4) {
+      animation-delay: 0.15s;
+    }
+    .menu-movil[open] .menu-movil__lista li:nth-child(5) {
+      animation-delay: 0.2s;
+    }
+  }
+
+  @keyframes menu-entra {
+    from {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+  }
+
+  .menu-movil__cabeza {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+  }
+
+  .menu-movil__nav {
+    flex: 1;
+    padding-block: 24px 40px;
+  }
+
+  .menu-movil__lista {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-movil__lista a {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--linea);
+    font-size: clamp(2.2rem, 9vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
     text-decoration: none;
-    color: var(--albariza);
-    opacity: 0;
-    transform: translateY(0.8rem);
-    animation: menu-entrada 0.5s var(--salida) forwards;
-    animation-delay: calc(60ms * var(--i) + 80ms);
-    display: block;
   }
 
-  @keyframes menu-entrada {
-    to {
-      opacity: 1;
-      transform: none;
-    }
+  .menu-movil__lista a[aria-current='page'] {
+    color: var(--albero-osc);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .menu__lista a {
-      animation: none;
-      opacity: 1;
-      transform: none;
-    }
+  .menu-movil__num {
+    font-family: var(--fraunces);
+    font-style: italic;
+    font-weight: 320;
+    font-size: 1.1rem;
+    letter-spacing: 0;
+    color: var(--albero-osc);
+  }
+
+  .menu-movil__acciones {
+    display: grid;
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .menu-movil__zocalo {
+    padding: 18px var(--margen);
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .menu-movil__zocalo .fraunces {
+    font-style: italic;
+    font-weight: 340;
   }
 </style>
-
-<script>
-  function montarCabecera() {
-    const cabecera = document.querySelector<HTMLElement>('[data-cabecera]');
-    const boton = document.querySelector<HTMLButtonElement>('[data-abrir]');
-    const menu = document.querySelector<HTMLElement>('[data-menu]');
-    if (!cabecera || !boton || !menu) return;
-
-    // Sólida en cuanto se despega del hero.
-    const centinela = () => {
-      cabecera.toggleAttribute('data-fija', window.scrollY > 24);
-    };
-    centinela();
-    window.addEventListener('scroll', centinela, { passive: true });
-
-    const alternar = (abrir: boolean) => {
-      boton.setAttribute('aria-expanded', String(abrir));
-      menu.hidden = !abrir;
-      document.body.style.overflow = abrir ? 'hidden' : '';
-    };
-
-    boton.addEventListener('click', () => {
-      alternar(boton.getAttribute('aria-expanded') !== 'true');
-    });
-
-    menu.addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).tagName === 'A') alternar(false);
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && boton.getAttribute('aria-expanded') === 'true') {
-        alternar(false);
-        boton.focus();
-      }
-    });
-  }
-
-  montarCabecera();
-  document.addEventListener('astro:page-load', montarCabecera);
-</script>

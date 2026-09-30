@@ -1,297 +1,225 @@
 ---
-import { Image, Picture } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import Vitrina from '../../components/Vitrina.astro';
-import {
-  vinos,
-  marquesDeLaVega,
-  cincoEssences,
-  pack,
-  euros,
-  enlaceCompraPack,
-} from '../../data/vinos';
+import TarjetaVino from '../../components/TarjetaVino.astro';
+import Icono from '../../components/Icono.astro';
+import { catalogo } from '../../lib/catalogo';
+import { ENVIO_GRATIS_DESDE } from '../../data/vinos';
 
-import copas from '../../assets/fotos/copas.jpg';
+export const prerender = false;
 
-const desde = (v: (typeof vinos)[number]) => Math.min(...v.variaciones.map((x) => x.precio));
+const { vinos, pack } = await catalogo();
+const orden = [...vinos.filter((v) => v.gama === 'Marqués de la Vega'), ...vinos.filter((v) => v.gama === '5 Essences')];
+
+const filtros = [
+  { id: 'todos', texto: 'Todos' },
+  { id: 'pedro-ximenez', texto: 'Pedro Ximénez' },
+  { id: '5-essences', texto: '5 Essences' },
+  { id: 'secos', texto: 'Secos' },
+  { id: 'dulces', texto: 'Dulces' },
+  { id: 'packs', texto: 'Packs' },
+];
+const total = orden.length + 1;
 ---
 
 <Base
-  titulo="Vinos"
-  descripcion="Pedro Ximénez Marqués de la Vega y la gama 5 Essences: Amontillado, Palo Cortado, Oloroso, Cream y Pedro Ximénez. Vinos generosos D.O.P. Montilla-Moriles."
+  titulo="Nuestros vinos"
+  descripcion="Compra online los vinos de Bodegas Galán Portero: Pedro Ximénez Solera Fundador, Cosecha, la gama 5 Essences y el pack. Envío gratis a península desde 100 €."
 >
-  <header class="portada grano">
-    <div class="portada__foto">
-      <Picture formats={['avif']} fallbackFormat="webp"
-        src={copas}
-        alt="Cuatro copas sobre una bota, del ámbar del Amontillado al azabache del Pedro Ximénez"
-        widths={[720, 1200, 1800]}
-        sizes="100vw"
-        loading="eager"
-      />
-    </div>
-    <div class="contenedor portada__texto">
-      <p class="sello">Nuestros vinos</p>
-      <h1 class="portada__titulo display">Ocho maneras<br />de mirar la misma uva</h1>
-      <p class="portada__entrada">
-        Dos Pedro Ximénez de la casa, cinco generosos de la gama 5 Essences y el pack que los reúne. Todos con
-        Denominación de Origen Protegida Montilla-Moriles.
+  <section class="catalogo contenedor" aria-labelledby="catalogo-titulo">
+    <header class="catalogo__cabeza">
+      <div>
+        <p class="antetitulo">Tienda online · D.O.P. Montilla-Moriles</p>
+        <h1 id="catalogo-titulo" class="titular titular--1 catalogo__titulo">Nuestros <span class="cursiva">vinos.</span></h1>
+      </div>
+      <p class="lectura catalogo__entrada">
+        Dos Pedro Ximénez de la casa y cinco generosos que puedes catar juntos en un solo pack. Todos se crían en
+        nuestra bodega de Montilla.
       </p>
-    </div>
-  </header>
+    </header>
 
-  <!-- ------------------------------------------------- marqués de la vega -->
-  <section class="seccion">
-    <div class="contenedor">
-      <header class="grupo__cabecera revelar">
-        <p class="sello">Gama</p>
-        <h2 class="grupo__titulo display">Marqués de la Vega</h2>
-        <p class="grupo__entrada">Los dos Pedro Ximénez que dan nombre a la casa.</p>
-      </header>
-
-      <ul class="catalogo catalogo--dos">
-        {
-          marquesDeLaVega.map((v, i) => (
-            <li class="revelar" data-retardo={i + 1}>
-              <a class="tarjeta" href={`/vinos/${v.slug}`}>
-                <figure class="tarjeta__foto">
-                  <Image
-                    src={v.imagen}
-                    alt={v.nombre}
-                    widths={[360, 620, 900]}
-                    sizes="(max-width: 48rem) 80vw, 26rem"
-                    loading="lazy"
-                  />
-                </figure>
-                <div class="tarjeta__cuerpo">
-                  <p class="sello sello--tenue">{v.estilo}</p>
-                  <h3 class="tarjeta__nombre display">{v.corto}</h3>
-                  <p class="tarjeta__gancho italica">{v.gancho}</p>
-                  <p class="tarjeta__precio">
-                    Desde <strong>{euros(desde(v))}</strong>
-                  </p>
-                </div>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+    <div class="filtros" data-filtros role="group" aria-label="Filtrar vinos" data-scroll-x>
+      {
+        filtros.map((f, i) => (
+          <button class="filtro" type="button" data-filtro={f.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+            {f.texto}
+          </button>
+        ))
+      }
+      <p class="filtros__cuenta" data-cuenta-filtro aria-live="polite">{total} vinos</p>
     </div>
+
+    <h2 class="oculto-visual">Vinos a la venta</h2>
+    <ul class="rejilla" role="list" data-rejilla>
+      {orden.map((v, i) => <li><TarjetaVino producto={v} prioridad={i < 4} pegatina={i === 0 ? 'La joya de la casa' : undefined} /></li>)}
+      <li><TarjetaVino producto={pack} pegatina="Las cinco juntas" /></li>
+    </ul>
   </section>
 
-  <!-- la vitrina, ahora como selector del catálogo -->
-  <Vitrina />
-
-  <!-- ------------------------------------------------------- 5 essences -->
-  <section class="seccion">
-    <div class="contenedor">
-      <header class="grupo__cabecera revelar">
-        <p class="sello">Gama</p>
-        <h2 class="grupo__titulo display">5 Essences</h2>
-        <p class="grupo__entrada">
-          Un Amontillado, un Palo Cortado, un Oloroso, un Cream y una edición especial de Pedro Ximénez.
-        </p>
-      </header>
-
-      <ul class="catalogo">
-        {
-          cincoEssences.map((v, i) => (
-            <li class="revelar" data-retardo={(i % 4) + 1}>
-              <a class="tarjeta" href={`/vinos/${v.slug}`}>
-                <figure class="tarjeta__foto">
-                  <Image
-                    src={v.imagen}
-                    alt={v.nombre}
-                    widths={[280, 480, 720]}
-                    sizes="(max-width: 48rem) 45vw, 18rem"
-                    loading="lazy"
-                  />
-                </figure>
-                <div class="tarjeta__cuerpo">
-                  <p class="sello sello--tenue">{v.estilo}</p>
-                  <h3 class="tarjeta__nombre display">{v.corto}</h3>
-                  <p class="tarjeta__precio">
-                    Desde <strong>{euros(desde(v))}</strong>
-                  </p>
-                </div>
-              </a>
-            </li>
-          ))
-        }
-
-        <li class="revelar" data-retardo="4">
-          <div class="tarjeta tarjeta--pack">
-            <figure class="tarjeta__foto">
-              <Image
-                src={pack.imagen}
-                alt={pack.nombre}
-                widths={[280, 480, 720]}
-                sizes="(max-width: 48rem) 45vw, 18rem"
-                loading="lazy"
-              />
-            </figure>
-            <div class="tarjeta__cuerpo">
-              <p class="sello sello--tenue">Las cinco</p>
-              <h3 class="tarjeta__nombre display">{pack.nombre}</h3>
-              <p class="tarjeta__precio">
-                <strong>{euros(pack.precio)}</strong>
-              </p>
-              <a class="boton tarjeta__boton" href={enlaceCompraPack()} rel="noopener">
-                Comprar
-                <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
-          </div>
-        </li>
-      </ul>
+  <div class="zocalo catalogo__zocalo">
+    <div class="contenedor catalogo__zocalo-interior">
+      <Icono nombre="sol" tam={36} />
+      <p><strong>Envío gratis a península</strong> <span class="cursiva">desde {ENVIO_GRATIS_DESDE}&nbsp;€.</span></p>
+      <a class="boton boton--primario boton--pequeno" href="/cesta">Ver la cesta</a>
     </div>
-  </section>
+  </div>
 </Base>
 
+<script>
+  function montarFiltros() {
+    const caja = document.querySelector<HTMLElement>('[data-filtros]');
+    const rejilla = document.querySelector<HTMLElement>('[data-rejilla]');
+    if (!caja || !rejilla) return;
+    const botones = [...caja.querySelectorAll<HTMLButtonElement>('[data-filtro]')];
+    const cuenta = caja.querySelector<HTMLElement>('[data-cuenta-filtro]')!;
+
+    const aplicar = (id: string) => {
+      const cambiar = () => {
+        let n = 0;
+        for (const li of rejilla.children as HTMLCollectionOf<HTMLElement>) {
+          const tipos = li.querySelector<HTMLElement>('[data-tipos]')?.dataset.tipos?.split(' ') ?? [];
+          const ver = id === 'todos' || tipos.includes(id);
+          li.hidden = !ver;
+          if (ver) n++;
+        }
+        for (const b of botones) b.setAttribute('aria-pressed', String(b.dataset.filtro === id));
+        cuenta.textContent = `${n} ${n === 1 ? 'vino' : 'vinos'}`;
+      };
+      // Las tarjetas se recolocan animadas donde el navegador lo sabe hacer.
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (document.startViewTransition && !reduce) document.startViewTransition(cambiar);
+      else cambiar();
+    };
+
+    caja.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filtro]');
+      if (!b) return;
+      aplicar(b.dataset.filtro!);
+      history.replaceState(history.state, '', b.dataset.filtro === 'todos' ? location.pathname : `#${b.dataset.filtro}`);
+    });
+
+    const inicial = location.hash.slice(1);
+    if (botones.some((b) => b.dataset.filtro === inicial)) aplicar(inicial);
+  }
+  document.addEventListener('astro:page-load', montarFiltros);
+</script>
+
 <style>
-  .portada {
-    position: relative;
-    display: grid;
-    align-items: end;
-    min-height: 62svh;
-    padding-block: var(--e-7) var(--e-5);
-    isolation: isolate;
-    overflow: hidden;
-  }
-
-  .portada__foto {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-  }
-
-  .portada__foto :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .portada::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(
-      0deg,
-      var(--azabache) 4%,
-      color-mix(in srgb, var(--azabache) 62%, transparent) 48%,
-      color-mix(in srgb, var(--azabache) 45%, transparent) 100%
-    );
-  }
-
-  .portada__titulo {
-    font-size: var(--t-5);
-    margin-block: 0.3em 0.45em;
-  }
-
-  .portada__entrada {
-    max-width: 36rem;
-    font-size: var(--t-1);
-    color: color-mix(in srgb, var(--albariza) 84%, transparent);
-  }
-
-  .grupo__cabecera {
-    max-width: 42rem;
-    margin-bottom: var(--e-4);
-  }
-
-  .grupo__titulo {
-    font-size: var(--t-3);
-    margin-block: 0.3em 0.4em;
-  }
-
-  .grupo__entrada {
-    color: var(--texto-tenue);
-  }
-
   .catalogo {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--e-2);
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    padding-block: clamp(32px, 5vw, 72px) clamp(64px, 8vw, 112px);
   }
 
-  .catalogo--dos {
-    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  .catalogo__cabeza {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    align-items: end;
+    gap: 24px 48px;
   }
 
-  .tarjeta {
-    height: 100%;
-    text-decoration: none;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    background: var(--azabache-90);
-    border: 1px solid var(--filete);
+  .catalogo__titulo {
+    margin-top: 16px;
+  }
+
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: clamp(28px, 4vw, 48px);
+  }
+
+  .filtro {
+    min-height: 44px;
+    padding: 0 20px;
+    border: 2px solid rgba(23, 20, 18, 0.2);
+    border-radius: 999px;
+    background: transparent;
+    font-size: 0.9375rem;
+    font-weight: 700;
     transition:
-      border-color 0.5s var(--salida),
-      transform 0.5s var(--salida);
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s;
   }
 
-  .tarjeta:hover,
-  .tarjeta:focus-visible {
-    border-color: color-mix(in srgb, var(--oro) 65%, transparent);
-    transform: translateY(-4px);
+  .filtro:hover {
+    border-color: var(--hierro);
   }
 
-  .tarjeta__foto {
-    margin: 0;
-    overflow: hidden;
-    background: color-mix(in srgb, var(--azabache) 88%, var(--caoba));
+  .filtro[aria-pressed='true'] {
+    background: var(--hierro);
+    border-color: var(--hierro);
+    color: var(--cal);
   }
 
-  .tarjeta__foto :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: contain;
-    padding: var(--e-3);
-    transition: scale 0.7s var(--salida);
+  .filtros__cuenta {
+    margin-left: auto;
+    font-family: var(--fraunces);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--texto-2);
   }
 
-  .tarjeta:hover .tarjeta__foto :global(img) {
-    scale: 1.06;
-  }
-
-  .tarjeta__cuerpo {
-    padding: var(--e-3);
+  .rejilla {
     display: grid;
-    gap: 0.5rem;
-    align-content: start;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 24px);
+    margin-top: 32px;
+    list-style: none;
+    padding: 0;
   }
 
-  .tarjeta__nombre {
-    font-size: var(--t-1);
+  .rejilla > li {
+    display: flex;
   }
 
-  .tarjeta__gancho {
-    color: var(--texto-tenue);
+  .rejilla > li > :global(.tarjeta) {
+    flex: 1;
   }
 
-  .tarjeta__precio {
-    font-size: var(--t--1);
-    color: var(--texto-tenue);
+  .catalogo__zocalo-interior {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 24px;
+    padding-block: 28px;
+    font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
   }
 
-  .tarjeta__precio strong {
-    font-family: var(--display);
-    font-weight: 400;
-    font-size: var(--t-1);
-    color: var(--albariza);
+  .catalogo__zocalo-interior p {
+    flex: 1;
   }
 
-  .tarjeta--pack {
-    border-color: color-mix(in srgb, var(--oro) 45%, transparent);
+  @media (max-width: 1100px) {
+    .rejilla {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
-  .tarjeta__boton {
-    margin-top: 0.5rem;
-    justify-content: center;
+  @media (max-width: 800px) {
+    .catalogo__cabeza {
+      grid-template-columns: 1fr;
+    }
+    .rejilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .filtros {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-right: calc(var(--margen) * -1);
+      padding-right: var(--margen);
+      scrollbar-width: none;
+    }
+    .filtro {
+      flex-shrink: 0;
+    }
+    .filtros__cuenta {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
   }
 </style>

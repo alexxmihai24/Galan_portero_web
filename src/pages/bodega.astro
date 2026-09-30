@@ -1,322 +1,178 @@
 ---
-import { Image, Picture } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-
+import PortadaPagina from '../components/PortadaPagina.astro';
+import Capitulo from '../components/Capitulo.astro';
+import Icono from '../components/Icono.astro';
 import patio from '../assets/fotos/patio.jpg';
 import campina from '../assets/fotos/pasera-montilla.jpg';
 import naveBotas from '../assets/fotos/solera-montilla.jpg';
 import solera from '../assets/fotos/solera.jpg';
 import vinedo from '../assets/fotos/vid-espaldera.jpg';
-
-const capitulos = [
-  {
-    sello: 'El origen',
-    titulo: 'La tradición a partir de la constancia',
-    parrafos: [
-      'Su origen se establece a mediados del siglo XX. Los fundadores, Don Antonio Galán López y Doña Soledad Portero Urbano, eran un matrimonio montillano dedicado a la labor en el campo.',
-      'Habían luchado por crecer, en distintas localizaciones de la campiña cordobesa, en proyectos que los llevaban a comprar, cultivar y recolectar, cambiando de tierras cuando surgía una posibilidad de mejora.',
-    ],
-    foto: campina,
-    alt: 'Tierras de labor de la campiña cordobesa, con Montilla sobre el cerro al fondo',
-  },
-  {
-    sello: 'La bodega',
-    titulo: 'Un negocio familiar',
-    parrafos: [
-      'En ese tiempo, con unos hijos ya dispuestos para ayudar en las labores familiares, se decidió fundar una pequeña bodega, un negocio familiar donde, a raíz de los estupendos viñedos de la comarca, elaborar vinos de calidad.',
-      'Los inicios fueron duros, luchando por encontrar un hueco en un mercado establecido y nada fácil, como es el del vino montillano.',
-    ],
-    foto: naveBotas,
-    alt: 'Nave de la bodega con las botas de roble apiladas en filas',
-  },
-  {
-    sello: 'La decisión',
-    titulo: 'Algo arriesgado pero ilusionante',
-    parrafos: [
-      'Como era lo más habitual, empezaron elaborando vinos finos, cuidando con esmero la elaboración, pero pronto se dieron cuenta de la dificultad, competencia y fluctuaciones de precios de estos mercados, y en consecuencia se decidieron por algo arriesgado pero ilusionante: elaborar vinos dulces Pedro Ximénez. Vinos elaborados a partir del soleado de la uva hasta la pasificación.',
-      'Con su viña, Antonio y sus hijos elaboraron con esfuerzo grandes vinos dulces y de reconocida calidad, aprovechando que el terreno, el clima, y sobre todo la variedad de la uva, Pedro Ximénez, se prestaban de manera única a elaborar el vino enseña desde entonces de la bodega.',
-    ],
-    foto: solera,
-    alt: 'Botas de Pedro Ximénez a contraluz en la penumbra de la bodega',
-  },
-];
 ---
 
 <Base
   titulo="La bodega"
   descripcion="Empresa familiar de Montilla fundada a mediados del siglo XX por Antonio Galán López y Soledad Portero Urbano. Soleras de más de 25 años y lagar propio."
 >
-  <header class="portada grano">
-    <div class="portada__foto">
-      <Picture formats={['avif']} fallbackFormat="webp"
-        src={patio}
-        alt="Patio encalado de la bodega en Montilla, con el zócalo amarillo y la torre al fondo"
-        widths={[720, 1200, 1800]}
-        sizes="100vw"
-        loading="eager"
-      />
-    </div>
-    <div class="contenedor portada__texto">
-      <p class="sello">Bienvenido a nuestro lagar</p>
-      <h1 class="portada__titulo display">Una familia,<br />una viña, un vino</h1>
-      <p class="portada__entrada">
-        Bodegas Galán Portero es una empresa familiar, ubicada en la localidad de Montilla dentro del marco
-        regulador de la denominación de origen protegida de Montilla-Moriles, afamada tierra de vinos.
-      </p>
-    </div>
-  </header>
+  <PortadaPagina
+    antetitulo="Bienvenido a nuestro lagar · Montilla"
+    imagen={patio}
+    alt="Patio encalado de la bodega en Montilla, con el zócalo amarillo y la torre al fondo"
+    pegatina="Desde 1950"
+  >
+    <Fragment slot="titulo">Una familia, <span class="cursiva">una viña, un vino.</span></Fragment>
+    <p>
+      Bodegas Galán Portero es una empresa familiar, ubicada en la localidad de Montilla dentro del marco regulador de
+      la denominación de origen protegida de Montilla-Moriles, afamada tierra de vinos.
+    </p>
+  </PortadaPagina>
 
-  <!-- ---------------------------------------------------------- entrada -->
-  <section class="papel seccion">
-    <div class="contenedor entrada">
-      <p class="sello">Soleras con más de 25 años</p>
-      <p class="entrada__texto capitular">
-        Criamos nuestros vinos con el mejor cuidado y atención, para ofrecer un producto de altísima calidad.
-        Fruto de una historia marcada por la constancia en el trabajo, de una variedad de uva y un terreno
-        hechos el uno para el otro, y gracias a la pasión por un trabajo artesanal transmitida de padres a
-        hijos.
-      </p>
-    </div>
-  </section>
-
-  <!-- --------------------------------------------------------- capítulos -->
-  <section class="capitulos">
+  <div class="zocalo cinta" aria-hidden="true" data-scroll-x>
     {
-      capitulos.map((c, i) => (
-        <article class={`capitulo${i % 2 === 1 ? ' capitulo--invertido' : ''}`}>
-          <div class="capitulo__texto revelar">
-            <p class="sello">{c.sello}</p>
-            <h2 class="capitulo__titulo display">{c.titulo}</h2>
-            <div class="lectura">
-              {c.parrafos.map((p) => (
-                <p>{p}</p>
-              ))}
-            </div>
-          </div>
-          <figure class="capitulo__foto revelar" data-retardo="1">
-            <Image
-              src={c.foto}
-              alt={c.alt}
-              widths={[520, 860, 1300]}
-              sizes="(max-width: 62rem) 92vw, 40rem"
-              loading="lazy"
-            />
-            <span class="capitulo__numero display" aria-hidden="true">
-              0{i + 1}
-            </span>
-          </figure>
-        </article>
+      [0, 1].map(() => (
+        <div class="cinta__pista cinta--bodega">
+          <span>Soleras con más de 25 años</span>
+          <Icono nombre="sol" tam={36} />
+          <span class="fraunces">una familia</span>
+          <Icono nombre="sol" tam={36} />
+          <span>Lagar El Puntal</span>
+          <Icono nombre="sol" tam={36} />
+          <span class="fraunces">de padres a hijos</span>
+          <Icono nombre="sol" tam={36} />
+        </div>
       ))
     }
+  </div>
+
+  <section class="seccion contenedor">
+    <p class="entrada revela">
+      Criamos nuestros vinos con el mejor cuidado y atención, para ofrecer un producto de altísima calidad. Fruto de una
+      historia marcada por la constancia en el trabajo, de una variedad de uva y un terreno
+      <span class="cursiva">hechos el uno para el otro,</span> y gracias a la pasión por un trabajo artesanal transmitida
+      de padres a hijos.
+    </p>
   </section>
 
-  <!-- ------------------------------------------------------------ cierre -->
-  <section class="cierre">
-    <div class="cierre__foto">
-      <Image
-        src={vinedo}
-        alt="Viñedo propio en espaldera bajo el cielo de la campiña"
-        widths={[720, 1200, 1800]}
-        sizes="100vw"
-        loading="lazy"
-      />
-    </div>
-    <div class="cierre__panel grano">
-      <div class="contenedor cierre__texto">
-        <p class="sello">Viña Cangilones &middot; Lagar El Puntal</p>
-        <h2 class="cierre__titulo display">Somos productores<br />con lagar propio</h2>
-        <p class="lectura">
-          Desde mediados del siglo pasado hemos ido evolucionando y tomando experiencia para lograr
-          desarrollar una gama propia de los vinos generosos de la Denominación de Origen Protegida
-          Montilla-Moriles, siempre manteniendo nuestros máximos estándares de calidad.
-        </p>
-        <div class="cierre__acciones">
-          <a class="boton boton--solido" href="/vinos">
-            Ver los vinos
-            <span class="boton__flecha" aria-hidden="true">&rarr;</span>
-          </a>
-          <a class="boton" href="/produccion">Cómo lo hacemos</a>
-        </div>
+  <Capitulo antetitulo="El origen" numero="01" imagen={campina} alt="Tierras de labor de la campiña cordobesa, con Montilla sobre el cerro al fondo">
+    <Fragment slot="titulo">La tradición a partir <span class="cursiva">de la constancia.</span></Fragment>
+    <p>
+      Su origen se establece a mediados del siglo XX. Los fundadores, Don Antonio Galán López y Doña Soledad Portero
+      Urbano, eran un matrimonio montillano dedicado a la labor en el campo.
+    </p>
+    <p>
+      Habían luchado por crecer, en distintas localizaciones de la campiña cordobesa, en proyectos que los llevaban a
+      comprar, cultivar y recolectar, cambiando de tierras cuando surgía una posibilidad de mejora.
+    </p>
+  </Capitulo>
+
+  <Capitulo antetitulo="La bodega" numero="02" invertido imagen={naveBotas} alt="Nave de la bodega con las botas de roble apiladas en filas">
+    <Fragment slot="titulo">Un negocio <span class="cursiva">familiar.</span></Fragment>
+    <p>
+      En ese tiempo, con unos hijos ya dispuestos para ayudar en las labores familiares, se decidió fundar una pequeña
+      bodega, un negocio familiar donde, a raíz de los estupendos viñedos de la comarca, elaborar vinos de calidad.
+    </p>
+    <p>
+      Los inicios fueron duros, luchando por encontrar un hueco en un mercado establecido y nada fácil, como es el del
+      vino montillano.
+    </p>
+  </Capitulo>
+
+  <Capitulo antetitulo="La decisión" numero="03" imagen={solera} alt="Botas de Pedro Ximénez a contraluz en la penumbra de la bodega">
+    <Fragment slot="titulo">Algo arriesgado <span class="cursiva">pero ilusionante.</span></Fragment>
+    <p>
+      Como era lo más habitual, empezaron elaborando vinos finos, cuidando con esmero la elaboración, pero pronto se
+      dieron cuenta de la dificultad, competencia y fluctuaciones de precios de estos mercados, y en consecuencia se
+      decidieron por algo arriesgado pero ilusionante: elaborar vinos dulces Pedro Ximénez. Vinos elaborados a partir del
+      soleado de la uva hasta la pasificación.
+    </p>
+    <p>
+      Con su viña, Antonio y sus hijos elaboraron con esfuerzo grandes vinos dulces y de reconocida calidad,
+      aprovechando que el terreno, el clima, y sobre todo la variedad de la uva, Pedro Ximénez, se prestaban de manera
+      única a elaborar el vino enseña desde entonces de la bodega.
+    </p>
+  </Capitulo>
+
+  <section class="cierre oscuro">
+    <Picture src={vinedo} formats={['avif', 'webp']} class="cierre__foto" alt="Viñedo propio en espaldera bajo el cielo de la campiña" widths={[640, 1024, 1600]} sizes="100vw" />
+    <div class="contenedor cierre__caja">
+      <p class="antetitulo">Viña Cangilones · Lagar El Puntal</p>
+      <h2 class="titular titular--2">Somos productores <span class="cursiva">con lagar propio.</span></h2>
+      <p class="lectura">
+        Desde mediados del siglo pasado hemos ido evolucionando y tomando experiencia para lograr desarrollar una gama
+        propia de los vinos generosos de la Denominación de Origen Protegida Montilla-Moriles, siempre manteniendo
+        nuestros máximos estándares de calidad.
+      </p>
+      <div class="cierre__acciones">
+        <a class="boton boton--albero" href="/vinos">Ver los vinos <Icono nombre="flecha" /></a>
+        <a class="boton boton--contorno-claro" href="/produccion">Cómo lo hacemos</a>
       </div>
     </div>
   </section>
 </Base>
 
 <style>
-  .portada {
-    position: relative;
-    display: grid;
-    align-items: end;
-    min-height: 68svh;
-    padding-block: var(--e-7) var(--e-5);
-    isolation: isolate;
-    overflow: hidden;
+  .cinta--bodega {
+    padding-block: 18px;
+    font-size: clamp(1.6rem, 3vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
   }
 
-  .portada__foto {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
+  .cinta--bodega .fraunces {
+    font-style: italic;
+    font-weight: 340;
   }
-
-  .portada__foto :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .portada::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(
-      0deg,
-      var(--azabache) 4%,
-      color-mix(in srgb, var(--azabache) 66%, transparent) 50%,
-      color-mix(in srgb, var(--azabache) 42%, transparent) 100%
-    );
-  }
-
-  .portada__titulo {
-    font-size: var(--t-5);
-    margin-block: 0.3em 0.45em;
-  }
-
-  .portada__entrada {
-    max-width: 38rem;
-    font-size: var(--t-1);
-    color: color-mix(in srgb, var(--albariza) 84%, transparent);
-  }
-
-  /* --------------------------------------------------------- entrada */
 
   .entrada {
-    max-width: 46rem;
+    max-width: 72rem;
+    font-size: clamp(1.7rem, 2.8vw + 0.5rem, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
   }
-
-  .entrada__texto {
-    font-family: var(--display);
-    font-size: var(--t-2);
-    line-height: 1.35;
-    margin-top: var(--e-2);
-  }
-
-  /* -------------------------------------------------------- capítulos */
-
-  .capitulos {
-    display: grid;
-    gap: var(--e-6);
-    padding-block: var(--e-6);
-  }
-
-  @media (width < 48rem) {
-    .capitulos {
-      gap: var(--e-5);
-      padding-block: var(--e-5);
-    }
-  }
-
-  .capitulo {
-    width: min(100% - 2.5rem, var(--ancho));
-    margin-inline: auto;
-    display: grid;
-    gap: var(--e-3);
-    align-items: center;
-  }
-
-  @media (width >= 48rem) {
-    .capitulo {
-      width: min(100% - 5rem, var(--ancho));
-    }
-  }
-
-  @media (width >= 62rem) {
-    .capitulo {
-      grid-template-columns: 1fr 1.15fr;
-      gap: var(--e-5);
-    }
-
-    .capitulo--invertido .capitulo__texto {
-      order: 2;
-    }
-  }
-
-  .capitulo__titulo {
-    font-size: var(--t-3);
-    margin-block: 0.3em 0.5em;
-  }
-
-  .capitulo__foto {
-    position: relative;
-    margin: 0;
-    overflow: hidden;
-  }
-
-  .capitulo__foto :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    transition: scale 1s var(--salida);
-  }
-
-  .capitulo__foto:hover :global(img) {
-    scale: 1.04;
-  }
-
-  /* Número de capítulo mordiendo la esquina de la foto */
-  .capitulo__numero {
-    position: absolute;
-    left: -0.06em;
-    bottom: -0.28em;
-    font-size: clamp(5rem, 12vw, 10rem);
-    line-height: 1;
-    color: transparent;
-    -webkit-text-stroke: 1px color-mix(in srgb, var(--albariza) 55%, transparent);
-    pointer-events: none;
-  }
-
-  /* ---------------------------------------------------------- cierre */
 
   .cierre {
     position: relative;
-    display: grid;
+    display: flex;
+    align-items: flex-end;
+    min-height: 720px;
+    margin-top: clamp(40px, 6vw, 80px);
+    overflow: hidden;
   }
 
-  .cierre__foto,
-  .cierre__panel {
-    grid-area: 1 / 1;
-  }
-
-  .cierre__foto :global(img) {
+  .cierre :global(.cierre__foto) {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    min-height: 30rem;
     object-fit: cover;
   }
 
-  .cierre__panel {
+  .cierre::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(28, 17, 12, 0.1) 0%, rgba(28, 17, 12, 0.92) 70%);
+  }
+
+  .cierre__caja {
     position: relative;
+    z-index: 2;
     display: grid;
-    align-items: center;
-    background: color-mix(in srgb, var(--azabache) 82%, transparent);
+    justify-items: start;
+    gap: 22px;
+    padding-block: 96px 72px;
   }
 
-  .cierre__texto {
-    padding-block: var(--e-5);
-    max-width: 46rem;
-  }
-
-  .cierre__titulo {
-    font-size: var(--t-4);
-    margin-block: 0.3em 0.5em;
+  .cierre__caja .lectura {
+    color: #e3d8c8;
   }
 
   .cierre__acciones {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--e-2);
-    margin-top: var(--e-3);
+    gap: 12px;
   }
 </style>

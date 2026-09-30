@@ -1,0 +1,55 @@
+---
+import Base from '../../layouts/Base.astro';
+import CajaCuenta from '../../components/CajaCuenta.astro';
+import { anotarFallo, bloqueado, mensajeAuth, normalizarEmail, olvidarFallos, rutaSegura, usuarioDe } from '../../lib/auth';
+
+export const prerender = false;
+
+const volver = rutaSegura(Astro.url.searchParams.get('volver'));
+if (Astro.locals.usuario) return Astro.redirect(volver);
+
+const supabase = Astro.locals.supabase; // null si Supabase no está configurado
+let error = '';
+let email = '';
+if (Astro.request.method === 'POST' && supabase) {
+  const datos = await Astro.request.formData();
+  email = normalizarEmail(String(datos.get('email') ?? ''));
+  if (bloqueado(email)) {
+    error = 'Demasiados intentos. Espera 15 minutos y vuelve a probar.';
+    Astro.response.status = 429;
+  } else {
+    const { data, error: e } = await supabase.auth.signInWithPassword({ email, password: String(datos.get('password') ?? '') });
+    if (!e) {
+      olvidarFallos(email);
+      const usuario = usuarioDe(data.user);
+      return Astro.redirect(usuario.rol === 'admin' && volver === '/cuenta' ? '/admin' : volver);
+    }
+    if (e.code === 'invalid_credentials') anotarFallo(email);
+    error = mensajeAuth(e);
+    Astro.response.status = e.status === 429 ? 429 : 400;
+  }
+}
+const conVolver = (ruta: string) => `${ruta}${volver !== '/cuenta' ? `?volver=${encodeURIComponent(volver)}` : ''}`;
+---
+
+<Base titulo="Entrar" descripcion="Entra en tu cuenta de Bodegas Galán Portero para pagar y seguir tus pedidos." privada>
+  <CajaCuenta antetitulo="Tu cuenta">
+    <h1 class="titular titular--2">Hola <span class="cursiva">de nuevo.</span></h1>
+    {volver === '/cesta' && <p class="aviso aviso--info">Entra o crea tu cuenta para pagar tu cesta. Tus vinos te esperan.</p>}
+    {!supabase && <p class="aviso aviso--error">Las cuentas de cliente todavía no están configuradas en esta tienda.</p>}
+    <form method="post" data-astro-reload>
+      {error && <p class="aviso aviso--error" role="alert">{error}</p>}
+      <div class="campo">
+        <label for="email">Correo electrónico</label>
+        <input id="email" name="email" type="email" autocomplete="email" required value={email} />
+      </div>
+      <div class="campo">
+        <label for="password">Contraseña</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+      </div>
+      <button class="boton boton--primario boton--bloque" type="submit" disabled={!supabase}>Entrar</button>
+    </form>
+    <p><a class="enlace" href="/cuenta/recuperar">¿Has olvidado tu contraseña?</a></p>
+    <p>¿Primera vez? <a class="enlace" href={conVolver('/cuenta/registro')}>Crea tu cuenta</a> en un minuto.</p>
+  </CajaCuenta>
+</Base>
