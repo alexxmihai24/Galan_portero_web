@@ -18,6 +18,8 @@ import patio from '../assets/fotos/patio.jpg';
 import escudo from '../assets/marca/escudo-tinta.png';
 
 export const prerender = false; // precios y stock salen de la base de datos
+// Por eso sus fotos se generan al pedirlas (/_image) y no al compilar: solo WebP, porque AVIF
+// tarda hasta 4 s en frío en Vercel tras cada despliegue y en el móvil se ven huecos vacíos.
 
 const { vinos, pack } = await catalogo();
 const esencias = vinos.filter((v) => v.gama === '5 Essences');
@@ -39,7 +41,7 @@ const pasos = [
   <!-- ============================================================ HERO -->
   <section class="hero contenedor" aria-labelledby="hero-titulo">
     <div class="hero__texto">
-      <p class="antetitulo">Montilla · Córdoba · D.O.P. Montilla-Moriles</p>
+      <p class="antetitulo">Montilla · Córdoba · <span style="white-space: nowrap">D.O.P. Montilla-Moriles</span></p>
       <h1 id="hero-titulo" class="titular titular--hero hero__titulo">
         <span class="hero__linea">Se hace</span>
         <span class="hero__linea hero__linea--sol">
@@ -61,7 +63,7 @@ const pasos = [
       <div class="hero__arco">
         <Picture
           src={pasera}
-          formats={['avif', 'webp']}
+          formats={['webp']}
           alt="Uva Pedro Ximénez soleándose en la pasera, con Montilla al fondo"
           width={560}
           height={744}
@@ -107,7 +109,7 @@ const pasos = [
   <section class="seccion contenedor manifiesto" aria-labelledby="manifiesto-titulo">
     <p class="antetitulo revela">Nuestra casa · desde 1950</p>
     <h2 id="manifiesto-titulo" class="manifiesto__frase revela">
-      Fruto de una historia marcada por la constancia en el trabajo, de una variedad de uva y un terreno
+      Fruto de una historia marcada por la constancia en el trabajo, de una variedad de uva y un terreno{" "}
       <span class="cursiva">hechos el uno para el otro.</span>
     </h2>
     <ul class="cifras" role="list">
@@ -192,7 +194,7 @@ const pasos = [
       <div class="bodega__fotos">
         <Picture
           src={copas}
-          formats={['avif', 'webp']}
+          formats={['webp']}
           class="bodega__copas"
           alt="Cuatro catavinos con vinos de ámbar a azabache sobre una bota"
           widths={[480, 720, 1000, 1280]}
@@ -296,7 +298,7 @@ const pasos = [
   <section class="visita diferido" aria-labelledby="visita-titulo">
     <Picture
       src={patio}
-      formats={['avif', 'webp']}
+      formats={['webp']}
       class="visita__foto"
       alt="Patio del cortijo con las paredes encaladas, el zócalo albero y la torre"
       widths={[640, 1024, 1440, 2000]}
