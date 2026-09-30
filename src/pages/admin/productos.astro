@@ -100,7 +100,7 @@ const lista = [...(await articulos(true)).values()]; // sin caché: el admin ve 
   .admin {
     display: grid;
     gap: 24px;
-    padding-block: clamp(32px, 5vw, 64px) clamp(64px, 8vw, 112px);
+    padding-block: clamp(32px, calc(5vw / var(--zoom)), 64px) clamp(64px, calc(8vw / var(--zoom)), 112px);
   }
 
   .producto {
@@ -131,8 +131,8 @@ const lista = [...(await articulos(true)).values()]; // sin caché: el admin ve 
   }
 
   .interruptor input {
-    width: 24px;
-    height: 24px;
+    width: calc(24px / var(--zoom));
+    height: calc(24px / var(--zoom));
     accent-color: var(--persiana);
   }
 

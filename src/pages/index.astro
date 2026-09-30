@@ -325,12 +325,12 @@ const pasos = [
   .hero {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 560px);
-    gap: clamp(32px, 4vw, 56px);
-    padding-top: clamp(24px, 4vw, 56px);
+    gap: clamp(32px, calc(4vw / var(--zoom)), 56px);
+    padding-top: clamp(24px, calc(4vw / var(--zoom)), 56px);
   }
 
   .hero__texto {
-    padding-top: clamp(8px, 2vw, 24px);
+    padding-top: clamp(8px, calc(2vw / var(--zoom)), 24px);
     display: flex;
     flex-direction: column;
   }
@@ -428,7 +428,7 @@ const pasos = [
       .hero__sol {
         animation: sol-sube linear both;
         animation-timeline: scroll(root);
-        animation-range: 0 70vh;
+        animation-range: 0 calc(70vh / var(--zoom));
       }
       .hero__arco {
         animation: arco-abre linear both;
@@ -498,11 +498,11 @@ const pasos = [
 
   /* ---------------------------------------------------------------- cinta */
   .hero-cinta {
-    padding-block: clamp(10px, 1.6vw, 24px);
+    padding-block: clamp(10px, calc(1.6vw / var(--zoom)), 24px);
   }
 
   .cinta__grande {
-    font-size: clamp(2.4rem, 5.6vw, 5.25rem);
+    font-size: clamp(2.4rem, calc(5.6vw / var(--zoom)), 5.25rem);
     font-weight: 800;
     letter-spacing: -0.05em;
   }
@@ -511,14 +511,14 @@ const pasos = [
     font-family: var(--fraunces);
     font-style: italic;
     font-weight: 340;
-    font-size: clamp(2.6rem, 6vw, 5.6rem);
+    font-size: clamp(2.6rem, calc(6vw / var(--zoom)), 5.6rem);
   }
 
   /* ---------------------------------------------------------------- manifiesto */
   .manifiesto__frase {
     margin-top: 24px;
     max-width: 74rem;
-    font-size: clamp(1.9rem, 3.2vw + 0.6rem, 3.25rem);
+    font-size: clamp(1.9rem, calc(3.2vw / var(--zoom)) + 0.6rem, 3.25rem);
     font-weight: 600;
     letter-spacing: -0.03em;
     line-height: 1.12;
@@ -528,7 +528,7 @@ const pasos = [
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
-    margin-top: clamp(40px, 5vw, 72px);
+    margin-top: clamp(40px, calc(5vw / var(--zoom)), 72px);
     list-style: none;
     padding: 0;
   }
@@ -597,7 +597,7 @@ const pasos = [
   }
 
   .cifra__num {
-    font-size: clamp(4.4rem, 7vw, 7.5rem);
+    font-size: clamp(4.4rem, calc(7vw / var(--zoom)), 7.5rem);
     font-weight: 800;
     letter-spacing: -0.06em;
     line-height: 0.85;
@@ -620,7 +620,7 @@ const pasos = [
       padding: 20px;
     }
     .cifra__num {
-      font-size: 12.5vw;
+      font-size: calc(12.5vw / var(--zoom));
     }
     .cifra__pie {
       font-size: 0.75rem;
@@ -640,7 +640,7 @@ const pasos = [
      Por defecto: carrusel con scroll-snap y flechas. En escritorio con soporte:
      la sección se queda fija y el scroll vertical desliza las tarjetas. */
   .proceso__fijo {
-    padding-block: clamp(72px, 8vw, 104px);
+    padding-block: clamp(72px, calc(8vw / var(--zoom)), 104px);
   }
 
   .proceso__cabeza {
@@ -700,7 +700,7 @@ const pasos = [
 
   .paso {
     position: relative;
-    width: clamp(260px, 72vw, 420px);
+    width: clamp(260px, calc(72vw / var(--zoom)), 420px);
     scroll-snap-align: start;
     scroll-margin-left: var(--margen);
   }
@@ -742,13 +742,13 @@ const pasos = [
   @media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
       .proceso {
-        height: 220vh;
+        height: calc(220vh / var(--zoom));
         view-timeline-name: --proceso;
       }
       .proceso__fijo {
         position: sticky;
         top: 0;
-        height: 100vh;
+        height: calc(100vh / var(--zoom));
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -783,10 +783,10 @@ const pasos = [
         animation-range: contain 0% contain 100%;
       }
       .paso {
-        width: min(420px, 30vw);
+        width: min(420px, calc(30vw / var(--zoom)));
       }
       .paso__foto {
-        height: min(460px, 46vh);
+        height: min(460px, calc(46vh / var(--zoom)));
         aspect-ratio: auto;
       }
     }
@@ -794,7 +794,7 @@ const pasos = [
 
   @keyframes desliza {
     to {
-      translate: calc(-100% + 100vw - 16px) 0;
+      translate: calc(-100% + calc(100vw / var(--zoom)) - 16px) 0;
     }
   }
 
@@ -808,7 +808,7 @@ const pasos = [
   .bodega__rejilla {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 640px);
-    gap: clamp(48px, 7vw, 96px);
+    gap: clamp(48px, calc(7vw / var(--zoom)), 96px);
     align-items: start;
   }
 
@@ -1235,7 +1235,7 @@ const pasos = [
       display: none;
     }
     .bloque {
-      flex: 0 0 min(300px, 80vw);
+      flex: 0 0 min(300px, calc(80vw / var(--zoom)));
       min-height: 400px;
       padding: 26px;
       scroll-snap-align: start;
@@ -1260,7 +1260,7 @@ const pasos = [
     flex-direction: column;
     align-items: flex-start;
     gap: 24px;
-    padding-right: clamp(0px, 3vw, 40px);
+    padding-right: clamp(0px, calc(3vw / var(--zoom)), 40px);
   }
 
   .marques__cursiva {
@@ -1310,7 +1310,7 @@ const pasos = [
     display: grid;
     gap: 18px;
     width: min(100%, 520px);
-    padding: clamp(28px, 4vw, 44px);
+    padding: clamp(28px, calc(4vw / var(--zoom)), 44px);
     border-radius: var(--radio-g);
     background: var(--cal);
   }

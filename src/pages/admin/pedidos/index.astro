@@ -78,7 +78,7 @@ const filtros: { valor?: Estado; texto: string }[] = [
   .admin {
     display: grid;
     gap: 28px;
-    padding-block: clamp(32px, 5vw, 64px) clamp(64px, 8vw, 112px);
+    padding-block: clamp(32px, calc(5vw / var(--zoom)), 64px) clamp(64px, calc(8vw / var(--zoom)), 112px);
   }
 
   .filtros {

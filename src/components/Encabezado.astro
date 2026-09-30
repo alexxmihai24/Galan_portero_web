@@ -295,7 +295,7 @@ const actual = (href: string) => !href.includes('#') && (ruta === href || ruta.s
   .menu-movil {
     width: 100%;
     max-width: none;
-    height: 100dvh;
+    height: calc(100dvh / var(--zoom));
     max-height: none;
     margin: 0;
     padding: 0;
@@ -365,7 +365,7 @@ const actual = (href: string) => !href.includes('#') && (ruta === href || ruta.s
     gap: 14px;
     padding: 10px 0;
     border-bottom: 1px solid var(--linea);
-    font-size: clamp(2.2rem, 9vw, 3.4rem);
+    font-size: clamp(2.2rem, calc(9vw / var(--zoom)), 3.4rem);
     font-weight: 800;
     letter-spacing: -0.05em;
     line-height: 1;

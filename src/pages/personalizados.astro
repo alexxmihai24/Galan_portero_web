@@ -108,7 +108,7 @@ const pasos = [
 
   .ocasiones__lista .pegatina {
     border-color: var(--cal-2);
-    font-size: clamp(1.3rem, 2.4vw, 2.2rem);
+    font-size: clamp(1.3rem, calc(2.4vw / var(--zoom)), 2.2rem);
     padding: 10px 26px;
   }
 
@@ -164,7 +164,7 @@ const pasos = [
   .cierre__rejilla {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(32px, 5vw, 72px);
+    gap: clamp(32px, calc(5vw / var(--zoom)), 72px);
     align-items: center;
   }
 

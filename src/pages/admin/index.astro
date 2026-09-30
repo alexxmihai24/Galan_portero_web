@@ -81,8 +81,8 @@ const stockBajo = [...catalogo.values()].filter((a) => a.activo && a.stock !== n
 <style>
   .admin {
     display: grid;
-    gap: clamp(28px, 4vw, 48px);
-    padding-block: clamp(32px, 5vw, 64px) clamp(64px, 8vw, 112px);
+    gap: clamp(28px, calc(4vw / var(--zoom)), 48px);
+    padding-block: clamp(32px, calc(5vw / var(--zoom)), 64px) clamp(64px, calc(8vw / var(--zoom)), 112px);
   }
 
   .stats {
@@ -121,7 +121,7 @@ const stockBajo = [...catalogo.values()].filter((a) => a.activo && a.stock !== n
   }
 
   .stat__num {
-    font-size: clamp(2.8rem, 4.5vw, 4.4rem);
+    font-size: clamp(2.8rem, calc(4.5vw / var(--zoom)), 4.4rem);
     font-weight: 800;
     letter-spacing: -0.05em;
     line-height: 0.9;
@@ -129,13 +129,13 @@ const stockBajo = [...catalogo.values()].filter((a) => a.activo && a.stock !== n
   }
 
   .stat__num--dinero {
-    font-size: clamp(2rem, 3vw, 3rem);
+    font-size: clamp(2rem, calc(3vw / var(--zoom)), 3rem);
   }
 
   .admin__rejilla {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
-    gap: clamp(24px, 4vw, 48px);
+    gap: clamp(24px, calc(4vw / var(--zoom)), 48px);
     align-items: start;
   }
 

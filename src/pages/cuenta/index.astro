@@ -108,7 +108,7 @@ const aviso = Astro.url.searchParams.has('bienvenida')
 
 <style>
   .cuenta {
-    padding-block: clamp(32px, 5vw, 72px) clamp(64px, 8vw, 112px);
+    padding-block: clamp(32px, calc(5vw / var(--zoom)), 72px) clamp(64px, calc(8vw / var(--zoom)), 112px);
   }
 
   .cuenta__aviso {
@@ -143,9 +143,9 @@ const aviso = Astro.url.searchParams.has('bienvenida')
   .cuenta__rejilla {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
-    gap: clamp(32px, 5vw, 64px);
+    gap: clamp(32px, calc(5vw / var(--zoom)), 64px);
     align-items: start;
-    margin-top: clamp(40px, 5vw, 64px);
+    margin-top: clamp(40px, calc(5vw / var(--zoom)), 64px);
   }
 
   .vacio {
@@ -153,7 +153,7 @@ const aviso = Astro.url.searchParams.has('bienvenida')
     justify-items: start;
     gap: 16px;
     margin-top: 20px;
-    padding: clamp(24px, 4vw, 40px);
+    padding: clamp(24px, calc(4vw / var(--zoom)), 40px);
     border-radius: var(--radio-g);
     background: var(--blanco);
   }

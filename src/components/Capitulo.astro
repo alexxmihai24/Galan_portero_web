@@ -32,9 +32,9 @@ const { antetitulo, imagen, alt, numero, invertido = false, entera = false } = A
   .capitulo {
     display: grid;
     grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
-    gap: clamp(32px, 6vw, 96px);
+    gap: clamp(32px, calc(6vw / var(--zoom)), 96px);
     align-items: center;
-    padding-block: clamp(40px, 5vw, 72px);
+    padding-block: clamp(40px, calc(5vw / var(--zoom)), 72px);
   }
 
   .capitulo--invertido {

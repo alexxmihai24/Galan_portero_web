@@ -67,7 +67,7 @@
   --grotesca: 'Bricolage Grotesque Variable', 'Grotesca respaldo', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --fraunces: 'Fraunces Variable', 'Fraunces respaldo', Georgia, 'Times New Roman', serif;
 
-  --margen: clamp(16px, 3.4vw, 48px);
+  --margen: clamp(16px, calc(3.4vw / var(--zoom)), 48px);
   --ancho: 1440px;
   --radio: 28px;
   --radio-g: 32px;
@@ -75,14 +75,26 @@
   --curva: cubic-bezier(0.2, 0.7, 0.2, 1);
 
   /* Escala: móvil → escritorio (valores del mockup en spec.md §4.2) */
-  --t-hero: clamp(4.1rem, 11vw + 1.2rem, 11.5rem);
-  --t-1: clamp(3rem, 8.5vw + 0.4rem, 9.4rem);
-  --t-2: clamp(2.6rem, 5vw + 0.8rem, 6rem);
-  --t-3: clamp(1.9rem, 2.6vw + 0.8rem, 3.3rem);
-  --t-4: clamp(1.35rem, 0.9vw + 1rem, 2rem);
-  --t-cuerpo: clamp(1rem, 0.25vw + 0.95rem, 1.1875rem);
+  --t-hero: clamp(4.1rem, calc(11vw / var(--zoom)) + 1.2rem, 11.5rem);
+  --t-1: clamp(3rem, calc(8.5vw / var(--zoom)) + 0.4rem, 9.4rem);
+  --t-2: clamp(2.6rem, calc(5vw / var(--zoom)) + 0.8rem, 6rem);
+  --t-3: clamp(1.9rem, calc(2.6vw / var(--zoom)) + 0.8rem, 3.3rem);
+  --t-4: clamp(1.35rem, calc(0.9vw / var(--zoom)) + 1rem, 2rem);
+  --t-cuerpo: clamp(1rem, calc(0.25vw / var(--zoom)) + 0.95rem, 1.1875rem);
 
+  --zoom: 1;
   color-scheme: light;
+}
+
+/* En ordenador todo el diseño se ve al 80 % (como el navegador con zoom al 80 %).
+   `zoom` también encoge las unidades de pantalla (vw, vh, dvh), así que cada uso las
+   divide por --zoom: `calc(100dvh / var(--zoom))` sigue ocupando toda la pantalla.
+   Y en JS, getBoundingClientRect() ya viene encogido (ver cesta.ts, volar()). */
+@media (min-width: 1025px) {
+  :root {
+    --zoom: 0.8;
+    zoom: var(--zoom);
+  }
 }
 
 /* ------------------------------------------------------------ base */
@@ -216,7 +228,7 @@ button {
 }
 
 .seccion {
-  padding-block: clamp(72px, 8vw + 20px, 120px);
+  padding-block: clamp(72px, calc(8vw / var(--zoom)) + 20px, 120px);
 }
 
 /* Secciones lejos del primer pantallazo: el navegador no las maqueta hasta que se acercan. */
@@ -430,7 +442,7 @@ button {
 
 .enlace {
   /* relleno vertical: más zona táctil sin mover el texto de alrededor */
-  padding-block: 3px;
+  padding-block: calc(5px / var(--zoom));
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 6px;
@@ -601,8 +613,8 @@ button {
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  gap: clamp(18px, 2.5vw, 36px);
-  padding-right: clamp(18px, 2.5vw, 36px);
+  gap: clamp(18px, calc(2.5vw / var(--zoom)), 36px);
+  padding-right: clamp(18px, calc(2.5vw / var(--zoom)), 36px);
 }
 
 .cinta__pista > * {
@@ -666,7 +678,7 @@ button {
 }
 
 .tarjeta__nombre {
-  font-size: clamp(1.2rem, 0.6vw + 1rem, 1.6rem);
+  font-size: clamp(1.2rem, calc(0.6vw / var(--zoom)) + 1rem, 1.6rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;

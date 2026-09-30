@@ -61,7 +61,7 @@ const navegacion = [
 <style>
   .pie {
     background: var(--hierro);
-    padding-block: clamp(56px, 6vw, 80px) 28px;
+    padding-block: clamp(56px, calc(6vw / var(--zoom)), 80px) 28px;
     overflow: hidden;
   }
 
@@ -120,12 +120,12 @@ const navegacion = [
   .pie__lista a {
     display: inline-flex;
     align-items: center;
-    min-height: 24px;
+    min-height: calc(24px / var(--zoom)); /* 24 px táctiles reales también con zoom */
   }
 
   .pie__gigante {
-    margin-top: clamp(40px, 5vw, 64px);
-    font-size: min(13.4vw, 12.25rem);
+    margin-top: clamp(40px, calc(5vw / var(--zoom)), 64px);
+    font-size: min(calc(13.4vw / var(--zoom)), 12.25rem);
     font-weight: 800;
     letter-spacing: -0.06em;
     line-height: 0.8;
@@ -150,7 +150,7 @@ const navegacion = [
   .pie__lista-linea a {
     display: inline-flex;
     align-items: center;
-    min-height: 24px;
+    min-height: calc(24px / var(--zoom));
   }
 
   .pie__lista-linea {

@@ -51,7 +51,7 @@ import { ENVIO_CENT, euros } from '../lib/pedido';
 
 <style>
   .cesta-pagina {
-    padding-block: clamp(32px, 5vw, 72px) clamp(64px, 8vw, 112px);
+    padding-block: clamp(32px, calc(5vw / var(--zoom)), 72px) clamp(64px, calc(8vw / var(--zoom)), 112px);
   }
 
   .cesta-pagina__titulo {
@@ -66,7 +66,7 @@ import { ENVIO_CENT, euros } from '../lib/pedido';
   .cesta-pagina__rejilla {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
-    gap: clamp(32px, 5vw, 72px);
+    gap: clamp(32px, calc(5vw / var(--zoom)), 72px);
     align-items: start;
     margin-top: 32px;
   }
@@ -74,7 +74,7 @@ import { ENVIO_CENT, euros } from '../lib/pedido';
   .cesta-pagina__lista {
     display: flex;
     flex-direction: column;
-    padding: clamp(20px, 3vw, 36px);
+    padding: clamp(20px, calc(3vw / var(--zoom)), 36px);
     border-radius: var(--radio-g);
     background: var(--blanco);
   }

@@ -116,18 +116,18 @@ const acciones: Record<Estado, string> = {
   .admin {
     display: grid;
     gap: 28px;
-    padding-block: clamp(32px, 5vw, 64px) clamp(64px, 8vw, 112px);
+    padding-block: clamp(32px, calc(5vw / var(--zoom)), 64px) clamp(64px, calc(8vw / var(--zoom)), 112px);
   }
 
   .rejilla {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
-    gap: clamp(24px, 4vw, 48px);
+    gap: clamp(24px, calc(4vw / var(--zoom)), 48px);
     align-items: start;
   }
 
   .caja {
-    padding: clamp(20px, 3vw, 32px);
+    padding: clamp(20px, calc(3vw / var(--zoom)), 32px);
     border-radius: var(--radio-g);
     background: var(--blanco);
   }

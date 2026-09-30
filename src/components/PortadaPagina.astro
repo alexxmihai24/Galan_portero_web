@@ -46,9 +46,9 @@ const { antetitulo, imagen, alt, pegatina } = Astro.props;
   .portada {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
-    gap: clamp(32px, 5vw, 72px);
+    gap: clamp(32px, calc(5vw / var(--zoom)), 72px);
     align-items: center;
-    padding-block: clamp(24px, 4vw, 56px) clamp(56px, 7vw, 96px);
+    padding-block: clamp(24px, calc(4vw / var(--zoom)), 56px) clamp(56px, calc(7vw / var(--zoom)), 96px);
   }
 
   .portada__texto {
@@ -58,7 +58,7 @@ const { antetitulo, imagen, alt, pegatina } = Astro.props;
   }
 
   .portada__titulo {
-    font-size: clamp(3.2rem, 7.5vw, 7.6rem);
+    font-size: clamp(3.2rem, calc(7.5vw / var(--zoom)), 7.6rem);
   }
 
   .portada__acciones {

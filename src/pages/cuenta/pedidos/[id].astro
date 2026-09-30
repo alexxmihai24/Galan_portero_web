@@ -131,7 +131,7 @@ const repetir = JSON.stringify(
   .detalle {
     display: grid;
     gap: 28px;
-    padding-block: 24px clamp(64px, 8vw, 112px);
+    padding-block: 24px clamp(64px, calc(8vw / var(--zoom)), 112px);
   }
 
   .migas {
@@ -144,7 +144,7 @@ const repetir = JSON.stringify(
   .migas a {
     display: inline-flex;
     align-items: center;
-    min-height: 24px;
+    min-height: calc(24px / var(--zoom));
     font-weight: 700;
     color: var(--hierro);
   }
@@ -152,14 +152,14 @@ const repetir = JSON.stringify(
   .gracias {
     display: grid;
     gap: 8px;
-    padding: clamp(24px, 4vw, 36px);
+    padding: clamp(24px, calc(4vw / var(--zoom)), 36px);
     border-radius: var(--radio-g);
     background: var(--persiana);
     color: var(--cal);
   }
 
   .gracias__titulo {
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(2rem, calc(4vw / var(--zoom)), 3rem);
     font-weight: 800;
     letter-spacing: -0.05em;
     line-height: 1;
@@ -228,12 +228,12 @@ const repetir = JSON.stringify(
   .detalle__rejilla {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
-    gap: clamp(24px, 4vw, 48px);
+    gap: clamp(24px, calc(4vw / var(--zoom)), 48px);
     align-items: start;
   }
 
   .detalle__lineas {
-    padding: clamp(20px, 3vw, 32px);
+    padding: clamp(20px, calc(3vw / var(--zoom)), 32px);
     border-radius: var(--radio-g);
     background: var(--blanco);
   }

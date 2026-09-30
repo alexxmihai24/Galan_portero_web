@@ -162,8 +162,15 @@ function volar(origen: HTMLImageElement | null | undefined) {
     c.classList.add('salta');
   });
   if (!origen || !destino || reduce()) return saltar();
-  const a = origen.getBoundingClientRect();
-  const b = destino.getBoundingClientRect();
+  // Con `zoom` en <html> (ordenador, global.css) el rect viene encogido y left/top/translate
+  // se vuelven a encoger: se pasa a px del diseño antes de usarlo.
+  const z = Number(getComputedStyle(document.documentElement).zoom) || 1;
+  const caja = (el: Element) => {
+    const r = el.getBoundingClientRect();
+    return { left: r.left / z, top: r.top / z, width: r.width / z, height: r.height / z };
+  };
+  const a = caja(origen);
+  const b = caja(destino);
   if (!a.width) return saltar();
   const clon = origen.cloneNode() as HTMLImageElement;
   Object.assign(clon.style, {
