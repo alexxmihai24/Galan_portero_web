@@ -36,6 +36,11 @@ export default defineConfig({
       SUPABASE_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
       STRIPE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       STRIPE_WEBHOOK_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
+      // Correos de pedido (Resend). CORREO_PEDIDOS: quién recibe los pedidos (varios, separados por comas).
+      // CORREO_REMITENTE: "Nombre <pedidos@dominio>" cuando el dominio esté verificado en Resend.
+      RESEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      CORREO_PEDIDOS: envField.string({ context: 'server', access: 'secret', optional: true }),
+      CORREO_REMITENTE: envField.string({ context: 'server', access: 'secret', optional: true }),
     },
   },
 });

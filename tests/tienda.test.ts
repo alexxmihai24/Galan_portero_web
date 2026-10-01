@@ -123,3 +123,25 @@ test('los errores de Supabase se traducen sin revelar detalles internos', () => 
   assert.match(auth.mensajeAuth({ status: 429 }), /Espera/);
   assert.match(auth.mensajeAuth({ code: 'algo_raro', status: 500 }), /Inténtalo de nuevo/);
 });
+
+test('correos del pedido: escapan lo que escribe el cliente y llevan totales y enlaces', async () => {
+  const { correoBodega, correoCliente } = await import('../src/lib/correo.ts');
+  const p = {
+    id: 42, usuario_id: null, email: 'ana@ejemplo.es', estado: 'pagado' as const,
+    subtotal_cent: 3400, envio_cent: 700, total_cent: 4100, stripe_sesion: 'cs_x',
+    envio_nombre: 'Ana <script>alert(1)</script>', envio_direccion: 'Calle "Mayor" 1, 14550 Montilla',
+    creado: '', pagado: '', actualizado: '',
+    lineas: [{ sku: 1, nombre: 'Solera <b>Fundador</b>', formato: 'Botella 50 cl', unidades: 2, precio_cent: 1700 }],
+  };
+  const b = correoBodega(p, 'https://tienda.example');
+  const c = correoCliente(p, 'https://tienda.example');
+  for (const html of [b.html, c.html]) {
+    assert.ok(!html.includes('<script>') && !html.includes('<b>Fundador'), 'HTML sin escapar');
+    assert.ok(html.includes('&#60;script&#62;') && html.includes('&#34;Mayor&#34;'));
+    assert.match(html, /41,00\s€/);
+  }
+  assert.match(b.subject, /^Nuevo pedido nº 42 · 41,00\s€$/);
+  assert.ok(b.html.includes('https://tienda.example/admin/pedidos/42') && b.text.includes('ana@ejemplo.es'));
+  assert.ok(c.html.includes('https://tienda.example/cuenta/pedidos/42') && !c.html.includes('/admin/'));
+  assert.equal(c.subject, 'Tu pedido nº 42 está confirmado');
+});
